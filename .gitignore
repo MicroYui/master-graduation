@@ -1,0 +1,18 @@
+# LaTeX build files
+*.aux
+*.bbl
+*.blg
+*.lof
+*.log
+*.lot
+*.fls
+*.out
+*.toc
+*.fdb_latexmk
+*.synctex.gz
+*.synctex
+*.pdf
+
+# Other common temporary files
+*~
+.DS_Store
