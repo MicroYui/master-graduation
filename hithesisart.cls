@@ -131,6 +131,8 @@
 \LoadClass[a4paper,UTF8,zihao=-4,scheme=plain]{ctexart}
 
 %% 各种宏包
+\RequirePackage{algorithmic}
+\RequirePackage{algorithm}
 \RequirePackage{etoolbox}
 \RequirePackage{ifxetex}
 \ifxetex
