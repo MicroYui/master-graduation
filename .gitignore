@@ -12,6 +12,7 @@
 *.synctex.gz
 *.synctex
 *.pdf
+!figures/*.pdf
 
 # Other common temporary files
 *~
