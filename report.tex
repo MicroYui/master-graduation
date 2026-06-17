@@ -16,7 +16,7 @@
 %      `\\//`   \\   \./    \\ /     //    \\./   \\   //   \\ |/ /
 %     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\documentclass[fontset=windows,toc=true,type=master,stage=opening,campus=harbin]{hithesisart}
+\documentclass[fontset=windows,toc=true,type=master,stage=midterm,campus=harbin]{hithesisart}
 % 此处选项中不要有空格
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 必填选项
@@ -39,6 +39,14 @@
 
 
 \graphicspath{{figures/}}
+
+% 目录中 section 项前距偏大，局部收紧 subsection 后接下一节时的空白。
+\makeatletter
+\patchcmd{\l@section}
+  {\addvspace{1.0em \@plus\p@}}
+  {\addvspace{0.25ex}}
+  {}{}
+\makeatother
 
 
 \begin{document}

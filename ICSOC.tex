@@ -1,0 +1,474 @@
+\documentclass[runningheads]{llncs}
+%
+\usepackage[T1]{fontenc}
+% T1 fonts will be used to generate the final print and online PDFs,
+% so please use T1 fonts in your manuscript whenever possible.
+% Other font encondings may result in incorrect characters.
+%
+\usepackage{graphicx}
+% Used for displaying a sample figure. If possible, figure files should
+% be included in EPS format.
+%
+% If you use the hyperref package, please uncomment the following two lines
+% to display URLs in blue roman font according to Springer's eBook style:
+\usepackage{color}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks,        % 链接显示为彩色
+    linkcolor=blue,     % 定义链接的颜色为蓝色
+    citecolor=blue,
+    urlcolor=blue,
+    pdfborder={0 0 0}  % 定义链接边框为无边框
+}
+\renewcommand\UrlFont{\color{blue}\rmfamily}
+\pdfobjcompresslevel=0
+\urlstyle{rm}
+%
+\usepackage{algorithmic}
+\usepackage{algorithm}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{marvosym}
+\usepackage{tabularx}
+\usepackage{subcaption}
+% \setlength{\textfloatsep}{12pt plus 1.0pt minus 2.0pt}
+\begin{document}
+%
+\title{\textbf{LEADR: A Lyapunov-based Energy-Aware Decentralized Routing Strategy for Continuous UAV Communication Services}}
+\titlerunning{A Lyapunov-based Energy-Aware Decentralized Routing Strategy}
+
+\author{Yifan Li \and Xiang He\textsuperscript{(\Letter)} \and Haomai Shi \and Zhongjie Wang}
+\authorrunning{Y. Li et al.}
+\institute{Faculty of Computing, Harbin Institute of Technology, Harbin, China\\
+\email{liyifan@stu.hit.edu.cn, hexiang@hit.edu.cn, shihaomai0109@163.com, rainy@hit.edu.cn}}
+
+\maketitle
+
+\begin{abstract}
+% 在灾后搜救等任务中，利用飞行自组织网络（FANET）快速构建并维持任务期间的通信服务至关重要。然而，一个由大量能量受限的无人机（UAV）所构成的动态网络，如何确保其通信服务在整个指定任务周期内能够持续可靠地运行，是一个挑战。任务过程中，任何无人机因能量过早耗尽而失效，不仅会造成经济损失，更可能导致通信服务的局部或全局性中断。现有的路由策略往往侧重于即时性能，却忽视了在整个任务期间网络能耗的均衡性与无人机的持续生存能力。本文提出了基于李雅普诺夫的能耗感知型分布式路由（LEADR）策略，通过结合李雅普诺夫优化框架和启发式算法，将贯穿任务全程的长期优化目标分解为每个无人机在每个时隙执行的低复杂度决策。其核心在于，在保障数据传输效率的同时，主动平衡网络能耗，从而最大化无人机网络的整体存活时间，确保通信服务在任务期间的连续性与稳定性。通过对比仿真验证了该方法的有效性，结果表明，LEADR在密集场景中显著优于基准策略。
+% In missions such as post-disaster search and rescue, the rapid establishment and sustainment of communication services via Flying Ad-hoc Networks (FANETs) is an effective approach. However, ensuring that a dynamic network composed of numerous energy-constrained Unmanned Aerial Vehicles (UAVs) can provide continuous and reliable communication services throughout a specified mission duration presents a significant challenge. During a mission, the failure of any UAV due to premature energy depletion not only incurs economic losses but can lead to partial or global disruptions of the communication service. Existing routing strategies often prioritize instantaneous performance, overlooking the balance of network-wide energy consumption and the sustained survivability of UAVs over the entire mission period.
+Flying Ad-hoc Networks (FANETs) provide essential emergency communication services in post-disaster scenarios by enabling data relay when terrestrial infrastructure is damaged.
+However, designing effective routing strategies presents a significant challenge, as they must simultaneously optimize data transmission efficiency and energy consumption. Poor routing decisions can create energy hotspots, leading to premature Unmanned Aerial Vehicle (UAV) failures and network fragmentation.
+Existing routing strategies predominantly focus on instantaneous performance metrics while neglecting long-term network survivability, often resulting in unbalanced energy consumption patterns.
+The core challenge lies in balancing immediate transmission efficiency with long-term energy sustainability under strict real-time constraints.
+This paper proposes Lyapunov-based Energy-Aware Distributed Routing (LEADR) strategy, which addresses this challenge by transforming the mission-long optimization problem into a series of low-complexity, per-timeslot decisions for each UAV. By integrating the Lyapunov drift-plus-penalty framework with geographic and energy-based heuristics, LEADR enables proactive energy balance management while maintaining high network throughput. Extensive simulations demonstrate that LEADR significantly outperforms baseline strategies, achieving superior network lifetime, aggregate throughput, energy balance, and lower packet loss rate, particularly in dense deployment scenarios.
+% This paper proposes a Lyapunov-based Energy-Aware Distributed Routing (LEADR) strategy. By combining the Lyapunov optimization framework with a heuristic algorithm, LEADR decomposes the long-term, mission-wide optimization objective into a series of low-complexity, per-timeslot decisions executed by each UAV. Its core principle is to proactively balance network energy consumption while ensuring data transmission efficiency, thereby maximizing the overall lifetime of the UAV network and guaranteeing the continuity and stability of communication services during the mission. The effectiveness of this method is validated through comparative simulations, with results demonstrating that LEADR significantly outperforms baseline strategies, particularly in dense scenarios.
+
+\keywords{Unmanned Aerial Vehicle \and Lyapunov Optimization \and Routing \and Power Control \and Flying Ad-hoc Network.}
+\end{abstract}
+%
+\section{Introduction}
+% 在地震、海啸等重大自然灾害发生后，传统的固定通信基础设施极易受到灾难性故障的影响，导致信息孤岛的形成，阻碍救援工作。在此背景下，飞行自组织网络（FANET）已成为一种关键的应急通信解决方案\cite{intro3, intro1, intro2}。由于无人机（UAV）具备的快速部署、高机动性以及不依赖地面设施的优势，能够迅速进入灾区上空组建临时的空中通信中继网络，为救援队和指挥中心提供至关重要的通信服务。
+In the aftermath of major natural disasters, such as earthquakes and tsunamis, terrestrial communication infrastructure is often rendered inoperable. This failure creates ``information islands'' that severely impede rescue operations. In this context, Flying Ad-Hoc Networks (FANETs) have emerged as a critical solution for emergency communications \cite{intro3}. Leveraging their inherent advantages of rapid deployment, high mobility, and independence from ground infrastructure, Unmanned Aerial Vehicles (UAVs) can be rapidly deployed to disaster zones to establish temporary aerial relay networks, thereby providing essential communication services for rescue teams and command centers.
+
+% 在典型的FANET应用场景中，无人机群协同工作，充当动态的空中通信基站。其核心任务是将灾区现场采集到的数据，如监控视频、传感器读数，通过多跳路由的方式，将这些数据可靠、高效地传输至远程数据中心\cite{intro4}。这项任务的成功不仅要求网络具备高吞吐量以承载大容量数据流，也对通信服务的连续性提出了严苛要求，因为无人机突然的能量耗尽可能导致服务中断\cite{intro11}。因此，保障网络在指定的任务周期内稳定运行，也是至关重要的。
+In typical FANET applications, guaranteeing the stable operation of the network throughout the entire specified mission duration is of paramount importance. To this end, a swarm of UAVs collaborates to function as dynamic aerial communication base stations. Their core mission is to reliably and efficiently relay data collected from the disaster site—such as surveillance videos and sensor readings—to a remote data center via multi-hop routing \cite{intro4}. The success of this mission, therefore, not only demands high network throughput to handle large data streams but also imposes stringent requirements on service continuity, as the sudden energy depletion of a UAV can cause critical service disruptions \cite{intro11}.
+
+% 为实现高效的数据路由，学术界已提出多种方案。传统的地理位置路由策略，如GPSR\cite{gpsr}，其贪婪的下一跳选择机制易导致“热点”无人机能量过早耗尽。为解决此问题，研究者们转向更智能的策略。基于强化学习的路由策略\cite{qtar,DRLFR,DRLRR}通过与环境交互来学习最优策略，但在拓扑结构频繁变化的FANET中，其收敛速度慢、样本效率低，且模型泛化能力不足，当场景变化时往往需要代价高昂的重训练。基于启发式算法的路由策略\cite{intro12,aco}虽然能够找到较优路径，但其迭代计算的过程使其难以满足灾后场景对实时决策的需求。基于李雅普诺夫优化的方法\cite{intro13,intro9}被用于网络控制，但现有工作主要聚焦于保障数据队列的稳定性以减小延迟，而未能有效解决网络长期的能耗管理这一核心挑战，无法从根本上保证整个任务周期的服务连续性。
+% A variety of academic schemes have been proposed for efficient data routing, yet each contends with significant limitations. Traditional geographic protocols, such as GPSR \cite{gpsr}, employ a greedy next-hop selection mechanism that can lead to the premature energy depletion of ``hotspot'' UAVs. Strategies based on heuristic algorithms \cite{intro12, aco} can find near-optimal paths, but their iterative process and high computational complexity make them impractical for real-time decision-making in large-scale FANETs. Reinforcement learning (RL)-based approaches \cite{qtar, DRLFR, DRLRR} learn an optimal policy through environmental interaction; however, in the highly dynamic topologies of FANETs, they are hampered by slow convergence, low sample efficiency, and poor generalization, often requiring costly retraining as scenarios change \cite{intro11}. Concurrently, methods based on Lyapunov optimization \cite{intro13, intro9} have been utilized for network control, but existing works focus primarily on guaranteeing data queue stability to reduce latency. They fail to effectively address the core challenge of long-term network energy management and thus cannot fundamentally guarantee service continuity throughout the entire mission.
+
+Existing solutions show significant limitations. Traditional geographic routing like GPSR \cite{gpsr} can create energy ``hotspots,'' leading to premature UAV failure. Heuristic algorithms \cite{intro12,aco} are often too computationally intensive for real-time decisions in dynamic FANETs. Reinforcement learning (RL)-based methods \cite{qtar,DRLFR,DRLRR} are hampered by slow convergence and poor generalization , while existing Lyapunov-based strategies \cite{intro13,intro9} have focused on data queue stability for low latency, failing to address the core challenge of long-term energy management for mission-long service continuity.
+
+\begin{figure} 
+\includegraphics[width=\textwidth]{uav_edit.pdf}
+\caption{Schematic diagram of UAV cluster collaborative work.}
+\label{fig:uav}
+\end{figure}
+
+% 上述方法的共同限制是它们倾向于针对瞬时性能进行优化，而忽略了决策对网络未来状态的长期影响。如图\ref{fig： uav}所示，动态FANET中的真正挑战是平衡瞬时吞吐量和长期网络生存。例如，考虑时间t处UAV1的下一跳选择。短视的、基于位置的策略可能会选择UAV2，仅仅因为它更靠近数据中心。然而，这种选择忽略了UAV2的状态，它正在遭受拥挤的数据队列和危险的低能量储备。正如t+1的潜在结果所描述的那样，这一决定不仅加速了UAV2向过早故障的能量消耗，还迫使UAV1由于糟糕的信道条件而在高功率传输上消耗大量能量。相反，一个有远见的策略会选择UAV3。这一选择利用UAV3健康的能量储备和更好的信道条件为UAV1实现节能传输。这反过来又有助于平衡网络的整体能量消耗，并通过主动避免节点故障最终延长其运行寿命。这种对长期成本的考虑正是现有方法所缺乏的。
+As illustrated in Fig. \ref{fig:uav}, the core challenge in a dynamic FANET is balancing immediate throughput with long-term network survival. For instance, a myopic decision might cause UAV1 to select an energy-depleted UAV2 for its proximity to the data center, thus accelerating its failure and increasing UAV1's own energy consumption. In contrast, a far-sighted strategy would select the healthier UAV3 to balance network energy consumption and extend its operational lifetime. This trade-off exposes a critical deficiency in existing long-term optimization methods. In many Reinforcement Learning applications, for example, while a UAV's energy level is included in the state representation, the reward function often fails to encode the mission-long objective of network survival \cite{DRLFR}. Meanwhile, existing Lyapunov-based routing strategies focus on data queue stability to reduce latency, but they lack the direct control over energy needed to guarantee sustained network operation \cite{intro9}.
+
+% 为了应对这些挑战，本文提出了A Lyapunov-based Energy-Aware Decentralized Routing Strategy(LEADR)。该策略通过将贯穿任务全程的长期优化问题分解为每个无人机在每个时隙执行的轻量级、分布式决策，从而动态地选择下一跳中继和数据传输功率。LEADR旨在最大化网络平均吞吐量的同时，将无人机集群的能量消耗不均衡性维持在较低水平，最终目标是显著提升网络生存时间，为任务全程提供持续、稳定的通信服务。
+To address these challenges, this paper proposes the Lyapunov-based Energy-Aware Decentralized Routing (LEADR) strategy. LEADR uniquely transforms the mission-long optimization problem into a series of lightweight, decentralized decisions executed by each UAV in every time slot. This approach allows for the dynamic selection of both the next-hop relay and the corresponding data transmission power. The core objective of LEADR is to maximize the average network throughput while concurrently maintaining a low energy consumption imbalance across the UAV swarm. By achieving this balance, the ultimate goal is to significantly extend the network's lifetime, thereby providing continuous and stable communication services for the entire mission duration.
+
+\begin{itemize}
+    % 一个针对FANET联合路由与功率控制的长期优化问题被构建。该问题的目标是在满足通信服务连续性需求的前提下，协同最大化网络总吞吐量并将网络中各无人机间的能量消耗不均衡性控制在合理范围。
+    \item A long-term optimization problem is formulated to address joint routing and power control in FANETs. The objective is to maximize the total network throughput while maintaining the energy consumption imbalance among UAVs within an acceptable range, thereby satisfying the overarching requirement of continuous communication service.
+    % 一种名为LEADR的轻量级分布式算法被提出。该算法运用李雅普诺夫漂移惩罚框架，指导每个无人机基于本地信息进行实时路由与功率控制决策。其决策过程通过一个低复杂度的启发式方法实现，计算复杂度仅为每个时隙$O（N_i）$，其中$N_i$表示邻居节点的数量。
+    \item A lightweight, distributed algorithm named LEADR is proposed. It leverages the Lyapunov drift-plus-penalty framework to enable each UAV to make real-time routing and power control decisions using only local information. The decision-making process is driven by a low-complexity heuristic, yielding a computational complexity of just $O(N_i)$ per time slot, where $N_i$ denotes the number of neighboring nodes.
+    % 通过仿真实验证明，相较于现有基准策略，所提出的LEADR策略在多个关键性能指标上表现出显著优势，包括更高的网络总吞吐量、更低的丢包率以及更长的网络生存时间，同时成功地将能量消耗不均衡性维持在较低水平。
+    \item Simulation results demonstrate that the proposed LEADR strategy significantly outperforms existing baseline strategies across multiple key performance metrics. It achieves higher total network throughput, a lower packet loss rate, and a longer network lifetime, while successfully balancing energy consumption among the UAVs.
+\end{itemize}
+
+The remainder of this paper is organized as follows.
+Section \ref{s2} reviews the related work. 
+Section \ref{s3} presents the system model, including the network, communication, and energy models. Section \ref{s4} details the proposed LEADR algorithm design and Section \ref{s5} presents and analyzes the simulation results. 
+Finally, Section \ref{s6} concludes the paper.
+
+\section{Related Work}
+\label{s2}
+% 目前，许多研究人员已经探索了多设备集群中的路由挑战，并提出了各种方法。贪婪周界无状态路由(GPSR)\cite{gpsr}等传统策略采用基于位置的贪婪转发技术，选择周围一跳中最接近目标的邻居节点，这在FANET环境下极容易造成“热点”无人机能量过早耗尽，从而影响在指定任务周期内通信服务的稳定性和连续性。
+Numerous researchers have investigated the routing challenges within multi-device clusters and have proposed a variety of methods. Traditional strategies, such as GPSR \cite{gpsr}, employ a position-based greedy forwarding technique, selecting the one-hop neighbor that is geographically closest to the destination. In the context of FANETs, this approach is highly prone to causing the premature energy depletion of ``hotspot'' UAVs, which in turn compromises the stability and continuity of communication services throughout the designated mission duration.
+
+% 为克服传统方法的局限性，部分研究探索了启发式算法。例如，在水下环境中，有工作采用蚁群优化（ACO）算法来迭代式地收敛于最优路径。这类方法通过模拟“蚂蚁”探索路径并留下信息素，根据信息价值（VoI）等指标评估路径质量。然而，启发式方法的一个关键限制是其较高的计算复杂度。在大规模、动态变化的FANET场景中，这种需要多轮迭代的计算过程无法满足实时路由决策的需求，难以适应贯穿任务全程的拓扑变化。
+To overcome the limitations of traditional methods, some studies have explored the use of heuristic algorithms \cite{intro12}. For instance, in underwater environments, \cite{aco} employed ACO to iteratively converge on an optimal path. Such methods simulate ``ants'' exploring paths and depositing pheromones, evaluating path quality based on metrics like the Value of Information. However, a key limitation of heuristic approaches is their high computational complexity. In large-scale and highly dynamic FANET scenarios, this iterative process cannot meet the demands of real-time routing decisions, making it difficult to adapt to the topological changes that occur throughout a mission.
+
+% 近年来，基于RL的路由方案已被应用于优化FANET的路由策略。QTAR\cite{qtar}利用Q-Learning和两跳邻居信息来提高分组传递率，其奖励函数综合考虑了延迟、转发速度和节点剩余能量。jin等人提出了DRLRR\cite{DRLRR}，这是一种基于DRL的策略，采用双深度Q-Network（DDQN）来适应城市紧急情况下的链路中断。类似地，Li等人引入了DRLFR\cite{DRLFR}来联合优化路由决策和功率控制，使用从Q值和延迟违规容忍度派生的唯一策略来最大化加权效用函数。\cite{related1}中基于强化学习的集群路由使地面控制站能够根据链路稳定性和电池功率优化簇头节点的选择，从而减少延迟和拓扑构建时间。尽管这些方法取得了一定进展，但它们普遍存在共同的局限性：首先基于历史信息训练智能体，在面对长期规划时具有局限性，需要延长训练周期来收敛并依赖难以调整的复杂奖励函数。其次，在动态环境中，这些模型需要重新训练以适应变化。最关键的是，它们缺乏一个明确的机制来管理长期的通信能耗，而这对于确保无人机能够提供持续稳定的通信服务至关重要。
+In recent years, Reinforcement Learning (RL)-based schemes have been increasingly applied to optimize routing in FANETs. For example, QTAR \cite{qtar} uses Q-Learning with a composite reward function to improve packet delivery. DRL-based strategies have also been introduced: DRLRR \cite{DRLRR}, for instance, employs a DDQN to adapt to link disruptions, while DRLFR \cite{DRLFR} performs joint optimization of routing decisions and power control. Another RL approach optimizes the selection of cluster heads to reduce latency and topology construction time \cite{related1}. Despite this progress, these RL-based methods share significant limitations: their reliance on historical data complicates long-term planning, requiring extended training and costly retraining for dynamic environments \cite{intro11}. Most critically, they lack an explicit mechanism to manage the long-term energy consumption crucial for continuous service.
+
+% 为了实现长期的优化，基于Lyapunov优化也被应用于路由问题。Ying et al.\cite{related2} used virtual queues to add hop constraints to Lyapunov-based backpressure routing, achieving queuing stability with the smallest hop counts possible. Zhuang等人\cite{intro9}利用李雅普诺夫优化技术保证网络队列的稳定性，并用DRL自适应地学习和调整路由策略以应对动态变化的网络环境。这些工作集中在保证数据队列的稳定性上，旨在最小化数据包延迟，没有对能量队列进行的长期控制，无法适应在FANET中无人机长期能源消耗的挑战，也就无法保障服务在任务全程的连续性。
+To achieve long-term optimization, Lyapunov optimization has been applied to network control problems. However, existing research has diverged into two main areas, neither of which fully addresses the critical requirements of sustainable FANETs. One line of work focuses on using Lyapunov to ensure data queue stability and minimize packet delay. For example, researchers have used virtual queues to add hop constraints to routing \cite{related2}, or combined Lyapunov techniques with DRL to adapt routing policies \cite{intro9}. By concentrating solely on data queues, these methods neglect the vital challenge of long-term energy management, thus failing to ensure mission-long service continuity. Conversely, other studies have successfully used the Lyapunov framework to explicitly control UAV energy. This includes work on optimizing flight trajectories for energy harvesting \cite{intro1} and maintaining long-term energy stability in computing clusters \cite{intro2}. While these studies validate Lyapunov for energy management, they were not designed to address the problem of decentralized, multi-hop routing. Consequently, a critical and largely unaddressed gap remains: there is a significant lack of distributed routing strategies that effectively leverage long-term energy control to guarantee network survival.
+
+% 尽管现有算法在一定程度上考虑了延迟、吞吐量或能量等因素，但当应用于具有大量UAV和复杂动态的现实场景时，均暴露了各自的局限性。在灾后救援的背景下，无人机在追求高吞吐量以保证服务质量的同时，还需要确保FANET在整个任务持续时间内通信服务的稳定运行。这将问题从无约束的性能优化转移到硬生存性约束下的性能优化。因此，设计一种能够在严格的长期能耗与队列稳定性约束下，最大化网络总吞吐量的路由策略，对于保障应急通信服务的成功至关重要。
+Although existing algorithms consider factors such as latency, throughput, or energy to some extent, they each reveal their respective limitations when applied to realistic scenarios characterized by a large number of UAVs and complex dynamics. In the context of post-disaster rescue, pursuing high throughput to guarantee Quality of Service must be balanced with the imperative to ensure stable network operation throughout the entire mission. This reframes the problem from one of unconstrained performance optimization to one of performance optimization under hard survivability constraints. Therefore, designing a routing strategy that can maximize the total network throughput under strict long-term energy and queue stability constraints is crucial for ensuring the success of emergency communication services.
+
+\section{Problem Modeling}
+\label{s3}
+% 本节对无人机辅助应急通信网络的系统模型进行介绍。内容首先概述了系统架构及关键符号，随后详细描述了网络、移动性、通信、数据和能源模型，并最终定义了优化问题。
+This section presents the system model for the UAV-assisted communication network. It begins by outlining the system architecture and key notations, then provides detailed descriptions of the network, mobility, communication, data, and energy models, and concludes with the formulation of the optimization problem.
+
+% 考虑灾后城市场景，地面通信基础设施受到严重破坏。部署了一支由$N$无人机组成的FANET，如图\ref{fig： uav}所示，为救援行动提供临时通信服务。无人机由$\mathcal{N}=\{1,2，…，N\}$表示。任务是将灾区多个传感器收集到的关键数据通过多跳通信将其中继到单个数据中心，由$\mathcal{D}$表示。本研究的主要目标是最大限度地提高自组织网络的总吞吐量，但要受到确保无人机在关键任务持续时间内运行寿命的限制。本文中使用的主要符号和变量总结在表\ref{tab:variable}中。
+\textbf{System Overview and Scenario.}Consider a FANET of $\mathcal{N}$ UAVs, $\mathcal{N}=\{1,2,...,N\}$, deployed in a post-disaster scenario with damaged terrestrial infrastructure, as shown in Fig. \ref{fig:uav}.. The core task is to relay critical data collected from multiple sensors in the disaster area to a single data center, denoted by $\mathcal{D}$, via multi-hop communication. The main notations used in this paper are summarized in Table \ref{tab:variable}.
+% \vspace{-12pt}
+\begin{table}[h]
+\centering
+\caption{Notations used in our study}
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Notation} & \textbf{Description} \\
+\hline
+$N$ & Total number of UAVs in the network \\
+\hline
+$D$ & The location of the central command center \\
+\hline
+$q_i(t)$ & position vector of UAV $i$ at time $t$ \\
+\hline
+$d_{ij}(t)$ & Euclidean distance between nodes $i$ and $j$ at time $t$ \\
+\hline
+$P_{ij}^{trans}(t)$ & Transmission power from UAV $i$ to node $j$ at time $t$ \\
+\hline
+$P_{max}^{trans}$ & Maximum allowable transmission power for a UAV \\
+\hline
+$r_{ij}(t)$ & Data transmission rate from UAV $i$ to node $j$ at time $t$ \\
+\hline
+$x_{i,j}(t)$ & Binary indicator: 1 if UAV $i$ transmits to node $j$ at time $t$, 0 otherwise \\
+\hline
+$E_{i}(t)$ & Remaining energy of UAV $i$ at time $t$ \\
+\hline
+$E^{max}$ & UAV Communication Energy Budget \\
+\hline
+$Q_{i}(t)$ & Data queue length (backlog) of UAV $i$ at time $t$ \\
+\hline
+$Q^{max}$ & Maximum data queue (buffer) size of a UAV \\
+\hline
+$T$ & Total duration of the rescue mission \\
+\hline
+$F_{i}(t)$ & Virtual energy queue length for UAV $i$ at time $t$ \\
+\hline
+\end{tabular}
+\label{tab:variable}
+\end{table}
+% \vspace{-12pt}
+
+\textbf{UAV Network and Mobility Model.} The state of each UAV $i\in \mathcal{N}$ at time $t$ is characterized by its two-dimensional position vector $q_{i}=(x_{i}^{uav},y_{i}^{uav}$ and velocity vector $v_i=(v_{x,i},v_{y,i}$. The analysis is constrained to a two-dimensional operational area, assuming all UAVs maintain a constant flight altitude. The Euclidean distance between any two UAVs, $i$ and $j$, is denoted by $d_{ij}(t)$. For decentralized decision-making, each UAV broadcasts a HELLO message containing its state (ID, timestamp, position $q_i(t)$, velocity $ v_i(t)$), remaining energy $E_i(t)$), data backlog $Q_i(t)$, and virtual energy queue $F_i(t)$. This exchange provides the local real-time topology necessary for routing and power control\cite{DRLFR}.
+
+\textbf{Communication Model.} Communication between UAVs occurs primarily through Line-of-Sight (LoS) links\cite{qtar}. The channel gain between two UAVs $i$ and $j$ is modeled based on the free-space path loss model:
+\begin{equation}
+    h_{ij}=\frac{\rho_{0}}{d_{ij}^{2}}
+\end{equation}
+
+Where $\rho_{0}=\frac{G_{i}G_{j}\lambda^{2}}{(4\pi)^{2}}$ is the channel power gain at a reference distance, $G$ is the antenna gain of two nodes (a fixed hardware parameter), $\lambda$ is the wavelength of the signal, which is determined by the carrier frequency and is usually fixed, so it can be regarded as a constant. The Signal-to-Interference-plus-Noise Ratio (SINR) for a transmission is defined as:
+\begin{equation}
+    SINR_{ij}=\frac{h_{ij}P_{ij}^{trans}(t)}{I_{ij}(t)+\sigma^{2}}
+\end{equation}
+
+Where $\sigma^{2}$ is the noise power, and $I_{ij}$ is interference:
+\begin{equation}
+    I_{ij}=\sum_{k \neq i} \sum_{l \neq k} {h_{kj}P_{kl}^{trans}\cdot x_{kl}(t)}
+\end{equation}
+
+Based on the Shannon-Hartley theorem, the achievable data transmission rate $r_{ij}(t)$ is then given by:
+\begin{equation}
+    r_{ij}(t)=B~\log_{2}(1+SINR_{ij}(t))
+\label{eq:rij}
+\end{equation}
+
+Where $B$ is the channel bandwidth.
+
+% 无人机的总能耗包括飞行能耗和数据传输通信能耗。在灾后救援中，无人机遵循由任务目标（如区域覆盖）规定的预先规划的飞行路径。路由层缺乏改变这些飞行模式的权力，从其角度来看，推进能量是无法控制的开销。同时有效管理通信能耗对于延长无人机任务续航至关重要\cite{DRLFR}，因此，这项工作中的能量模型只关注传输功率，因为它是路由决策可以直接影响和控制的主要变量。无人机$i$在时间$t$数据传输的功率被定义为$P_i（t）$。为了研究网络在整个任务周期内的生存能力，优化的核心必须从管理瞬时的功耗，转向管理有限的总能耗。因此，将可用于通信的能量抽象为一个有限的预算$E$。无人机$i$在单位时间间隔$\Delta t$内剩余能量的描述为：
+\textbf{Energy Consumption and Data Queue Models.} A UAV's total energy consumption comprises both propulsion energy for flight and communication energy for data transmission. In post-disaster rescue scenarios, UAVs typically adhere to pre-planned flight paths dictated by mission objectives like area coverage. Because the routing layer lacks the authority to alter these flight patterns, propulsion energy is treated as an uncontrollable overhead from its perspective. Since effectively managing communication energy is crucial for extending a UAV's mission endurance \cite{DRLFR}, the energy model in this work focuses solely on transmission power, as it is the primary variable that routing decisions can directly influence and control.The transmission power of UAV $i$ at time $t$ is defined as $P_i(t)$. The remaining energy of UAV $i$ over a time interval of $\Delta t$ is described as:
+\begin{equation}
+    E_{i}(t+1)=E_{i}(t)-P_{i}(t)\cdot\Delta t
+\end{equation}
+
+Where $P_i(t)=\sum_{j\in \mathcal{N}\cup \{D\},j\neq i}x_{ij}(t)P_{ij}^{trans}(t)$. In this model, a UAV can transmit data to only one other UAV in a time slot. If a UAV depletes its energy, it ceases all data reception and forwarding functions and is subsequently removed from the network.
+
+Each UAV maintains a data buffer of a maximum size $Q^{max}$. The length of the data queue for UAV $i$, $Q_i(t)$, evolves according to:
+\begin{equation}
+    Q_{i}(t+1)=\max\{Q_{i}(t)-\mu_{i}(t)\cdot\Delta t,0\}+\nu_{i}(t)\cdot\Delta t
+\end{equation}
+
+This equation updates the data queue by subtracting the transmitted data from the current backlog, imposing a non-negativity constraint via the $\max$ operator, and then adding all newly arrived data. Where $\mu_{i}(t)=\sum_{j}x_{ij}(t)r_{ij}(t)$ is the total departure data rate and $\nu_{i}(t)=\lambda_{i}(t)+\sum_{k}x_{ki}(t)r_{ki}(t)$ is the total arrival data rate.
+
+% 从单个无人机的角度出发，其首要任务是高效地转发自身的数据，因此追求高吞吐量是保障其服务质量的基础。然而，在需要考虑长期网络生存时间的FANET中，孤立地追求局部最优会导致资源利用失衡。因此，将优化目标从个体性能提升，转变为最大化整个网络的总数据传输速率，对于实现链路资源的协同、高效利用至关重要。为确保该目标的有效性，所设计的路由策略内在地防止了数据包的路由循环，保证了每一次中继都是朝向目的地的有效投递。这种全局优化目标通过激励无人机间的智能协作，自然地均衡网络负载并规避拥塞，从而保障网络的整体完整性与通信服务的连续性。因此，本研究的优化问题被正式地表述为最大化网络总吞吐量：
+\textbf{Problem Formulation.} From the perspective of an individual UAV, its primary task is to efficiently forward its own data, making high throughput fundamental to its quality of service. However, in a FANET where long-term network survivability must be considered, the isolated pursuit of such local optima leads to imbalanced resource utilization. Consequently, shifting the optimization objective from enhancing individual performance to maximizing the entire network's total data transmission rate is crucial for achieving collaborative and efficient use of link resources. A global objective of this nature incentivizes intelligent collaboration among UAVs, which in turn naturally balances the network load and mitigates congestion. This approach preserves the overall integrity of the network and the continuity of communication services. Therefore, the optimization problem in this study is formally stated as the maximization of the total network throughput:
+\begin{align}
+\text{Maximize} & \quad \frac{1}{T}\sum_{t=0}^{T} \sum_{i=1}^{N} \mu_i(t) \\
+\text{s.t.} \quad 
+&0 \le P_{ij}^{\text{trans}}(t) \le P_{\text{max}}^{\text{trans}}, \quad \forall i,j,t \label{C1}\\
+& \sum_{j \in \mathcal{N} \cup \{D\}, j \neq i} x_{ij}(t) \le 1, \quad \forall i,t \label{C2}\\
+& 0 \le Q_i(t) \le Q^{\text{max}}, \quad \forall i,t \label{C3}
+\end{align}
+
+Where constraint \ref{C1} ensures that for all time slots, transmission power is within limits, each UAV forwards to at most one neighbor (constraint \ref{C2}), data queues do not overflow (constraint \ref{C3}).
+
+\section{Proposed Algorithm}
+\label{s4}
+This section details the proposed LEADR algorithm. The algorithm addresses the long-term optimization problem using a two-stage approach. First, the Lyapunov optimization framework is employed to decompose the complex, mission-long problem into a series of simple, per-slot decisions. Second, a lightweight heuristic method is used to solve these per-slot problems in real-time, enabling each UAV to make decentralized routing and power control decisions.
+4\subsection{Lyapunov Optimization Formulation} 
+The Lyapunov optimization framework provides a formal method to control system stability while optimizing performance. The core of this method involves defining a Lyapunov function, which is a measure of instability based on the data queue, energy queue and a new virtual energy queue. The objective is then to minimize a drift-plus-penalty expression in each time slot.
+\subsubsection{Virtual Energy Queue}
+To handle the mission-long energy constraint, a virtual energy queue $F_i(t)$ is introduced for each UAV. This queue is a mathematical construct that tracks the cumulative deficit between the actual energy consumed and a sustainable average power budget $P_{avg}=\frac{E^{max}}{T}$. The dynamics of this virtual queue are given by:
+\begin{equation}
+    F_{i}(t+1)=\max\{F_{i}(t)+P_{i}(t)\cdot\Delta t-P_{avg}\cdot\Delta t,0\}
+\end{equation}
+\subsubsection{Lyapunov Function and Drift-Plus-Penalty Analysis}
+Let the quadratic Lyapunov function $L_i(t)$ be a scalar measure of the system's instability, encompassing the data queue backlog\cite{algo1,algo2}, the energy deficit, and the virtual energy queue:
+\begin{equation}
+    L_{i}(t)=\frac{1}{2}[Q_{i}(t)]^{2}+\frac{\beta}{2}[\Phi_{i}(t)]^{2}+\frac{\gamma}{2}[F_{i}(t)]^{2}
+\end{equation}
+where $\Phi_{i}(t)=E^{max}-E_i(t)$ represents the current energy loss. The one-step conditional Lyapunov drift, $\Delta L_{i}(t) = \mathbb{E}[L(t+1)-L(t)|Q(t),\Phi(t),F(t)]$, measures the expected change in system instability. The drift-plus-penalty framework is employed to jointly optimize for stability and network throughput by seeking to minimize an upper bound on the drift minus a V-weighted penalty term representing the desired aggregate network throughput. This leads to the following upper bound on the drift-plus-penalty expression:
+\begin{equation}
+\begin{split}
+\Delta L_{i}(t) - V\mathbb{E}[\mu_i(t)|Q(t)] \le C &+ \mathbb{E}[Q_{i}(t)\Delta t(\nu_{i}(t)-\mu_{i}(t))|Q(t)] \\
+&+ \mathbb{E}[(\beta\Phi_{i}(t)+\gamma F_{i}(t))\Delta tP_{i}(t)|\Phi(t),F(t)] \\
+&- \mathbb{E}[\gamma F_{i}(t)\Delta tP_{avg}|F(t)] \\
+&- V\mathbb{E}[\mu_i(t)|Q(t)]
+\end{split}
+\end{equation}
+
+where $C$ is a constant, and $V$ is a non-negative parameter that controls the trade-off between queue stability and throughput maximization. The per-slot objective for each UAV $i$ is to greedily minimize this bound, which is achieved by focusing only on minimizing the terms within the expectation:
+\begin{equation}
+\min_{\mathbf{x}_i(t),\mathbf{P}_i^{trans}(t)} \bigg\{ Q_i(t)\Delta t\nu_i(t) - D_i(t)\mu_i(t) + C_i(t)\Delta tP_i(t) \bigg\}
+\end{equation}
+where $\mathbf{x}_i(t)=\{x_{ij}(t)\}_{\forall j}$ and $\mathbf{P}_i^{trans}(t)=\{P_{ij}^{trans}(t)\}_{\forall j}$ are the routing and power control decisions for UAV $i$ at time $t$, $C_{i}(t)=\beta\Phi_{i}(t)+\gamma F_{i}(t)$, $D_{i}(t)=Q_{i}(t)\Delta t+V$.
+
+\textbf{Proof of the Drift-Plus-Penalty Bound.}
+The bound is derived by analyzing the drift of each component of the Lyapunov function. It is assumed that the data arrival and departure rates are bounded stochastic processes such that for each UAV $i$:
+\begin{itemize}
+    \item $\mathbb{E}[\mu_{i}(t)^{2}\Delta t^{2}|Q(t)]\le C_{1}^{2}$
+    \item $\mathbb{E}[\nu_{i}(t)^{2}\Delta t^{2}|Q(t)]\le C_{2}^{2}$
+    \item $\mathbb{E}[\mu_{i}(t)\nu_{i}(t)\Delta t^{2}|Q(t)]\le C_{1}C_{2}$
+\end{itemize}
+Based on these assumptions, the drift of the data queue is bounded by:
+\begin{equation}
+\frac{1}{2}\mathbb{E}[[Q_{i}(t+1)]^{2}-[Q_{i}(t)]^{2}|Q(t)]\le C_{Q}+Q_{i}(t)\Delta t\mathbb{E}[\nu_{i}(t)-\mu_{i}(t)|Q(t)]
+\end{equation} 
+Where $C_Q$ is a constant. Similarly, the energy drift and virtual queue drift are bounded by:
+\begin{equation}
+    \frac{\beta}{2}\mathbb{E}[[\Phi_{i}(t+1)]^{2}-[\Phi_{i}(t)]^{2}|\Phi(t)]\le\mathbb{E}[\beta(E^{max}-E_i(t))P_i(t)\Delta t|E_i(t)]+C_E
+\end{equation}
+\begin{equation}
+    \frac{\gamma}{2}\mathbb{E}[[F_{i}(t+1)]^{2}-[F_{i}(t)]^{2}|F(t)]\le\gamma F_{i}(t)\cdot\Delta t\cdot\mathbb{E}[P_{i}(t)-P_{avg}|F(t)]+\gamma\frac{H}{2}
+\end{equation}
+where $C_E$ and $H$ are bounded constants. Let $C=C_{Q}+\frac{\gamma H}{2}+C_E$ be the composite constant for the upper bound of the Lyapunov drift plus penalty. Summing these terms and subtracting the V-weighted penalty term yields the drift-plus-penalty upper bound shown previously.
+
+\subsection{Heuristic-Enhanced Real-Time Decision-Making}
+The LEADR algorithm is designed to solve the per-slot optimization objective derived above. Since the routing decision $x_{ij}(t)$ and power control decision $P_{ij}^{trans}(t)$ are coupled, the problem is decomposed into two sequential subproblems that each UAV solves independently. To ensure that these decisions are based on the current network topology, each UAV periodically broadcasts a HELLO message containing its state information. The broadcast interval is adaptive, set as a fraction of the predicted link lifetime based on neighbor mobility. This approach follows the method proposed by Arafat and Moh \cite{qtar}, which effectively prevents routing voids caused by outdated topology information while minimizing protocol overhead.
+\begin{algorithm}[!ht]
+    \caption{LEADR Decentralized Routing and Power Control}
+    \label{alg:LEADR}
+    \renewcommand{\algorithmicrequire}{\textbf{Input:}}
+    \renewcommand{\algorithmicensure}{\textbf{Output:}}
+    \begin{algorithmic}[1]
+        \REQUIRE Local state $Q_i(t)$,$E_i(t)$,$F_i(t)$, Neighbor states from received HELLO messages.
+        \ENSURE Control actions $x_{ij}(t)$ and $P_{ij}^{trans}(t)$.
+        \FOR{neighbor $j \in N_i(t) \cup D$}
+            \STATE Calculate optimal transmission power $P_{ij}^{\text{trans,opt}}(t)$ (Equation \ref{eq:pij}).
+            \STATE Calculate the corresponding data rate $r_{ij}^{\text{opt}}(t)$ (Equation \ref{eq:rij}).
+            \STATE Calculate the composite heuristic weight $W_{ij}^{\text{E,G}}(t)$ (Equation \ref{eq:wij}).
+        \ENDFOR
+        \STATE Select the best next-hop neighbor: $j^{*}(t)=\arg\max_{j\in N_{i}(t)\cup\{D\}}W_{ij}^{E,G}(t)$.
+        \STATE Set routing decision $x_{ij}^{*}(t)$
+        \STATE Transmit data to neighbor $j^{*}(t)$ with power $P_{ij}^{trans,opt}(t)$.
+        \STATE Update local states $Q_i(t+1)$,$E_i(t+1)$,$F_i(t+1)$ for the next time slot.
+        \RETURN Actions $x_{ij}(t)$ and power $P_{ij}^{trans,opt}(t)$.
+    \end{algorithmic}
+\end{algorithm}
+
+Algorithm~\ref{alg:LEADR} shows the process of our proposed Algorithm. For each potential next-hop neighbor $j$, UAV $i$ first calculates the optimal transmission power $P_{ij}^{trans,opt}(t)$. This is achieved by isolating the terms in the objective function relevant to a single link $(i,j)$ and solving the following sub-problem:
+\begin{equation}
+    \min_{P_{ij}^{trans}(t)}f(P_{ij}^{trans}(t))=-D_{i}(t)\cdot B~\log_{2}\left(1+\frac{h_{ij}P_{ij}^{trans}(t)}{N_{ij}}\right)+C_{i}(t)\cdot\Delta t\cdot P_{ij}^{trans}(t)
+\end{equation}
+
+Where $N_{ij}=I_{ij}(t)+\sigma^{2}$. This function is a convex function of $P_{ij}^{trans}(t)$. By setting its first derivative to zero yields the optimal power $P_{ij}^{trans*}(t)$. Accounting for physical constraints, the final power is:
+\begin{equation}
+    P_{ij}^{trans,opt}(t)=\min\{\max\{0,P_{ij}^{trans*}(t)\},P_{max}^{trans}\}
+\label{eq:pij}
+\end{equation}
+
+After computing the optimal power for every potential neighbor, UAV $i$ must select the single best next hop. This decision is guided by a composite link weight that incorporates practical routing heuristics to ensure robust performance. First, a base weight $W_ij(t)$ is calculated by plugging the optimal power and resulting rate back into the objective function. This weight represents the benefit of selecting the link $(i,j)$:
+\begin{equation}
+    W_{ij}(t)=D_{i}(t)\cdot r_{ij}^{opt}(t)-C_{i}(t)\cdot\Delta t\cdot P_{ij}^{trans,opt}(t)
+\end{equation}
+
+To prevent routing loops and forwarding to energetically unstable nodes, this base weight is then modified by incorporating two key heuristics. The first heuristic assesses the energy health of the potential next-hop $j$ through its normalized energy, $\tilde{E}_{j}(t)=\frac{E_{j}(t)}{E^{max}}$, which discourages forwarding to UAVs with low battery levels. The second heuristic ensures consistent geographic progress toward the sink node $D$ by calculating a relative distance parameter, $D_{ij}(t)=\frac{d_{iD}(t)-d_{jD}(t)}{d_{iD}(t)}$, and only permitting forwarding to nodes where $D_{ij}(t)>0$:
+\begin{equation}
+    W_{ij}^{E,G}(t)=\begin{cases}W_{ij}(t)\cdot\tilde{E}_{j}(t)& \text{if } D_{ij}(t)>0 \text{ and } j\ne D \\ W_{ij}(t)& \text{if } j=D \text{ and } D_{ij}(t)>0  \\ -\infty& \text{otherwise}\end{cases}
+\label{eq:wij}
+\end{equation}
+
+The UAV then selects the neighbor $j^{*}(t)$ that maximizes this composite weight:
+\begin{equation}
+    j^{*}(t)=\arg\max_{j\in N_{i}(t)\cup\{D\}}W_{ij}^{E,G}(t)
+\end{equation}
+\begin{equation}
+    x^{*}_{ij}(t)=\begin{cases}1& \text{if } j=j^{*}(t) \text{ and } W_{ij^{*}}^{E,G}(t)>-\infty \\ 0& \text{otherwise}\end{cases}
+\end{equation}
+
+\section{Experimental Evaluation}
+\label{s5}
+% 本节介绍了仿真设计和实验结果。通过分析四个关键性能指标，针对几种基线路由策略评估了所提出的LEADR算法的有效性：聚合网络吞吐量、包丢失率、能量平衡（以所有无人机归一化剩余能量的均方差衡量）和网络寿命（定义为第一架无人机能量耗尽之前的时间）。这些实验旨在测试算法在各种网络条件下的鲁棒性和可扩展性，包括不同数量的无人机、不同的飞行速度和不断变化的通信范围。
+This section details the simulation design and presents the experimental results. To evaluate the effectiveness of the proposed LEADR algorithm against several baseline strategies, its robustness and scalability are tested by conducting experiments under various network conditions, including different numbers of UAVs, changing communication ranges, and varying flight speeds.
+
+\subsection{Experimental Setup}
+
+\subsubsection{Simulation Environment.} The experiments are conducted in a custom-built discrete-event simulator implemented in Python. The simulation environment is a two-dimensional area of 1000m × 1000m, representing the disaster zone. Each simulation run corresponds to a mission duration of 3600 seconds, with the algorithm making decisions at each 1-second interval.
+
+The key physical and communication parameters used in the simulation experiments are drawn from relevant studies \cite{qtar,DRLFR}. In the network, UAVs adhere to the Gauss-Markov mobility model. To capture the random and bursty nature of data generation in the environment, data origination from multiple ground sources is modeled as a Poisson process.Regarding the communication model, the channel bandwidth is set to $20~\mathrm{MHz}$, the noise power is $0.8 \times 10^{-12}~\mathrm{W}$, and the reference channel power is $10^{-4}~\mathrm{W}$. The maximum transmission power for each UAV is capped at $0.2~\mathrm{W}$. In terms of data handling, the size of each data packet is $1~\mathrm{KB}$, and the maximum data queue for each UAV can hold $8000~\mathrm{KB}$. For the energy model, the communication energy budget for each UAV is set to $15~\mathrm{J}$.
+\subsubsection{Experimental Strategy.} 
+% 为了全面评估其性能，所提出的LEADR算法以四种基线策略为基准。其中包括经典的GPSR\cite{gpsr}，它贪婪地将数据包转发到离目的地最近的邻居；基于启发式的ACO\cite{aco}，依据信息素浓度和综合邻居节点的能量与距离来概率性地选择下一跳，并通过成功路径的信息素增强与全局挥发机制来发现最佳路由；基于强化学习的RLFR\cite{DRLFR}，通过Q学习，为每一个“状态-动作”对估计其长期效用，其奖励函数被设计为最大化成功投递率以关联吞吐量并最小化单次传输能耗；负载平衡GPSR（LB-GPSR），它通过识别所有提供积极地理进度的邻居并以循环方式向它们转发数据包以分配负载来缓解GPSR的“热点”问题。
+To evaluate its performance, the proposed LEADR algorithm is benchmarked against four baseline strategies. These include: GPSR \cite{gpsr}, which greedily forwards packets to the geographically closest neighbor; the heuristic-based ACO \cite{aco}, which uses a pheromone mechanism considering node energy and distance to find optimal routes; the reinforcement learning-based RLFR \cite{DRLFR}, a Q-learning method with a reward function that maximizes delivery rate and minimizes transmission energy; and Load-Balanced GPSR (LB-GPSR), a variant that mitigates the ``hotspot'' problem by using round-robin forwarding to distribute the load.
+
+\subsection{The Impact of the Number of UAVs}
+% 在这组实验中，我们通过将无人机数量从10到50来评估所提出的LEADR算法的性能，并验证了其在保障通信服务稳定性与连续性方面的能力，四个关键性能指标的结果如图\ref{fig：number_analysis}所示。
+In this set of experiments, the number of UAVs is varied from 10 to 50 to evaluate the performance of the proposed LEADR algorithm, specifically its ability to ensure the stability and continuity of communication services. The results for the four key performance metrics are presented in Fig. \ref{fig:number_analysis}.
+\begin{figure}[htbp] % h: here, t: top, b: bottom, p: page of floats
+    \centering 
+    \begin{subfigure}[t]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{num_a.eps}
+        \caption{Aggregate Network Throughput}
+        \label{fig:number_analysis_a}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[t]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{num_b.eps}
+        \caption{Packet Loss Rate}
+        \label{fig:number_analysis_b}
+    \end{subfigure}
+    
+    \begin{subfigure}[t]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{num_c.eps}
+        \caption{Energy Balance}
+        \label{fig:number_analysis_c}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[t]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{num_d.eps}
+        \caption{Network Lifetime}
+        \label{fig:number_analysis_d}
+    \end{subfigure}
+
+    \caption{Performance analysis with a varying number of UAVs.}
+    \label{fig:number_analysis}
+\end{figure}
+% 如图\ref{fig：number_analysis}(a)和(b)所示。随着无人机数量的增加，所有基线算法的吞吐量均呈现下降趋势，且伴随着较高的丢包率（0.05至0.45）。LEADR的吞吐量稳步增长，同时在所有场景下实现了很低的丢包率，这说明LEADR在大规模无人机集群下对于网络的利用更加充分。ACO和GPSR倾向于选择局部最优路径，因此吞吐量较小，同时丢包率较低；LB-GPSR通过轮询转发尝试均衡负载，但其机制忽略了实时的信道条件，容易导致数据堆积而丢包；RLFR因未考虑自身数据队列状态，常为少量数据付出不必要的传输功耗，导致电量过早消耗殆尽，形成很高丢包率。高吞吐与低丢包率的结合，反映了LEADR在构建通信服务时的稳定性，能够保障数据流的可靠传输。
+% As shown in Fig. \ref{fig:number_analysis_a} and \ref{fig:number_analysis_b}, as the number of UAVs increases, all baseline algorithms exhibit a declining trend in throughput, coupled with high packet loss rates (PLR) ranging from $0.05$ to $0.45$. In contrast, LEADR's throughput grows steadily while maintaining a very low PLR across all scenarios, demonstrating its more effective network utilization in large-scale UAV swarms. The suboptimal performance of the baseline algorithms can be attributed to their inherent mechanisms. ACO and GPSR tend to select locally optimal paths, which results in lower throughput and a correspondingly PLR. Although LB-GPSR attempts to balance the load via round-robin forwarding, its disregard for real-time channel conditions leads to data congestion and subsequent packet loss. Similarly, RLFR fails to consider its own data queue status, causing it to expend unnecessary transmission power on small data packets; this inefficiency results in premature energy depletion and a very high PLR. Ultimately, the combination of high throughput and low packet loss rate reflects the stability of LEADR in establishing communication services, thereby ensuring the reliable transmission of data streams.
+
+As shown in Fig. \ref{fig:number_analysis_a} and \ref{fig:number_analysis_b}, with an increasing number of UAVs, the throughput of all baseline algorithms exhibits a declining trend. In contrast, LEADR's throughput grows steadily while maintaining a very low packet loss rates (PLR), demonstrating its effectiveness and scalability in denser scenarios. The baselines' suboptimal performance stems from their inherent design flaws: ACO and GPSR tend to select local optima; LB-GPSR ignores real-time channel conditions; and RLFR's inefficient power management leads to premature node failure. Ultimately, LEADR’s combination of high throughput and low packet loss rate ensures the reliable transmission of data streams, guaranteeing service stability.
+
+% 如图\ref{fig:number_analysis}(d)所示，LEADR始终保持着3600秒的最长网络生存时间，确保了通信服务的持久运行。同时，如图\ref{fig:number_analysis}(c)所示，其良好的能量均衡性避免了网络中部分节点因能耗过快而提前失效，杜绝了网络“短板”的出现，为服务的连续性提供了保障。
+As shown in Fig. \ref{fig:number_analysis_d}, LEADR always maintains the maximum network lifetime of 3600 seconds, which ensures the sustained operation of the communication service. Meanwhile, as shown in Fig. \ref{fig:number_analysis_c}, its effective energy balance prevents nodes in the network from failing prematurely due to excessively fast energy consumption. This eradicates the emergence of network bottlenecks and provides a guarantee for service continuity.
+
+\subsection{Impact of Communication Range}
+% 为了评估算法对不同网络拓扑和干扰水平的鲁棒性，我们分析了它们在改变无人机通信范围从200美元~\matrm{m}$到300美元~\matrm{m}$时的性能。对于这组实验，无人机的数量保持不变为30。结果如图1所示。
+To evaluate the algorithms' robustness to varying network topologies and interference levels, their performance is analyzed while the UAV communication range is varied from $200~\mathrm{m}$ to $300~\mathrm{m}$. For this set of experiments, the number of UAVs is held constant at 30. The results are presented in Fig. \ref{fig:communication_analysis}.
+\begin{figure}[htbp] % h: here, t: top, b: bottom, p: page of floats
+    \centering 
+    \begin{subfigure}[t]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{com_a.eps}
+        \caption{Aggregate Network Throughput}
+        \label{fig:communication_analysis_a}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[t]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{com_b.eps}
+        \caption{Packet Loss Rate}
+        \label{fig:communication_analysis_b}
+    \end{subfigure}
+    
+    \begin{subfigure}[t]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{com_c.eps}
+        \caption{Energy Balance}
+        \label{fig:communication_analysis_c}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[t]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{com_d.eps}
+        \caption{Network Lifetime}
+        \label{fig:communication_analysis_d}
+    \end{subfigure}
+
+    \caption{Performance analysis with varying communication ranges.}
+    \label{fig:communication_analysis}
+\end{figure}
+
+% 图\ref{fig：communication_analysis}(a)和(b)中的结果表明，随着通信距离增加，无人机的邻居节点增加，所有算法的吞吐量均因信道干扰加剧和更少的跳数而下降。LEADR依然表现稳定性，其吞吐量始终显著高于所有基线算法，且丢包率稳定维持在0.05左右的极低水平。可以发现ACO和GPSR算法丢包率下降明显，这是因为当通信范围变大时局部的最优会更趋于全局的最优，对于整个无人机网络的依赖程度不高。
+% The results presented in Fig. \ref{fig:communication_analysis_a} and \ref{fig:communication_analysis_b} indicate that as the communication range increases, so does the number of neighbors for each UAV. The throughput of all algorithms decreases due to heightened channel interference and a reduction in the number of hops required for data transmission. LEADR demonstrates stability, its throughput remains significantly higher than all baseline algorithms, and its PLR is consistently maintained at an extremely low level of approximately 0.05. The PLR for the ACO and GPSR algorithms see a significant decrease. This occurs because a larger communication range makes it more likely that a locally optimal choice aligns with the global optimum, reducing the reliance on the broader UAV network.
+
+As shown in Fig. \ref{fig:communication_analysis_a} and \ref{fig:communication_analysis_b}, a larger communication range increases the number of neighbors for each UAV and the level of interference, causing throughput to drop for all algorithms. LEADR consistently maintains the highest throughput and a very low PLR of around 0.05. For GPSR and ACO, the PLR drops because a larger range increases the chance that a local optimum aligns with a global one.
+
+% 在服务的连续性上，LEADR同样表现出众。图\ref{fig:communication_analysis}(d)显示，它在所有通信距离下均实现了3600秒的最长网络寿命，而图\ref{fig:communication_analysis}(c)中LEADR对于无人机能量均衡度控制较好，这表明其能根据网络拓扑的动态变化，合理调整节点的传输功率与转发任务，始终维持能量消耗的均衡。
+In terms of service continuity, LEADR also performs outstandingly. It achieves the maximum network lifetime of 3600 seconds across all communication ranges, as shown in Fig. \ref{fig:communication_analysis_d}. This is attributed to its effective control over the energy balance of the UAVs, depicted in Fig. \ref{fig:communication_analysis_c}. LEADR shows good control over the energy balance of the UAVs. This suggests that LEADR can adeptly adjust the transmission power and forwarding tasks of nodes in response to dynamic changes in network topology, thereby consistently maintaining a balance in energy consumption.
+
+\subsection{Impact of UAV Speed}
+The adaptability of the algorithms to network dynamism is evaluated by varying the average UAV speed from 5 m/s to 25 m/s. Higher speeds induce more frequent topological changes, rigorously testing each strategy's responsiveness. The results are presented in Fig. \ref{fig:speed_analysis}.
+\begin{figure}[htbp] % h: here, t: top, b: bottom, p: page of floats
+    \centering 
+    \begin{subfigure}[t]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{speed_a.eps}
+        \caption{Aggregate Network Throughput}
+        \label{fig:speed_analysis_a}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[t]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{speed_b.eps}
+        \caption{Packet Loss Rate}
+        \label{fig:speed_analysis_b}
+    \end{subfigure}
+    
+    \begin{subfigure}[t]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{speed_c.eps}
+        \caption{Energy Balance}
+        \label{fig:speed_analysis_c}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[t]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{speed_d.eps}
+        \caption{Network Lifetime}
+        \label{fig:speed_analysis_d}
+    \end{subfigure}
+
+    \caption{Performance analysis with varying average flight speeds.}
+    \label{fig:speed_analysis}
+\end{figure}
+
+% 如图\ref{fig:speed_analysis}(a)和(b)所示，随着速度增加，网络拓扑变化更为频繁。这种高动态性打破了固有的静态路由瓶颈，为数据流向更多节点创造了机会，因此多数算法的吞吐量有所提升，丢包率也呈现下降趋势。其中LEADR吞吐量增幅最大，同时丢包率从本已极低的水平进一步降至几乎为零，展现了卓越的稳定性。而LB-GPSR因为是轮询进行转发，对于高动态的环境适应性很差，因此是唯一吞吐量随着速度的增加而持续下降的策略。
+As shown in Fig. \ref{fig:speed_analysis_a} and \ref{fig:speed_analysis_b}, an increase in UAV speed leads to more frequent topological changes, which breaks static routing bottlenecks and results in higher throughput and lower packet loss for most algorithms. LEADR, in particular, shows the most significant increase in throughput, while its already low PLR drops to nearly zero, demonstrating excellent stability. Conversely, LB-GPSR is the only strategy whose throughput consistently decreases, as its round-robin forwarding mechanism is ill-suited for highly dynamic environments.
+
+% 在服务的连续性方面，更高的移动速度带来了天然的负载均衡效应。如图\ref{fig:speed_analysis}(c)所示，所有算法的能量均衡度都有下降趋势，也使得多数算法的网络寿命随速度增加而延长，如图\ref{fig:speed_analysis}(d)所示。LEADR在所有速度下都保持了较好的能量均衡度和3600秒的最长网络寿命，从而在任何移动模式下都能确保服务的连续性。
+Regarding service continuity, higher mobility introduces a natural load-balancing effect.  As depicted in Fig. \ref{fig:speed_analysis_c}, the energy balance improves for all algorithms, which in turn extends the network lifetime for most strategies as speed increases, shown in Fig. \ref{fig:speed_analysis_d}. LEADR consistently maintains a superior energy balance and the maximum network lifetime of 3600 seconds at all speeds, thereby ensuring service continuity across different mobility models.
+
+\section{Conclusion and Future Work}
+\label{s6}
+% 本文提出了一种基于Lyapunov优化框架集成启发式的轻量级路由策略，以解决FANET中联合路由和功率控制的挑战。无人机根据路由策略做出实时、分散的决策，以最大限度地提高网络吞吐量，同时保证长期能量和数据队列稳定性。仿真结果表明，LEADR在总吞吐量、网络寿命和能量平衡方面明显优于代表性基线协议，证实了其在提供通信服务时的持续性和稳定性。
+This paper proposed LEADR, a lightweight routing strategy that integrates a Lyapunov optimization framework with heuristics to solve the joint routing and power control problem in FANETs. The strategy enables UAVs to make real-time, decentralized decisions to maximize network throughput while guaranteeing long-term energy and data queue stability. Simulation results demonstrate that LEADR significantly outperforms baseline protocols across multiple key metrics, achieving higher total network throughput, a lower packet loss rate, longer network lifetime, and superior energy balance. These results confirm its effectiveness and stability for providing continuous communication services. Future work may include extending the framework to 3D environments and adapting it for scenarios with multiple data centers.
+
+\section{Acknowledgements}
+Research in this paper is supported by the National Natural Science Foundation of China (62372140), and the Postdoctoral Science Foundation of Heilongjiang Province, China (LBH-Z23145).
+
+\bibliographystyle{splncs04}
+\bibliography{mybibliography}
+\end{document}
