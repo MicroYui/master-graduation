@@ -397,6 +397,7 @@
 \hit@def@term{caffil}
 \hit@def@term{csupervisor}
 \hit@def@term{cdate}
+\hit@def@term{creporttype}
 
 \def\hit@parse@keywords#1{
   \define@key{hit}{#1}{\csname #1\endcsname{##1}}
@@ -430,21 +431,26 @@
   \begin{center}
     \ifboolexpr{ bool {hit@shenzhen} and bool {hit@master} and bool {hit@opening} }%
     {\xiaoyi\ziju{1/8}}{\erhao}
-    \songti\textbf{\hit@cxuewei\hit@cthesisname
-      \ifhit@opening
-        \hit@stage@opening
+    \songti\textbf{%
+      \ifhit@midterm
+        \hit@cxuewei 学位\hit@stage@midterm\hit@stage@doctype
       \else
-        \ifhit@midterm
-          \hit@stage@midterm
+        \hit@cxuewei\hit@cthesisname
+        \ifhit@opening
+          \hit@stage@opening
         \fi
+        \hit@stage@doctype
       \fi
-      \hit@stage@doctype
     }
   \end{center}
   \vspace{10mm}
-  \parbox[t][3cm][t]{\textwidth}{
+  \parbox[t][4cm][t]{\textwidth}{
+    \noindent\parbox[t]{\textwidth}{%
+      \centering\songti\xiaoer\textbf{\hit@cthesistitleprefix\hit@title@csep\hit@ctitlecover}\par
+    }
     \begin{center}
-      \songti\xiaoer\textbf{\hit@cthesistitleprefix\hit@title@csep\hit@ctitlecover}
+      \vspace{8mm}
+      \songti\sanhao\textcolor[rgb]{1,0,0}{\textbf{（\hit@creporttype）}}
     \end{center}
   }
   \parbox[b][3cm][t]{\textwidth}{

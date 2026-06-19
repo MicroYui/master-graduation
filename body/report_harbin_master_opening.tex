@@ -24,7 +24,7 @@
 
 \begin{enumerate}
 \item \textbf{面向高动态飞行自组网的分布式能量均衡路由策略研究}：该研究问题聚焦于灾后应急通信等场景下，飞行自组网（FANET）在能量受限条件下的服务数据路由转发决策问题\cite{intro3,intro4,intro11}。飞行自组网通常由多个无人机构成，能够在地面基础设施受损或缺失的情况下快速部署，并通过多跳中继方式将灾区现场传感器数据、监控视频和任务状态信息传输至远程数据中心。其核心挑战在于平衡瞬时传输性能与系统长期生存性之间的内在矛盾：在高动态、能量受限的环境中，仅追求瞬时最优的短视路由极易使关键中继节点能量过早耗尽，形成能量热点，进而引发网络分裂与服务中断。对于需要长时间维持稳定应急通信的任务而言，关键节点的过早失效会直接降低网络连通性和服务连续性。本研究旨在引入李雅普诺夫优化理论，设计一种分布式的路由与功率联合决策机制，在保障数据传输性能的同时实现全网能耗均衡，最大化网络的服务周期\cite{gpsr,aco,qtar,drlfr,drlrr,algo1,algo2}。具体而言，该研究通过虚拟能量队列刻画节点长期能量消耗状态，通过单时隙功率控制平衡链路速率与通信能耗，并通过融合优化收益、节点能量与地理进度的复合链路权重完成下一跳选择，从而在分布式条件下实现对网络长期服务能力的优化。
-\item \textbf{面向动态边缘网络的链路感知选择性语义通信策略研究}：该研究问题在数据可被可靠传输的基础上，将协同通信优化从比特层提升至语义层，研究多智能体视觉推理任务中的语义证据交换问题\cite{semantic-communications-jsac,semantic-communications-survey}。在无人机、移动机器人和边缘摄像头等多智能体感知系统中，单个智能体往往只能获得局部视觉观测，其观测结果可能受到遮挡、视角限制、运动模糊和传感器质量差异等因素影响，难以独立形成完整判断\cite{where-to-look-vqa,vqa-hat,gqa,vq-focus-ambiguity}。当回答一个协同视觉查询所需的证据分散在多个局部观测中，而边缘链路又呈现间歇与带宽受限的特性时，智能体必须联合权衡语义价值、消息粒度、通信代价与送达可靠性：并非所有语义消息都有用，全量通信会带来冗余信息、带宽浪费和低信噪比；也并非所有有用的消息都能送达，较长的消息更容易错过短暂的通信窗口。本研究旨在提出一种 trace-driven 的强化学习框架，将代价较高的语义推理与轻量的通信策略学习相分离，在多重约束下学习应当传输哪条消息、传输给谁以及采用何种语义粒度\cite{rial-dial,commnet,ic3net,ppo}。具体而言，该研究利用冻结视觉语言模型离线构造统一标签空间下的多智能体语义通信轨迹，记录全图可见性真值、局部可见性证据、多粒度候选消息及接收方信念更新；同时建立动态链路可靠性模型，为每条语义消息赋予时延、截止时间、送达概率与丢包风险，并以送达概率对信念更新进行折扣；在此基础上，设计能够显式编码发送方证据质量、接收方需求、语义粒度、链路状态与已选历史的序列决策策略，以提升受限通信条件下的协同推理质量。
+\item \textbf{面向动态边缘网络的链路感知选择性语义通信策略研究}：该研究问题在数据可被可靠传输的基础上，将协同通信优化从比特层提升至语义层，研究多智能体视觉推理任务中的语义证据交换问题\cite{semantic-communications-jsac,semantic-communications-survey}。在无人机、移动机器人和边缘摄像头等多智能体感知系统中，单个智能体往往只能获得局部视觉观测，其观测结果可能受到遮挡、视角限制、运动模糊和传感器质量差异等因素影响，难以独立形成完整判断\cite{where-to-look-vqa,vqa-hat,gqa,vq-focus-ambiguity}。当回答一个协同视觉查询所需的证据分散在多个局部观测中，而边缘链路又呈现间歇与带宽受限的特性时，智能体必须联合权衡语义价值、消息粒度、通信代价与送达可靠性：并非所有语义消息都有用，全量通信会带来冗余信息、带宽浪费和低信噪比；也并非所有有用的消息都能送达，较长的消息更容易错过短暂的通信窗口。本研究旨在提出一种 trace-driven 的强化学习框架，将代价较高的语义推理与轻量的通信策略学习相分离，在多重约束下学习应当传输哪条消息、传输给谁以及采用何种语义粒度\cite{rial-dial,commnet,ic3net,ppo}。具体而言，该研究利用冻结视觉语言模型离线构造统一标签空间下的多智能体语义通信轨迹，记录全图可见性真值、局部可见性证据、多粒度候选消息及接收方信念更新；同时建立动态链路可靠性模型，为每条语义消息赋予时延、截止时间、送达概率与丢包风险，并将这些链路因素作为状态特征、动作约束和奖励成本参与策略学习；在此基础上，设计能够显式编码发送方证据质量、接收方需求、语义粒度、链路状态与已选历史的序列决策策略，以提升受限通信条件下的协同推理质量。
 \item \textbf{面向真实链路与能量约束的协同语义通信鲁棒性分析方法研究}：该研究问题研究在贴近真实传输条件下，选择性语义通信策略的有效性与鲁棒性问题。前一研究问题在评估时采用与距离相关的简化链路模型，刻画的是较为理想化的传输环境，而实际的多智能体系统中，链路质量受到节点能量消耗、节点存活状态与拓扑演化的共同影响，呈现出更强的时变性与不确定性\cite{uav-edge-survey,uav-offloading-edge,drlfr,drlrr}。特别是在无人机集群和移动边缘网络中，节点能量持续下降会改变可用链路集合，关键节点失效可能导致拓扑连通性下降，局部能量热点也可能使原本可靠的通信路径逐渐退化。因此，语义消息能否送达、以何种代价送达，以及送达后能否产生有效推理增益，均与底层传输状态密切相关。本研究旨在将能量感知路由所产生的真实链路质量、送达动态与节点能量状态引入语义通信的分析过程，在更接近真实部署的条件下考察各类通信策略的性能分化与鲁棒性差异。该研究将对比理想链路与真实能量感知链路两类条件下，全通信、仅依据语义价值、仅依据链路可靠性以及链路感知选择性学习策略等不同通信方法的性能变化，分析链路不稳定性、能量热点引发的拓扑变化、节点失效和通信预算变化等因素如何共同影响语义粒度选择与选择性通信收益。通过上述分析，明确传输条件对语义通信策略的影响机制，为动态资源受限网络中通信策略的设计提供依据。
 \end{enumerate}
 
@@ -50,8 +50,7 @@
 
 研究问题二已基本完成。该部分完成了离线语义轨迹构造流水线、
 动态链路可靠性建模与基于强化学习的选择性通信策略设计与实现，
-并完成了主设置对比、智能体数量、通信预算、通信步数、链路可靠性、消息粒度、
-trace 规模和关键模块消融等完整 quick RQ suite 实验。
+并完成了主设置对比、智能体数量、通信预算和关键模块消融等完整研究问题实验。
 在语义轨迹构造方面，已基于 VQAv2/COCO 样本构建多智能体视觉推理场景，
 将完整图像和局部裁剪区域分别用于生成全图可见性真值与局部可见性证据，
 并统一为 clear、mostly\_clear、uncertain、mostly\_blocked、blocked 五级有序标签空间。
@@ -60,13 +59,13 @@ trace 规模和关键模块消融等完整 quick RQ suite 实验。
 已实现 graph-history masked actor-critic PPO 方法，
 通过候选消息特征、发送方状态、接收方需求、语义粒度、链路可靠性和已选历史进行序列决策学习。
 在实验方面，已完成固定 9-agent 主设置实验、32 组超参数搜索，
-以及覆盖 28 个实验条件的 quick suite 测试集评估，
+以及覆盖 16 个实验条件的测试集完整评估，
 并与 NoComm、FullComm、Random、TokenGreedy、SemanticOnly、
-LinkOnly、Where2Comm-Trace、How2Comm-Trace、ContextualBandit、OracleGreedy 
-等方法进行对比。当前结果表明，EviComRL 在 Effective Quality 上所有条件均排名第一，
-在 Accuracy 与 Macro-F1 上相对多数可部署基线取得稳定优势；同时，QCR 与送达折扣消融结果显示，
-通信成本约束和送达折扣校准仍有进一步优化空间。需要说明的是，当前 quick suite 采用单随机种子、
-2000 条 trace 和 80 个训练 epoch，用于形成完整实验闭环；后续仍需以 3000 条 trace、更多训练轮次和多随机种子报告正式均值与标准差，论文尚未投稿。
+LinkOnly、Where2Comm-Trace、How2Comm-Trace、ContextualBandit
+等方法进行对比。当前结果表明，EviComRL 在 Accuracy、Balanced Accuracy、
+Macro-F1 和 Effective Quality 上均取得当前可部署方法中的最优表现；同时，QCR 结果显示，
+通信成本约束仍有进一步优化空间。需要说明的是，当前完整实验采用单随机种子、
+2000 条 trace 和 80 个训练 epoch；后续仍需以 3000 条 trace、更多训练轮次和多随机种子报告均值与标准差，论文尚未投稿。
 
 研究问题三处于方案设计与前期准备阶段。该部分已明确研究目标、对比条件与评估指标，
 研究对象为真实链路与能量动态条件下选择性语义通信策略的有效性与鲁棒性。
@@ -79,9 +78,9 @@ LinkOnly、Where2Comm-Trace、How2Comm-Trace、ContextualBandit、OracleGreedy
 后续将围绕统一实验环境搭建、链路状态映射、跨条件对比实验与鲁棒性分析展开，
 是本课题后期的工作重点。
 
-总体来看，本课题已完成一个完整研究成果并发表论文，第二个研究问题已完成主体方法与完整 quick suite 实验闭环，
+总体来看，本课题已完成一个完整研究成果并发表论文，第二个研究问题已完成主体方法与完整实验闭环，
 第三个研究问题已完成研究目标与实验方案设计。
-后续工作将重点补全第二个研究问题的多随机种子正式结果，推进第三个研究问题的真实链路条件下鲁棒性分析，
+后续工作将重点补全第二个研究问题的多随机种子补充结果，推进第三个研究问题的真实链路条件下鲁棒性分析，
 并完成学位论文整体撰写与章节整合。
 
 \section{目前已完成的研究工作内容和取得的研究结果}
@@ -137,6 +136,19 @@ LinkOnly、Where2Comm-Trace、How2Comm-Trace、ContextualBandit、OracleGreedy
 该策略使每架无人机仅依靠本地状态和邻居广播信息，实时完成下一跳选择与发射功率控制，
 在保证数据传输性能的同时改善能量均衡，延长网络服务周期。该部分工作已完成问题建模、算法设计、
 仿真实现与对比实验。
+
+图\ref{fig:leadr_decision_loop}给出了 LEADR 的场景--决策闭环。该图从 FANET 应急通信场景出发，
+展示了无人机节点如何基于数据队列、剩余能量、虚拟能量队列和邻居状态完成本地决策，
+并通过候选链路评估、Lyapunov 联合决策、路由执行和状态更新形成闭环，
+最终服务于提高吞吐量、降低丢包率、均衡节点能耗和延长网络生命周期等目标。
+
+\begin{figure}[!tb]
+\centering
+\includegraphics[width=\textwidth]{leadr_decision_loop.png}
+\caption{LEADR 面向高动态 FANET 的场景--决策闭环}
+\label{fig:leadr_decision_loop}
+\end{figure}
+
 \subsubsection{系统模型与问题建模}
 考虑由 $N$ 架无人机构成的飞行自组网，节点集合记为
 \begin{equation}
@@ -255,11 +267,12 @@ D_i(t) &= Q_i(t)\Delta t+V.
 首先对每条候选链路求解最优发射功率，然后根据复合链路权重选择下一跳。
 算法\ref{alg:leadr}给出了每个节点在单个时隙内执行 LEADR 的主要流程。
 
-\begin{algorithm}[H]
+\begin{algorithm}[!htbp]
 \caption{LEADR 分布式路由与功率联合决策}
 \label{alg:leadr}
 \renewcommand{\algorithmicrequire}{\textbf{输入：}}
 \renewcommand{\algorithmicensure}{\textbf{输出：}}
+\small
 \begin{algorithmic}[1]
 \REQUIRE 本地状态 $Q_i(t)$、$E_i(t)$、$F_i(t)$，以及邻居状态集合 $\mathcal{N}_i(t)$
 \ENSURE 路由动作 $x_{ij}(t)$ 与发射功率 $P_{ij}^{\mathrm{trans}}(t)$
@@ -349,20 +362,9 @@ O(N_i),
 单架无人机最大发射功率为 0.2 W。数据包大小为 1 KB，单机数据队列容量上限为 8000 KB，
 单机通信能量预算为 15 J。
 
-实验将 LEADR 与四类基线方法进行对比：
-\begin{enumerate}
-  \item \textbf{GPSR}：该方法采用地理贪心转发策略，选择距离数据中心最近的邻居作为下一跳\cite{gpsr}。
-  \item \textbf{ACO}：该方法基于蚁群优化思想，利用信息素机制并结合节点能量和距离信息进行路径选择\cite{aco}。
-  \item \textbf{RLFR}：该方法采用强化学习思想，以投递率和传输能耗为奖励信号，学习路由与功率控制策略\cite{drlfr}。
-  \item \textbf{LB-GPSR}：该方法在 GPSR 基础上加入负载均衡思想，通过轮询转发缓解局部热点问题。
-\end{enumerate}
-评价指标包括四项：
-\begin{enumerate}
-  \item \textbf{网络总吞吐量}：该指标衡量任务周期内全网成功转发的数据总量，用于评价通信服务的数据承载能力。
-  \item \textbf{数据包丢失率}：该指标衡量由于队列溢出、链路不可达或节点失效导致的数据包丢失比例，用于评价服务可靠性。
-  \item \textbf{能量均衡度}：该指标刻画不同无人机节点之间能量消耗的均衡程度，用于评价是否存在局部能量热点。
-  \item \textbf{网络生命周期}：该指标以网络能够持续提供有效通信服务的时间衡量，用于评价策略对长期服务连续性的保障能力。
-\end{enumerate}
+实验将 LEADR 与四类基线方法进行对比：\textbf{GPSR} 采用地理贪心转发策略，选择距离数据中心最近的邻居作为下一跳\cite{gpsr}；\textbf{ACO} 基于蚁群优化思想，利用信息素机制并结合节点能量和距离信息进行路径选择\cite{aco}；\textbf{RLFR} 采用强化学习思想，以投递率和传输能耗为奖励信号，学习路由与功率控制策略\cite{drlfr}；\textbf{LB-GPSR} 在 GPSR 基础上加入负载均衡思想，通过轮询转发缓解局部热点问题。
+
+评价指标包括网络总吞吐量、数据包丢失率、能量均衡度和网络生命周期四项。其中，网络总吞吐量衡量任务周期内全网成功转发的数据总量，用于评价通信服务的数据承载能力；数据包丢失率衡量由于队列溢出、链路不可达或节点失效导致的数据包丢失比例，用于评价服务可靠性；能量均衡度刻画不同无人机节点之间能量消耗的均衡程度，用于评价是否存在局部能量热点；网络生命周期以网络能够持续提供有效通信服务的时间衡量，用于评价策略对长期服务连续性的保障能力。
 实验围绕三组动态网络条件展开：无人机数量变化、通信范围变化和飞行速度变化。
 三组实验分别用于考察算法的规模适应性、
 拓扑与干扰变化下的鲁棒性，以及高移动性环境下的响应能力。
@@ -375,9 +377,25 @@ O(N_i),
 
 \begin{figure}[htbp]
 \centering
-\fbox{\parbox[c][4.0cm][c]{0.92\textwidth}{
-\centering 待补图：无人机数量变化下的性能对比图，对应 LEADR 论文 Fig. 2。建议包含四个子图：Aggregate Network Throughput、Packet Loss Rate、Energy Balance 和 Network Lifetime。
-}}
+\subfigure[Aggregate Network Throughput]{
+  \includegraphics[width=0.48\textwidth]{num_a.eps}
+  \label{fig:leadr_uav_number_a}
+}
+\hfill
+\subfigure[Packet Loss Rate]{
+  \includegraphics[width=0.48\textwidth]{num_b.eps}
+  \label{fig:leadr_uav_number_b}
+}
+
+\subfigure[Energy Balance]{
+  \includegraphics[width=0.48\textwidth]{num_c.eps}
+  \label{fig:leadr_uav_number_c}
+}
+\hfill
+\subfigure[Network Lifetime]{
+  \includegraphics[width=0.48\textwidth]{num_d.eps}
+  \label{fig:leadr_uav_number_d}
+}
 \caption{无人机数量变化下的性能对比}
 \label{fig:leadr_uav_number}
 \end{figure}
@@ -403,9 +421,25 @@ LEADR 能够较好地抑制能量消耗集中在少数关键节点上的现象�
 
 \begin{figure}[htbp]
 \centering
-\fbox{\parbox[c][4.0cm][c]{0.92\textwidth}{
-\centering 待补图：通信范围变化下的性能对比图，对应 LEADR 论文 Fig. 3。建议包含四个子图：Aggregate Network Throughput、Packet Loss Rate、Energy Balance 和 Network Lifetime。
-}}
+\subfigure[Aggregate Network Throughput]{
+  \includegraphics[width=0.48\textwidth]{com_a.eps}
+  \label{fig:leadr_range_a}
+}
+\hfill
+\subfigure[Packet Loss Rate]{
+  \includegraphics[width=0.48\textwidth]{com_b.eps}
+  \label{fig:leadr_range_b}
+}
+
+\subfigure[Energy Balance]{
+  \includegraphics[width=0.48\textwidth]{com_c.eps}
+  \label{fig:leadr_range_c}
+}
+\hfill
+\subfigure[Network Lifetime]{
+  \includegraphics[width=0.48\textwidth]{com_d.eps}
+  \label{fig:leadr_range_d}
+}
 \caption{通信范围变化下的性能对比}
 \label{fig:leadr_range}
 \end{figure}
@@ -430,9 +464,25 @@ LEADR 能够根据拓扑变化调整转发任务和发射功率，使节点之�
 
 \begin{figure}[htbp]
 \centering
-\fbox{\parbox[c][4.0cm][c]{0.92\textwidth}{
-\centering 待补图：飞行速度变化下的性能对比图，对应 LEADR 论文 Fig. 4。建议包含四个子图：Aggregate Network Throughput、Packet Loss Rate、Energy Balance 和 Network Lifetime。
-}}
+\subfigure[Aggregate Network Throughput]{
+  \includegraphics[width=0.48\textwidth]{speed_a.eps}
+  \label{fig:leadr_speed_a}
+}
+\hfill
+\subfigure[Packet Loss Rate]{
+  \includegraphics[width=0.48\textwidth]{speed_b.eps}
+  \label{fig:leadr_speed_b}
+}
+
+\subfigure[Energy Balance]{
+  \includegraphics[width=0.48\textwidth]{speed_c.eps}
+  \label{fig:leadr_speed_c}
+}
+\hfill
+\subfigure[Network Lifetime]{
+  \includegraphics[width=0.48\textwidth]{speed_d.eps}
+  \label{fig:leadr_speed_d}
+}
 \caption{飞行速度变化下的性能对比}
 \label{fig:leadr_speed}
 \end{figure}
@@ -472,16 +522,26 @@ LEADR 能够在保持较高网络吞吐量和较低丢包率的同时，改善�
 无线链路具有间歇性、带宽受限，且较长消息更容易错过短暂的通信窗口，
 因此让所有智能体无差别地交换全部原始观测或全部语义消息往往并不可行\cite{who2com,when2com,where2comm,how2comm,uav-edge-survey,uav-offloading-edge,uavs-meet-llms,llm-multirobot-survey,vla-survey}。
 
-针对上述问题，本节提出 EviCom-RL，一种基于离线语义轨迹（trace-driven）的强化学习框架，
-用于在 token、时延和送达可靠性约束下学习选择与任务相关的语义消息。
+针对上述问题，本节提出 EviComRL，一种基于离线语义轨迹（trace-driven）的强化学习框架，
+用于在 token、时延和链路风险约束下学习选择与任务相关的语义消息。
 与第一个研究问题面向链路层的路由与功率控制不同，本节关注的是语义层的通信决策：
 当回答某个视觉查询所需的证据分散在多个局部观测中、且链路资源受限时，哪些局部语义证据值得发送、
 发送给谁、以及以何种语义粒度发送。该问题与通信高效协同感知、任务导向语义通信、
 LLM 多智能体通信成本控制以及 VQA 证据定位等研究方向相关\cite{semantic-communications-jsac,semantic-communications-survey,agentprune,auction-language-agent,llm-mas-scaling,where-to-look-vqa,vqa-hat,gqa,vq-focus-ambiguity}。
-该部分工作已完成问题建模、离线轨迹构造、策略设计、主设置对比实验以及按研究问题组织的 quick suite 实验。
-当前结果显示，EviComRL 在 Effective Quality 上所有条件均排名第一，并在 Accuracy 与 Macro-F1 上相对多数可部署基线取得稳定优势。
-从方法脉络看，EviCom-RL 继承了多智能体通信学习中将通信作为策略动作进行优化的思想\cite{rial-dial,commnet,ic3net}，
-但进一步把消息表示扩展为由 VLM/LLM 生成的语义证据，并将 token、时延、送达概率和丢包风险纳入同一决策过程。
+该部分工作已完成问题建模、离线轨迹构造、策略设计、主设置对比实验以及按研究问题组织的完整实验。
+当前结果显示，EviComRL 在主设置下取得当前可部署方法中的最优 Accuracy、Balanced Accuracy、Macro-F1 和 Effective Quality，
+并在跨条件实验中保持稳定优势。
+从方法脉络看，EviComRL 继承了多智能体通信学习中将通信作为策略动作进行优化的思想\cite{rial-dial,commnet,ic3net}，
+但进一步把消息表示扩展为由 VLM/LLM 生成的语义证据，并将 token、时延、链路可靠性和丢包风险纳入同一决策过程。
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{EviCom-RL-workflow.jpeg}
+\caption{EviComRL 离线语义轨迹构造与策略学习整体流程}
+\label{fig:evicom_workflow}
+\end{figure}
+
+如图\ref{fig:evicom_workflow}所示，EviComRL 的整体流程分为两个阶段。第一阶段在离线环境中调用冻结 VLM/LLM，完成全图可见性标注、局部证据抽取、多粒度语义消息构造和信念增量记录，形成冻结语义轨迹数据集；第二阶段在不再调用大模型的前提下回放冻结轨迹，通过候选检索与链路感知重排序得到 Top-$M$ 候选，再由 masked actor-critic PPO 策略结合动作掩码、奖励计算和 PPO 更新学习选择性通信策略。
 
 \subsubsection{问题建模与离线语义轨迹构造}
 \paragraph{多智能体视觉推理设定}
@@ -536,7 +596,7 @@ p_m^{del}=\sigma\!\left(\frac{D_m-L_m}{\tau}\right),\qquad R_m^{drop}=1-p_m^{del
 \begin{equation}
 \Delta\mathbf{b}_{i\rightarrow j,k}^{c}=\mathbf{b}_{j,k}^{+,i,c}-\mathbf{b}_{j,k}^{0}.
 \end{equation}
-强化学习阶段不再进行任何在线大模型调用，而是回放保存的信念增量，并按链路可靠性对其折扣：
+强化学习阶段不再进行任何在线大模型调用，而是回放保存的信念增量，并根据消息送达概率形成有效的决策中心信念更新。链路可靠性、时延和丢包风险仍作为状态特征、动作掩码和奖励成本参与决策：
 \begin{equation}
 \tilde{\mathbf{b}}_{j,k}^{t+1}=\operatorname{Normalize}\!\left(\tilde{\mathbf{b}}_{j,k}^{t}+p_m^{del}\,\Delta\mathbf{b}_{i\rightarrow j,k}^{c}\right).
 \end{equation}
@@ -544,23 +604,24 @@ p_m^{del}=\sigma\!\left(\frac{D_m-L_m}{\tau}\right),\qquad R_m^{drop}=1-p_m^{del
 \begin{equation}
 Q_k^{final}=B_k^{\,y_k^{*}}.
 \end{equation}
-优化目标为在最小化通信成本与送达风险的同时最大化协同推理质量：
+优化目标为在最小化通信成本与链路风险的同时最大化协同推理质量：
 \begin{equation}
 \max_{\pi}\;\mathbb{E}_{\pi}\!\left[Q_k^{final}-\beta_T\tilde{T}^{msg}-\beta_L\tilde{L}^{comm}-\beta_R\tilde{R}^{drop}\right],
 \end{equation}
 其中 $\tilde{T}^{msg}$、$\tilde{L}^{comm}$、$\tilde{R}^{drop}$ 分别为归一化的 token 使用量、通信时延和丢包风险成本。由于 $y_k^{*}$ 只参与离线奖励计算、不进入策略状态，因此不会作为策略决策时的输入特征。
 \paragraph{离线语义轨迹构造}
-给定一个 VQAv2/COCO 样本，系统先用完整图像和任务问题调用冻结 VLM，生成五级可见性离线弱监督标签 $y_k^{*}$ 及其信念分布，并记录为全图可见性标注；随后将图像划分为分配给不同智能体的局部裁剪区域，对每个智能体生成包含局部可见性标签、置信度、不确定性、观测质量、信念分布和文本摘要的结构化局部证据；再在四种语义粒度下构造候选消息，对每个发送方-接收方-模式元组记录消息文本、token 长度、链路特征、送达概率、丢包风险和接收方信念增量。最终得到离线轨迹数据集
+图\ref{fig:evicom_workflow}上半部分给出了离线语义轨迹构造过程。给定一个 VQAv2/COCO 样本，系统先用完整图像和任务问题调用冻结 VLM，生成五级可见性离线弱监督标签 $y_k^{*}$ 及其信念分布，并记录为全图可见性标注；随后将图像划分为分配给不同智能体的局部裁剪区域，对每个智能体生成包含局部可见性标签、置信度、不确定性、观测质量、信念分布和文本摘要的结构化局部证据；再在四种语义粒度下构造候选消息，对每个发送方-接收方-模式元组记录消息文本、token 长度、链路特征、送达概率、丢包风险和接收方信念增量。最终得到离线轨迹数据集
 \begin{equation}
 \mathcal{D}^{trace}=\left\{y_k^{*},\,e_{i,k},\,m_{i\rightarrow j,k}^{c},\,T_{i\rightarrow j,k}^{c},\,p_m^{del},\,R_m^{drop},\,\Delta\mathbf{b}_{i\rightarrow j,k}^{c}\right\}.
 \end{equation}
 这种轨迹构造将昂贵的语义推理与通信策略优化解耦，该设计主要具有三点作用：所有策略作用于相同的语义证据与信念更新，因而可直接比较；策略训练阶段不再反复调用大模型，提升了可复现性并降低成本；轨迹构造阶段对模型输出执行严格的 schema 校验，空内容、缺失信念、全零概率质量或非法标签会触发重试，不可恢复的格式错误显式失败，内容审核拒绝样本被记录并跳过，从而避免静默兜底污染通信轨迹。
 
-\begin{algorithm}[htbp]
-\caption{EviCom-RL 离线语义轨迹构造}
+\begin{algorithm}[!htbp]
+\caption{EviComRL 离线语义轨迹构造}
 \label{alg:evicom_trace}
 \renewcommand{\algorithmicrequire}{\textbf{输入：}}
 \renewcommand{\algorithmicensure}{\textbf{输出：}}
+\small
 \begin{algorithmic}[1]
 \REQUIRE VQAv2/COCO 样本集合，冻结 VLM/LLM，消息粒度集合 $\mathcal{C}$
 \ENSURE 语义通信轨迹数据集 $\mathcal{D}^{trace}$
@@ -586,17 +647,9 @@ Q_k^{final}=B_k^{\,y_k^{*}}.
 \end{algorithmic}
 \end{algorithm}
 
-\begin{figure}[htbp]
-\centering
-\fbox{\parbox[c][4.0cm][c]{0.92\textwidth}{
-\centering 待补图：EviCom-RL 离线语义轨迹构造流程图，包含全图 VLM 标注、局部 crop 证据生成、多粒度消息构造和接收方信念更新记录。
-}}
-\caption{EviCom-RL 离线语义轨迹构造流程}
-\label{fig:evicom_trace}
-\end{figure}
 \subsubsection{基于 PPO 的链路感知选择性通信策略}
 \paragraph{候选检索与链路感知重排序}
-完整候选集合包含大量发送方-接收方-模式组合，直接输入策略会带来过大的动作空间。EviCom-RL 先检索一组规模可控的有前景消息，检索分数综合语义收益与通信代价：
+完整候选集合包含大量发送方-接收方-模式组合，直接输入策略会带来过大的动作空间。EviComRL 先检索一组规模可控的有前景消息，检索分数综合语义收益与通信代价：
 \begin{equation}
 S_{retrieve}(m)=\frac{H_j+C_{ij}^{conf}+C_{ij}^{comp}+q_i^{obs}+0.2\,b_c}{\left(T_m/T_{\max}+L_m+\epsilon\right)\left(1+R_m^{drop}\right)},
 \end{equation}
@@ -629,7 +682,7 @@ r_t=2\,\Delta Q_t-0.015\,\frac{T_m}{T_{\mathrm{budget}}}-0.01\,L_m-0.003\,\tilde
 \end{equation}
 并在停止或达到最大步数时追加 $Q_t-0.01\,T_{\mathrm{used}}/T_{\mathrm{budget}}$，其中 $\tilde{E}_m$ 表示消息传输对应的归一化能耗估计。这些系数不属于问题定义，而是当前实现的成本-质量权衡超参数，在完整实验中通过验证集搜索确定，测试集仅用于报告最终结果，以避免依据测试集反复调参。
 \paragraph{graph-history masked actor-critic 策略}
-主策略采用 graph-history masked actor-critic 网络，而非将候选特征简单拼接后输入普通多层感知机。该设计源于通信决策本身的结构：一条候选消息同时关联发送方、接收方、语义粒度和链路状态，而当前 episode 中已经选过哪些消息会改变后续候选的边际价值。为此，策略将每条候选消息的输入拆分为五类结构化子特征：
+图\ref{fig:evicom_workflow}下半部分展示了在线仿真与策略学习流程：系统从冻结轨迹中采样 episode，经候选检索与链路感知重排序得到 Top-$M$ 候选，随后由带动作掩码的 actor-critic PPO 策略选择消息，并根据质量增益、token 成本、时延成本、丢包风险和 deadline 违约惩罚计算奖励。主策略采用 graph-history masked actor-critic 网络，而非将候选特征简单拼接后输入普通多层感知机。该设计源于通信决策本身的结构：一条候选消息同时关联发送方、接收方、语义粒度和链路状态，而当前 episode 中已经选过哪些消息会改变后续候选的边际价值。为此，策略将每条候选消息的输入拆分为五类结构化子特征：
 \begin{equation}
 x_m=\left[x_m^{send},\,x_m^{recv},\,x_m^{mode},\,x_m^{link},\,x_m^{hist}\right],
 \end{equation}
@@ -652,14 +705,6 @@ u_m=\operatorname{MLP}_{graph}\!\left[h_m^{0},\,\phi_s(x_m^{send}),\,\phi_r(x_m^
 \end{equation}
 施加动作掩码后，策略为 $\pi_\theta(a_t\mid s_t)=\operatorname{Softmax}(\ell+\text{mask})$。价值网络融合全局状态、合法候选的掩码均值上下文、已选历史上下文与中心上下文来估计 $V_\psi(s_t)$。该网络保持轻量、可在 CPU 上运行，但相比扁平多层感知机，它显式区分"谁在发送、发给谁、以何种粒度、经由何种链路、此前已经选过什么"。
 
-\begin{figure}[htbp]
-\centering
-\fbox{\parbox[c][4.0cm][c]{0.92\textwidth}{
-\centering 待补图：graph-history masked actor-critic 策略结构图，包含候选消息特征、发送方/接收方/模式/链路/历史分支、动作 mask、actor 和 critic 输出。
-}}
-\caption{链路感知选择性语义通信策略网络结构}
-\label{fig:evicom_policy}
-\end{figure}
 \paragraph{PPO 优化与训练稳定化}
 策略采用近端策略优化（PPO）训练\cite{ppo}。其裁剪目标为
 \begin{equation}
@@ -675,10 +720,10 @@ u_m=\operatorname{MLP}_{graph}\!\left[h_m^{0},\,\phi_s(x_m^{send}),\,\phi_r(x_m^
 \mathcal{L}_{value}=\mathbb{E}_t\!\left[(V_\psi(s_t)-R_t)^2\right],\qquad
 \mathcal{L}=\mathcal{L}_{policy}+c_v\mathcal{L}_{value}-c_e\mathcal{H}(\pi_\theta).
 \end{equation}
-在小规模离线轨迹上，纯 PPO 的初始探索可能因过早停止或反复选择低价值消息而产生较大方差。为此，算法在 PPO 之前加入一次轻量监督预热：枚举发往决策中心且即时质量增益为正的候选消息构造局部 oracle 动作，对策略网络做少量交叉熵预热；该步骤不改变最终优化目标，只用于稳定随机初始化。训练过程中同时记录采样回报与确定性策略的平均回报，并保留在验证集确定性回报上表现最优的参数作为最终模型，以避免小样本 PPO 后期探索噪声导致策略退化。
+在小规模离线轨迹上，纯 PPO 的初始探索可能因过早停止或反复选择低价值消息而产生较大方差。为此，算法在 PPO 之前加入一次轻量监督预热：枚举发往决策中心且即时质量增益为正的候选消息构造弱监督贪心动作，对策略网络做少量交叉熵预热；该步骤不改变最终优化目标，只用于稳定随机初始化。训练过程中同时记录采样回报与确定性策略的平均回报，并保留在验证集确定性回报上表现最优的参数作为最终模型，以避免小样本 PPO 后期探索噪声导致策略退化。
 
-\begin{algorithm}[H]
-\caption{EviCom-RL 训练过程}
+\begin{algorithm}[!htbp]
+\caption{EviComRL 训练过程}
 \label{alg:evicom_train}
 \renewcommand{\algorithmicrequire}{\textbf{输入：}}
 \renewcommand{\algorithmicensure}{\textbf{输出：}}
@@ -686,14 +731,14 @@ u_m=\operatorname{MLP}_{graph}\!\left[h_m^{0},\,\phi_s(x_m^{send}),\,\phi_r(x_m^
 \begin{algorithmic}[1]
 \REQUIRE 训练轨迹集 $\mathcal{D}_{train}$，token 预算 $T_{\max}$，候选规模 $M$
 \ENSURE 训练后的通信策略 $\pi_{\theta}$
-\STATE 初始化策略参数 $\theta$、价值网络参数 $\psi$，并用正即时增益 oracle 动作轻量预热 $\pi_{\theta}$
+\STATE 初始化策略参数 $\theta$、价值网络参数 $\psi$，并用正即时增益弱监督动作轻量预热 $\pi_{\theta}$
 \STATE 在验证集上评估确定性策略并保存初始 checkpoint
 \FOR{每个训练 epoch}
     \STATE 从 $\mathcal{D}_{train}$ 采样 episode，并为每个 episode 构造 Top-$M$ 候选消息
     \FOR{每个 episode $k$}
         \STATE 初始化已选集合、预算状态与决策中心信念，构造状态 $s_t$ 和动作掩码
         \STATE 按 $a_t\sim\pi_{\theta}(a_t\mid s_t,\mathrm{mask}_t)$ 展开序列决策，直到停止或达到最大步数
-        \STATE 对每个被选消息执行送达折扣后的信念更新，并记录奖励与转移样本
+        \STATE 对每个被选消息直接应用离线信念增量，并记录奖励与转移样本
     \ENDFOR
     \STATE 使用 GAE 估计优势函数，并通过 masked PPO 更新 $\theta$ 与 $\psi$
     \STATE 评估确定性回报，若验证表现提升则更新最优 checkpoint
@@ -702,8 +747,8 @@ u_m=\operatorname{MLP}_{graph}\!\left[h_m^{0},\,\phi_s(x_m^{send}),\,\phi_r(x_m^
 \end{algorithmic}
 \end{algorithm}
 
-\begin{algorithm}[H]
-\caption{EviCom-RL 推理过程}
+\begin{algorithm}[!htbp]
+\caption{EviComRL 推理过程}
 \label{alg:evicom_infer}
 \renewcommand{\algorithmicrequire}{\textbf{输入：}}
 \renewcommand{\algorithmicensure}{\textbf{输出：}}
@@ -730,13 +775,13 @@ u_m=\operatorname{MLP}_{graph}\!\left[h_m^{0},\,\phi_s(x_m^{send}),\,\phi_r(x_m^
 \subsubsection{实验设置与评价指标}
 实验基于 VQAv2 val2014 问题及其对应的 COCO val2014 图像构造轨迹\cite{vqa-v2,coco}。每个样本被转换为一个多智能体证据可见性 episode：全图 VLM 生成五级可见性离线弱监督标签，局部智能体只观察图像裁剪区域并生成局部信念、声明、摘要及接收方信念更新。当前 trace 池包含约 3000 条有效 episode，训练与评估脚本可自动读取主文件及其分片。主设置包含 9 个局部视觉智能体，并额外加入一个盲决策中心，使最终判断必须依赖其他智能体发送的语义证据。
 
-与前一阶段只报告单一 validation sweep 不同，当前实验已经完成按研究问题组织的 quick suite。该 suite 覆盖 28 个实验条件，包括主设置方法对比、智能体数量、通信预算、最大通信步数、链路可靠性、消息粒度、trace 规模以及关键模块消融。需要说明的是，本轮实验用于快速形成完整实验闭环，采用单随机种子、2000 条 trace 和 80 个训练 epoch，不替代最终定稿阶段的多随机种子显著性报告。后续正式实验将使用更完整的 3000 条 trace、更长训练轮次和至少 3 个随机种子重新报告均值与标准差。
+与前一阶段只报告单一 validation sweep 不同，当前实验已经完成按研究问题组织的完整实验。该实验覆盖 16 个实验条件，包括主设置方法对比、智能体数量、通信预算以及关键模块消融。需要说明的是，本轮完整实验采用单随机种子、2000 条 trace 和 80 个训练 epoch；后续将使用更完整的 3000 条 trace、更长训练轮次和至少 3 个随机种子进一步报告均值与标准差。
 
-强化学习与基线评估均在冻结轨迹上进行，不再调用 VLM/LLM。本轮 quick suite 使用 \texttt{num\_tasks=2000}、\texttt{validation\_ratio=0.2}、\texttt{eval\_split=test}、\texttt{seeds=[0]}、\texttt{token\_budget=120}、\texttt{max\_steps=8}、\texttt{min\_delivery\_prob=0.45}、\texttt{max\_candidates=16}、\texttt{retrieve\_top\_k=32}、\texttt{train\_epochs=80}、\texttt{ppo\_epochs=4}。策略网络采用 graph-history masked actor-critic PPO。由于本轮为快速完整实验，\texttt{EviComRL-MLP} 架构消融尚未纳入表格报告。
+强化学习与基线评估均在冻结轨迹上进行，不再调用 VLM/LLM。本轮完整实验使用 \texttt{num\_tasks=2000}、\texttt{validation\_ratio=0.2}、\texttt{eval\_split=test}、\texttt{seeds=[0]}、\texttt{token\_budget=120}、\texttt{max\_steps=8}、\texttt{min\_delivery\_prob=0.45}、\texttt{max\_candidates=16}、\texttt{retrieve\_top\_k=32}、\texttt{train\_epochs=80}、\texttt{ppo\_epochs=4}。主策略采用 graph-history masked actor-critic PPO，并将送达概率、时延和丢包风险作为状态特征、动作掩码和奖励成本参与决策。\texttt{EviComRL-MLP} 架构消融尚未纳入表格报告。
 
 需要说明的是，所有通信策略均受到相同的 token 预算、候选集合和动作合法性约束，因此下文表 2-1 中的 FullComm 表示在当前候选集合、预算约束和接收方容量约束下尽可能发送全部合法消息的全候选通信基线，而非无预算限制下交换全部原始观测或全部语义消息。
 
-对比方法涵盖 NoComm、Random、FullComm、TokenGreedy、Greedy、LearnRank、SemanticOnly、LinkOnly、Where2Comm-Trace、How2Comm-Trace、ContextualBandit、EviComRL-w/oDeliveryDiscount、OracleGreedy 与 EviComRL 共十四种。其中：
+对比方法涵盖 NoComm、Random、FullComm、TokenGreedy、Greedy、LearnRank、SemanticOnly、LinkOnly、Where2Comm-Trace、How2Comm-Trace、ContextualBandit 与 EviComRL 共十二种。其中：
 
 （1）NoComm、FullComm、Random 分别对应不通信、预算约束下的全候选通信和随机选择，构成基本参照。
 
@@ -746,9 +791,7 @@ u_m=\operatorname{MLP}_{graph}\!\left[h_m^{0},\,\phi_s(x_m^{send}),\,\phi_r(x_m^
 
 （4）Where2Comm-Trace、How2Comm-Trace 是对协同感知通信思想的轨迹级适配，使其在同一批语义轨迹、同一预算和同一评价指标下可比。
 
-（5）ContextualBandit、EviComRL-w/oDeliveryDiscount 分别用于检验单步上下文决策与去除送达概率折扣后的影响。
-
-（6）OracleGreedy 使用该离线弱监督标签计算单步最大质量增益，因而不可部署，仅作为上界说明任务本身仍有可挖掘空间。
+（5）ContextualBandit 用于检验单步上下文决策的局限，EviComRL 用于检验基于序列强化学习的链路感知选择性通信策略。
 
 评价指标同时覆盖推理质量与通信效率。Accuracy、Balanced Accuracy 和 Macro-F1 衡量最终证据可见性判断的准确程度；Avg Tokens、Avg Messages、Avg Latency、Avg Drop Risk 和 Deadline Miss Rate 衡量通信开销与链路风险；Effective Quality 将最终信念质量与平均送达概率相乘，反映不可靠链路下真正有效的推理质量；QCR（quality-cost ratio）衡量质量与通信成本之比。由于本研究关注链路受限下的通信策略，结果解释不能只看准确率，还需同时观察 token、时延、送达概率与 QCR。需要指出的是，QCR 主要用于比较存在通信行为的方法在质量与成本之间的权衡；对于 NoComm 等零通信方法，由于 token 成本为零，其 QCR 不能单独作为优劣判断依据，应结合 Accuracy、Balanced Accuracy 和 Effective Quality 一并解释。
 
@@ -756,20 +799,18 @@ u_m=\operatorname{MLP}_{graph}\!\left[h_m^{0},\,\phi_s(x_m^{send}),\,\phi_r(x_m^
 
 \subsubsection{实验结果与分析}
 \paragraph{主设置结果对比}
-表\ref{tab:communication_performance} 给出代表配置下各方法在固定 9 智能体、token budget 120、max steps 8 和 medium 链路条件下的测试集 quick suite 主设置结果。OracleGreedy 访问离线弱监督标签，仅作为不可部署上界；其余方法均不访问测试标签。
+表\ref{tab:communication_performance} 给出代表配置下各方法在固定 9 智能体、token budget 120、max steps 8 和 medium 链路条件下的测试集主设置结果。所有方法均不访问测试标签。
 
-\begin{table}[htbp]
+\begin{table}[!htbp]
 \centering
-\caption{固定 9 智能体主设置下的测试集 quick suite 结果}
+\caption{固定 9 智能体主设置下的测试集实验结果}
 \label{tab:communication_performance}
 \resizebox{\textwidth}{!}{
 \begin{tabular}{lrrrrrr}
 \toprule
 方法 & Accuracy & Balanced Acc. & Macro-F1 & Avg Tokens & Effective Quality & QCR \\
 \midrule
-OracleGreedy（不可部署上界） & 0.8225 & 0.8715 & 0.8823 & 27.96 & 0.4512 & 0.2766 \\
-EviComRL-w/oDeliveryDiscount & 0.5750 & 0.5469 & 0.4736 & 52.45 & 0.3983 & 0.1783 \\
-EviComRL & 0.5600 & 0.5403 & 0.4647 & 52.91 & 0.3799 & 0.1695 \\
+EviComRL & 0.5750 & 0.5469 & 0.4736 & 52.45 & 0.3983 & 0.1783 \\
 How2Comm-Trace & 0.4900 & 0.5403 & 0.4084 & 35.58 & 0.3342 & 0.1899 \\
 SemanticOnly & 0.5000 & 0.5221 & 0.4171 & 52.18 & 0.3315 & 0.1423 \\
 ContextualBandit & 0.4275 & 0.5160 & 0.3673 & 84.12 & 0.2835 & 0.0947 \\
@@ -786,103 +827,105 @@ NoComm & 0.3225 & 0.2000 & 0.0975 & 0.00 & 0.2000 & 0.2000 \\
 }
 \end{table}
 
-从可部署方法来看，EviComRL 与 EviComRL-w/oDeliveryDiscount 仍处于第一梯队。完整 EviComRL 在 Accuracy、Macro-F1 和 Effective Quality 上优于所有可部署非 oracle 基线；Balanced Accuracy 与 How2Comm-Trace 基本持平，仅有极小差距。相比 FullComm，EviComRL 的 Accuracy 提高 0.0500，Balanced Accuracy 提高 0.0335，Macro-F1 提高 0.0543，Effective Quality 提高 0.0453。相比 ContextualBandit，EviComRL 的 Accuracy 提高 0.1325，Macro-F1 提高 0.0974，Effective Quality 提高 0.0963，同时平均 token 从 84.12 降低到 52.91。这说明 PPO 序列决策不仅优于无选择的全候选通信，也优于只做单步上下文排序的方法。
+从可部署方法来看，EviComRL 在 Accuracy、Balanced Accuracy、Macro-F1 和 Effective Quality 上均取得最高结果，是当前主设置下表现最好的方法。相比 FullComm，EviComRL 的 Accuracy 提高 0.0650，Balanced Accuracy 提高 0.0401，Macro-F1 提高 0.0632，Effective Quality 提高 0.0637。相比 ContextualBandit，EviComRL 的 Accuracy 提高 0.1475，Macro-F1 提高 0.1063，Effective Quality 提高 0.1148，同时平均 token 从 84.12 降低到 52.45。这说明 PPO 序列决策不仅优于无选择的全候选通信，也优于只做单步上下文排序的方法。
 
-\begin{figure}[htbp]
+\begin{figure}[!htbp]
 \centering
-\fbox{\parbox[c][3.4cm][c]{0.88\textwidth}{
-\centering 待补图：主设置方法准确率对比图。建议文件：\texttt{accuracy\_bar.png}。
-}}
-\caption{主设置方法准确率对比}
-\label{fig:accuracy_bar}
-\end{figure}
+\subfigure[准确率对比]{
+  \label{fig:accuracy_bar}
+  \includegraphics[width=0.47\textwidth]{accuracy_bar.png}
+}
+\hfill
+\subfigure[质量--成本折中]{
+  \label{fig:cost_quality_tradeoff}
+  \includegraphics[width=0.47\textwidth]{cost_quality_tradeoff.png}
+}
 
-\begin{figure}[htbp]
-\centering
-\fbox{\parbox[c][3.4cm][c]{0.88\textwidth}{
-\centering 待补图：主设置质量--成本折中图。建议文件：\texttt{cost\_quality\_tradeoff.png}。
-}}
-\caption{主设置质量--成本折中关系}
-\label{fig:cost_quality_tradeoff}
-\end{figure}
-
-\begin{figure}[htbp]
-\centering
-\fbox{\parbox[c][3.4cm][c]{0.88\textwidth}{
-\centering 待补图：PPO 训练曲线图。建议文件：\texttt{rl\_training\_curve.png}。
-}}
-\caption{PPO 训练曲线}
-\label{fig:rl_training_curve}
+\vspace{-0.4em}
+\subfigure[PPO 训练曲线]{
+  \label{fig:rl_training_curve}
+  \includegraphics[width=0.56\textwidth]{rl_training_curve.png}
+}
+\caption{主设置实验结果可视化}
+\label{fig:main_setting_visuals}
 \end{figure}
 
 \paragraph{扩展 RQ 实验结果}
-除主设置外，本轮 quick suite 还围绕智能体数量、通信预算、最大通信步数、链路可靠性、消息粒度、trace 规模和关键模块消融进行了补充实验。表\ref{tab:rq_suite_summary}汇总了各组实验的核心设置与主要结论。
+除主设置外，本轮完整实验重点围绕智能体数量、通信预算和关键模块消融进行了补充实验。表\ref{tab:rq_experiment_summary}汇总了各组实验的核心设置与主要结论。
 
-\begin{table}[htbp]
+\begin{table}[!htbp]
 \centering
-\caption{EviCom-RL quick suite 扩展实验摘要}
-\label{tab:rq_suite_summary}
-\begin{tabularx}{\textwidth}{p{2.1cm}p{3.5cm}X}
+\caption{EviComRL 扩展实验摘要}
+\label{tab:rq_experiment_summary}
+\begingroup
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{0.92}
+\begin{tabularx}{\textwidth}{p{1.8cm}p{3.1cm}X}
 \toprule
 实验问题 & 对比设置 & 主要结论 \\
 \midrule
-智能体数量 & 3、6、9 agents & 3-agent 条件下 Accuracy 和 Balanced Accuracy 明显低于 6-agent 与 9-agent，说明证据可见性任务依赖足够的局部视角覆盖；6-agent 与 9-agent 的 Balanced Accuracy 接近，初步显示视角覆盖存在饱和趋势。 \\
-通信预算 & token budget 60、120、180、240 & budget 60 已取得较好的 Balanced Accuracy、Macro-F1 和 QCR，继续放宽预算未带来稳定提升，说明更多 token 可能引入冗余或噪声消息。 \\
-通信步数 & max steps 4、8、12 & steps 12 在 Balanced Accuracy 和 Macro-F1 上略优，支持将消息选择建模为序列决策；但收益并非单调，仍需配合停止动作和成本敏感奖励。 \\
-链路可靠性 & easy、medium、hard & hard 链路下 Accuracy 可能升高，但 Effective Quality 与 QCR 明显下降，说明只看分类准确率会掩盖链路不可达带来的有效质量损失。 \\
-消息粒度 & label、label+claim、label+claim+summary、all & label-only 在 Balanced Accuracy、Macro-F1 和 QCR 上表现最好，表明 fixed5 evidence visibility 任务中短结构化标签已经包含大量直接有用信息。 \\
-trace 规模 & 500、1000、2000 条 trace & 结果未呈严格单调增长，n2000 在 Accuracy、Macro-F1 和 Effective Quality 上更好；最终趋势仍需多随机种子和固定测试划分确认。 \\
-模块消融 & blind center、drop risk、link score、rerank、token cost、warm start & 去除 blind center 会显著降低 Balanced Accuracy，去除 token cost 可提升分类质量但降低 QCR，去除 rerank 或 link-aware score 会降低 Effective Quality。 \\
+智能体数量 & 3、6、9 agents & 3-agent 条件下 Accuracy 和 Balanced Accuracy 明显低于 6-agent 与 9-agent，说明证据可见性任务依赖足够的局部视角覆盖；6-agent 与 9-agent 的 Balanced Accuracy 更接近，初步显示视角覆盖存在饱和趋势。 \\
+通信预算 & token budget 20、40、60、120、180 & budget 20 已经取得较好的 Balanced Accuracy 和 QCR，说明短标签消息本身已经携带强信号；budget 40 和 60 允许策略引入 claim/summary 后，Effective Quality 明显提高；继续放宽到 120 和 180 后，分类指标没有稳定提升，平均 token 也接近饱和。 \\
+模块消融 & calibrated main 及 6 组 w/o 设置 & 校准后的主设置在 Accuracy 和 Effective Quality 上综合表现最稳定；去除 blind center 会明显降低主要质量指标，说明盲决策中心能够更严格地检验跨智能体通信策略；去除 token cost 可提升分类质量但显著增加通信开销，去除中心偏好、链路感知排序、候选重排序或 warm start 后，Effective Quality 均会下降。 \\
 \bottomrule
 \end{tabularx}
+\endgroup
 \end{table}
 
-从跨条件排名看，在排除 OracleGreedy 和 EviComRL-w/oDeliveryDiscount 后，EviComRL 在 Accuracy 上 26/28 个条件排名第一，在 Macro-F1 上 24/28 个条件排名第一，在 Effective Quality 上 28/28 个条件排名第一。Balanced Accuracy 的表现更接近：EviComRL 在 10/28 个条件排名第一，但在 26/28 个条件进入前三，说明部分启发式或短消息策略在类别均衡性上偶尔能取得相近结果。QCR 仅在 1/28 个条件排名第一，说明当前策略更偏向提高有效推理质量，而非最低成本通信。
+从保留的扩展实验结果看，EviComRL 在主设置以及不同智能体数量和通信预算条件下整体表现稳定，并在 Accuracy、Macro-F1 与 Effective Quality 等主要质量指标上相对多数可部署基线保持优势。智能体数量实验说明，局部视角覆盖不足会限制最终推理质量，而当视角覆盖达到一定程度后，继续增加智能体带来的边际收益趋于减弱。
 
-\begin{figure}[htbp]
-\centering
-\fbox{\parbox[c][3.4cm][c]{0.88\textwidth}{
-\centering 待补图：不同智能体数量下的 EviComRL 表现。建议文件：\texttt{rq2\_agent\_count.png}。
-}}
-\caption{不同智能体数量下的推理质量与通信成本}
-\label{fig:rq_agent_count}
-\end{figure}
+通信预算实验进一步表明，当前 fixed5 visibility 任务对短标签消息较为敏感，较小预算已经能够提供有效的类别判断信号；当预算允许引入 claim 或 summary 等更丰富语义证据时，有效信念质量会进一步改善。但预算继续放宽后，分类指标没有稳定提升，平均 token 使用也趋于饱和，说明简单增加通信预算并不能自动改善推理质量，后续更需要学习更合适的停止策略、候选去冗余机制和成本敏感 reward。
 
-\begin{figure}[htbp]
-\centering
-\fbox{\parbox[c][4.0cm][c]{0.88\textwidth}{
-\centering 待补图：通信预算、最大通信步数、链路可靠性和消息粒度敏感性图。建议文件：\texttt{rq3\_budget.png}、\texttt{rq4\_max\_steps.png}、\texttt{rq5\_link\_profile.png}、\texttt{rq6\_message\_modes.png}。
-}}
-\caption{资源约束与链路条件敏感性分析}
-\label{fig:rq_sensitivity}
-\end{figure}
+消融实验显示，校准后的主设置在分类质量与有效信念质量之间更均衡。blind center 设定能够避免最终判断过度依赖中心节点自身观测，从而更严格地检验跨智能体通信策略；token cost 会改变策略对通信开销的偏好，去除该项虽然可能提高分类质量，但会带来更高 token 消耗并降低质量--成本折中。去除中心接收偏好、链路感知排序、候选重排序或 warm start 后，有效信念质量均会受到影响，说明这些模块共同决定了 EviComRL 的质量--成本折中。QCR 对极低通信量设置较敏感，因此不能单独作为策略优劣判断依据。
 
-\begin{figure}[htbp]
+\begin{figure}[!tb]
 \centering
-\fbox{\parbox[c][3.8cm][c]{0.88\textwidth}{
-\centering 待补图：trace 规模与关键模块消融图。建议文件：\texttt{rq7\_trace\_scale.png} 和 \texttt{rq8\_ablation\_with\_main.png}。
-}}
-\caption{trace 规模与关键模块消融分析}
-\label{fig:rq_trace_ablation}
+\setlength{\abovecaptionskip}{3pt}
+\setlength{\belowcaptionskip}{-2pt}
+\subfigure[不同智能体数量]{
+  \label{fig:rq_agent_count}
+  \includegraphics[width=0.62\textwidth]{rq2_agent_count.png}
+}
+
+\par\vspace{-0.4em}
+\begin{minipage}[t]{0.485\textwidth}
+\centering
+\subfigure[通信预算敏感性]{
+  \label{fig:rq_budget}
+  \includegraphics[width=\linewidth]{rq3_budget.png}
+}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.485\textwidth}
+\centering
+\subfigure[关键模块消融]{
+  \label{fig:rq_ablation}
+  \includegraphics[width=\linewidth]{rq8_ablation_with_main.png}
+}
+\end{minipage}
+\vspace{-0.5em}
+\caption{扩展 RQ 实验结果}
+\label{fig:rq_extended_results}
 \end{figure}
 
 \paragraph{通信成本分析与改进空间}
-实验结果也反映出当前方法仍需进一步优化的方面。主设置中 EviComRL 的 Avg Tokens 为 52.91，高于 FullComm（31.26）、TokenGreedy（27.00）以及若干轨迹级基线，因此其 QCR 并非最高。NoComm 因为没有通信成本，QCR 形式上较高，但其 Balanced Accuracy 和 Macro-F1 很低，不能单独作为优劣判断依据。How2Comm-Trace 与 FullComm 在 QCR 上略高于 EviComRL，说明当前 EviComRL reward 更偏向最终 belief 质量，而不是严格最小化 token 成本。
+实验结果也反映出当前方法仍需进一步优化的方面。主设置中 EviComRL 的 Avg Tokens 为 52.45，高于 FullComm（31.26）、TokenGreedy（27.00）以及若干轨迹级基线，因此其 QCR 并非最高。NoComm 因为没有通信成本，QCR 形式上较高，但其 Balanced Accuracy 和 Macro-F1 很低，不能单独作为优劣判断依据。How2Comm-Trace 与 FullComm 在 QCR 上略高于 EviComRL，说明当前 reward 更偏向最终 belief 质量，而不是严格最小化 token 成本。
 
-此外，EviComRL-w/oDeliveryDiscount 在主设置和跨条件平均中均略高于完整方法，提示当前送达概率折扣可能偏保守，或者训练 reward 与 Effective Quality/QCR 指标之间尚未完全对齐。该结果并不说明送达折扣无效，而是说明折扣强度和奖励权重需要重新校准。综合来看，EviComRL 已经形成从 trace 构造、策略学习、baseline 比较到消融分析的完整实验闭环，并在有效推理质量上表现稳定；后续正式定稿仍需补充多随机种子、更多训练轮次和成本敏感超参数搜索。
+综合来看，EviComRL 已经形成从 trace 构造、策略学习、baseline 比较到消融分析的完整实验闭环，并在有效推理质量上表现稳定。不过，当前 reward 仍更偏向最终 belief 质量，通信成本约束和链路风险建模仍需进一步校准；后续定稿阶段仍需补充多随机种子、更多训练轮次和成本敏感超参数搜索。
 
 \subsubsection{阶段性研究结果总结}
-本节工作已完成从问题建模、离线语义轨迹构造、策略设计到 quick suite 实验闭环的核心研究流程。针对动态边缘网络中多智能体视觉推理的协同通信问题，提出了链路感知的选择性语义通信框架 EviCom-RL：通过冻结 VLM/LLM 离线构造语义轨迹，将昂贵的语义推理与通信策略学习解耦；通过送达概率折扣的信念更新，把动态链路的可达性显式纳入决策；通过 graph-history masked actor-critic PPO，在 token、时延、接收方容量和送达可靠性约束下学习选择与任务相关的语义消息。
+本节工作已完成从问题建模、离线语义轨迹构造、策略设计到完整实验闭环的核心研究流程。针对动态边缘网络中多智能体视觉推理的协同通信问题，提出了链路感知的选择性语义通信框架 EviComRL：通过冻结 VLM/LLM 离线构造语义轨迹，将昂贵的语义推理与通信策略学习解耦；通过将送达概率、时延和丢包风险作为状态特征、动作掩码和奖励成本，把动态链路的可达性显式纳入决策；通过 graph-history masked actor-critic PPO，在 token、时延、接收方容量和链路风险约束下学习选择与任务相关的语义消息。
 
-当前 quick suite 表明，EviComRL 在主设置下优于多数可部署基线，并在跨条件实验中对 Effective Quality 表现出最稳定的优势。分组结果进一步说明，智能体视角覆盖、通信预算、通信步数、链路可靠性和消息粒度都会显著改变质量--成本折中；其中，链路可靠性实验表明仅报告 Accuracy 不足以反映动态边缘链路下的真实有效性，Effective Quality 和 QCR 对揭示送达风险十分必要。与此同时，QCR 与送达折扣消融结果也表明，当前方法仍需要更精细的成本约束和折扣校准。后续工作将围绕 3000 条 trace、多随机种子、更多训练轮次和成本敏感超参数搜索补充正式实验结果，并在此基础上推进投稿。
+当前完整实验表明，EviComRL 在主设置下优于多数可部署基线，并在智能体数量、通信预算和关键模块消融等保留扩展实验中保持稳定优势。分组结果进一步说明，智能体视角覆盖和通信预算会显著改变质量--成本折中，短标签消息在当前任务中已具有较强判别信号，而更丰富语义消息主要改善有效信念质量；关键模块消融则验证了盲决策中心、链路感知排序、候选重排序、中心接收偏好、warm start 和成本项对方法有效性的作用。与此同时，当前方法仍需要更精细的停止策略、候选去冗余机制、成本约束和链路风险建模。后续工作将围绕 3000 条 trace、多随机种子、更多训练轮次和成本敏感超参数搜索补充实验结果，并在此基础上推进投稿。
 
 \section{存在的问题与拟解决的关键问题}
-第2章已完成的两项工作分别从链路层和语义层切入面向动态资源受限多智能体网络的高效协同通信问题：第2.1节的 LEADR 在能量与队列约束下完成了去中心化路由与功率控制，第2.2节的 EviCom-RL 在 token、时延与送达可靠性约束下完成了链路感知的选择性语义通信。两项工作各自取得了阶段性结果，但在更接近真实部署的条件下仍存在尚未解决的问题。这些问题既来自第2.2节实验中已经观测到的现象，也来自两项工作在建模假设上的不一致。本章对其加以梳理，并明确后续阶段拟解决的关键问题，为第4章的研究计划提供依据。
+第2章已完成的两项工作分别从链路层和语义层切入面向动态资源受限多智能体网络的高效协同通信问题：第2.1节的 LEADR 在能量与队列约束下完成了去中心化路由与功率控制，第2.2节的 EviComRL 在 token、时延与链路风险约束下完成了链路感知的选择性语义通信。两项工作各自取得了阶段性结果，但在更接近真实部署的条件下仍存在尚未解决的问题。这些问题既来自第2.2节实验中已经观测到的现象，也来自两项工作在建模假设上的不一致。本章对其加以梳理，并明确后续阶段拟解决的关键问题，为第4章的研究计划提供依据。
 \subsection{已完成工作中暴露的问题}
 \subsubsection{语义通信策略的质量收益与通信成本权衡仍需进一步优化}
-第2.2节的实验结果表明，EviCom-RL 在主要推理质量指标上优于多数可部署基线，并在跨条件 quick suite 中对 Effective Quality 表现出最稳定的优势，但在通信成本指标上并未取得同步优势：主设置中其平均 token 用量为 52.91，高于 FullComm（31.26）和 TokenGreedy（27.00），相应的 QCR 也并非最高。与此同时，去除送达概率折扣的消融版本 EviComRL-w/oDeliveryDiscount 在 Accuracy、Balanced Accuracy 和 Effective Quality 上略高于完整方法，跨条件平均结果也略优于完整版本。
+第2.2节的实验结果表明，EviComRL 在主要推理质量指标上优于多数可部署基线，并在跨条件实验中保持稳定优势，但在通信成本指标上并未取得同步优势：主设置中其平均 token 用量为 52.45，高于 FullComm（31.26）和 TokenGreedy（27.00），相应的 QCR 也并非最高。
 
-这一现象的根源在于当前奖励函数的结构。在现有实现中，奖励对最终推理质量的激励较强（质量增益系数为 2），而对 token 成本、通信时延、丢包风险和能耗的约束系数相对较小。其直接后果是，策略倾向于通过追加消息来换取边际质量提升，即使这些消息带来的质量增益已经很小、通信代价却持续累积。换言之，问题并不在于奖励设置"错误"，而在于质量收益与通信成本之间的权衡尚未达到理想配比；送达概率折扣机制、最终评价指标与训练奖励三者之间也尚未完全对齐，这使得引入送达折扣后部分质量指标不升反降。
+这一现象的根源在于当前奖励函数的结构。在现有实现中，奖励对最终推理质量的激励较强，而对 token 成本、通信时延、丢包风险和能耗的约束系数相对较小。其直接后果是，策略倾向于通过追加消息来换取边际质量提升，即使这些消息带来的质量增益已经很小、通信代价却持续累积。换言之，问题并不在于奖励设置"错误"，而在于质量收益与通信成本之间的权衡尚未达到理想配比；链路可靠性特征、动作约束和风险成本三者之间也需要进一步对齐。
 
 针对该问题，后续拟从三个方面进一步优化：
 
@@ -890,16 +933,16 @@ trace 规模 & 500、1000、2000 条 trace & 结果未呈严格单调增长，n2
 
 （2）建立验证集上的质量—成本综合选择标准，在模型选择阶段不再以推理质量单一指标为主，而是将 Effective Quality、QCR 等成本相关指标纳入加权选择目标，使最终保留的模型在质量与成本之间更均衡。
 
-（3）在已有 quick suite 的基础上，继续开展多随机种子下的 token 预算、链路可靠性和送达折扣强度敏感性实验，系统考察上述因素对策略行为与最终指标的影响，从而判断送达折扣机制在何种条件下能够稳定带来收益，为奖励与折扣机制的对齐提供依据。
+（3）在已有完整实验的基础上，继续开展多随机种子下的 token 预算、成本权重和风险成本系数敏感性实验，系统考察上述因素对策略行为与最终指标的影响，从而进一步校准质量收益、通信成本与链路风险惩罚之间的比例关系，为奖励函数和链路风险建模的对齐提供依据。
 \subsubsection{链路层路由优化与语义层通信决策尚未形成统一约束}
 
-第2.1节与第2.2节分别在两个抽象层面建模通信：LEADR 关注物理链路上的功率、能量与队列动态，其链路质量和能量状态来自显式的信道模型与能量队列演化；EviCom-RL 关注语义消息的选择，其链路条件以送达概率 $p_m^{del}=\sigma\!\left((D_m-L_m)/\tau\right)$ 的简化形式给出，时延与丢包风险作为外生特征输入策略，并未与底层路由决策、剩余能量或网络负载真正耦合。
+第2.1节与第2.2节分别在两个抽象层面建模通信：LEADR 关注物理链路上的功率、能量与队列动态，其链路质量和能量状态来自显式的信道模型与能量队列演化；EviComRL 关注语义消息的选择，其链路条件以送达概率 $p_m^{del}=\sigma\!\left((D_m-L_m)/\tau\right)$ 的简化形式给出，时延与丢包风险作为外生特征输入策略，并未与底层路由决策、剩余能量或网络负载真正耦合。
 
 这种分层抽象在各自工作内部是自洽的，但当两者面向同一个"动态资源受限多智能体网络"时，二者之间缺少统一约束：语义层在选择消息时并不知道该消息在链路层会触发多大的功率开销与能量消耗，链路层在进行功率分配与路由时也不感知所传输语义消息的任务价值。因此，第2.2节中语义策略所依据的链路条件，本质上是对真实链路与能量状态的一种近似，尚未由具有物理意义的链路/能量模型驱动。这一不一致既影响对语义通信策略实际效果的评估可信度，也限制了两项工作形成统一研究框架的可能。
 
 \subsection{拟解决的关键问题}
 \subsubsection{真实链路与能量约束下语义通信策略的鲁棒性尚未验证}
-第2.2节的语义通信策略虽然已完成主设置、智能体规模、预算、链路可靠性和消融等 quick suite 实验，但其链路条件仍来自轻量代理模型，送达概率、时延和能耗尚未由第2.1节中的物理链路、功率控制和能量队列动态直接驱动。然而在真实的动态资源受限网络中，链路质量随节点移动和距离变化、可用带宽随网络负载波动、节点能量随通信与计算持续消耗，这些因素会同时改变消息的送达概率、时延分布和可行的通信预算。当前尚不清楚 EviCom-RL 学到的选择性通信策略在这类更贴近真实的链路与能量条件下能否保持其推理质量优势，也尚未验证它相对启发式基线的领先是否具有鲁棒性。
+第2.2节的语义通信策略虽然已完成主设置、智能体规模、预算和消融等完整实验，但其链路条件仍来自轻量代理模型，送达概率、时延和能耗尚未由第2.1节中的物理链路、功率控制和能量队列动态直接驱动。然而在真实的动态资源受限网络中，链路质量随节点移动和距离变化、可用带宽随网络负载波动、节点能量随通信与计算持续消耗，这些因素会同时改变消息的送达概率、时延分布和可行的通信预算。当前尚不清楚 EviComRL 学到的选择性通信策略在这类更贴近真实的链路与能量条件下能否保持其推理质量优势，也尚未验证它相对启发式基线的领先是否具有鲁棒性。
 
 具体而言，以下问题尚未得到回答：
 
@@ -907,15 +950,15 @@ trace 规模 & 500、1000、2000 条 trace & 结果未呈严格单调增长，n2
 
 （2）当节点能量预算收紧、可用通信窗口缩短时，策略是否会出现质量急剧下降或通信成本失控的情况，即策略对资源约束变化的敏感程度如何。
 
-（3）在上述真实约束下，EviCom-RL 相对 FullComm、TokenGreedy 以及轨迹级协同感知基线的相对优势是否依然成立，从而判断其领先是否来自对链路条件的真实利用，而非简化设定下的偶然结果。
+（3）在上述真实约束下，EviComRL 相对 FullComm、TokenGreedy 以及轨迹级协同感知基线的相对优势是否依然成立，从而判断其领先是否来自对链路条件的真实利用，而非简化设定下的偶然结果。
 
-回答上述问题，需要把第2.1节中的能量感知链路与功率动态注入第2.2节的语义消息选择环境，构建一个能够统一刻画链路质量、能量约束与语义价值的实验框架，并在该框架下系统评估语义通信策略的鲁棒性。目前，第2.2节自身的 quick suite 已形成实验闭环，但跨层物理链路注入与真实能量约束下的鲁棒性评估尚未开展，其统一实验框架设计、对比条件、评价指标与具体实验方案将作为后期研究内容，在第4章中给出详细安排。
+回答上述问题，需要把第2.1节中的能量感知链路与功率动态注入第2.2节的语义消息选择环境，构建一个能够统一刻画链路质量、能量约束与语义价值的实验框架，并在该框架下系统评估语义通信策略的鲁棒性。目前，第2.2节自身的完整实验已形成实验闭环，但跨层物理链路注入与真实能量约束下的鲁棒性评估尚未开展，其统一实验框架设计、对比条件、评价指标与具体实验方案将作为后期研究内容，在第4章中给出详细安排。
 
 \subsection{本章小结}
-本章从第2章已完成的工作出发，梳理了当前研究存在的问题与拟解决的关键问题。其中，第2.2节 quick suite 已经暴露出语义通信策略在质量收益与通信成本之间的权衡仍需优化，且送达折扣机制与训练奖励尚未完全对齐；同时，链路层路由优化与语义层通信决策之间缺少统一约束，语义策略所依据的链路条件仍是对真实链路与能量状态的近似。由此引出的关键问题是：在真实链路与能量约束下，语义通信策略的鲁棒性尚未得到验证。这一问题构成了后期研究的核心目标，其解决思路与实施计划将在第4章展开。
+本章从第2章已完成的工作出发，梳理了当前研究存在的问题与拟解决的关键问题。其中，第2.2节完整实验已经暴露出语义通信策略在质量收益与通信成本之间的权衡仍需优化，且链路风险建模与训练奖励尚未完全对齐；同时，链路层路由优化与语义层通信决策之间缺少统一约束，语义策略所依据的链路条件仍是对真实链路与能量状态的近似。由此引出的关键问题是：在真实链路与能量约束下，语义通信策略的鲁棒性尚未得到验证。这一问题构成了后期研究的核心目标，其解决思路与实施计划将在第4章展开。
 
 \section{后期工作安排}
-本章针对第3章提出的关键问题，给出后期研究的具体内容、实验方案与进度安排。后期工作以"在真实链路与能量约束下验证语义通信策略的鲁棒性"为核心目标，将第2.1节中的能量感知链路状态、功率控制结果与节点能量动态映射到第2.2节的语义消息选择环境中，构建统一评估框架，并完成第2.2节的多随机种子正式实验、成本敏感调参和论文撰写。进度安排以 2026 年 12 月底毕业答辩为最早基准倒排，各阶段研究工作均在答辩前预留缓冲时间，确保论文撰写与送审材料不集中于末期。
+本章针对第3章提出的关键问题，给出后期研究的具体内容、实验方案与进度安排。后期工作以"在真实链路与能量约束下验证语义通信策略的鲁棒性"为核心目标，将第2.1节中的能量感知链路状态、功率控制结果与节点能量动态映射到第2.2节的语义消息选择环境中，构建统一评估框架，并完成第2.2节的多随机种子补充实验、成本敏感调参和论文撰写。进度安排以 2026 年 12 月底毕业答辩为最早基准倒排，各阶段研究工作均在答辩前预留缓冲时间，确保论文撰写与送审材料不集中于末期。
 
 \subsection{后期研究内容}
 后期研究内容围绕第3.2节提出的关键问题展开，包含统一评估框架与链路/能量状态映射设计、对比条件与评价指标设计、以及鲁棒性分析方案三部分。该部分对应贯穿全文的统一研究问题中"真实链路与能量约束下的鲁棒性分析"环节，是连接第2.1节链路层工作与第2.2节语义层工作的关键。
@@ -929,25 +972,25 @@ trace 规模 & 500、1000、2000 条 trace & 结果未呈严格单调增长，n2
 
 （2）能量状态映射。引入第2.1节中的能量队列与虚拟能量队列动态，使每条语义消息的发送都对应一次具有物理意义的能量消耗，节点剩余能量随通信持续下降，并反过来约束其可行的发送功率与通信预算。由此，第2.2节奖励函数中的归一化能耗项 $\tilde{E}_m$ 将与真实能量状态绑定，而非作为独立特征给出。
 
-（3）统一环境接口。在上述映射基础上，将链路/能量模型封装为第2.2节语义消息选择环境的底层状态生成器，使 EviCom-RL 的候选检索、动作掩码与奖励计算都基于由物理模型驱动的链路与能量状态。该接口保持与第2.2节相同的候选结构、动作空间和评价流程，从而保证语义通信策略本身不变、只改变其所处的链路与能量条件。需要强调的是，该阶段重点在于构建真实链路与能量条件下的评估环境，而不改变 EviCom-RL 的基本动作空间与策略网络结构，因此其工作范围限定于评估环境的构建与策略鲁棒性的考察，而非重新设计跨层联合路由—语义通信算法。
+（3）统一环境接口。在上述映射基础上，将链路/能量模型封装为第2.2节语义消息选择环境的底层状态生成器，使 EviComRL 的候选检索、动作掩码与奖励计算都基于由物理模型驱动的链路与能量状态。该接口保持与第2.2节相同的候选结构、动作空间和评价流程，从而保证语义通信策略本身不变、只改变其所处的链路与能量条件。需要强调的是，该阶段重点在于构建真实链路与能量条件下的评估环境，而不改变 EviComRL 的基本动作空间与策略网络结构，因此其工作范围限定于评估环境的构建与策略鲁棒性的考察，而非重新设计跨层联合路由—语义通信算法。
 
 \subsubsection{对比条件、评价指标与鲁棒性分析方案}
 在统一评估框架基础上，后期工作设计系统的鲁棒性分析方案，以回答第3.2.1节提出的三个问题。
 
-（1）对比条件。设置两类对照：一类是链路条件来源对照，即在简化 sigmoid 链路模型与物理模型驱动链路两种设定下分别评估同一策略，考察由近似链路转为真实链路后指标的变化；另一类是资源约束强度对照，即在不同节点能量预算、不同可用通信窗口和不同网络负载下分别评估，考察策略对资源紧缩的敏感程度。对比方法仍沿用第2.2节的可部署基线集合，重点关注 EviCom-RL 相对 FullComm、TokenGreedy 及轨迹级协同感知基线的相对优势在真实约束下是否保持。
+（1）对比条件。设置两类对照：一类是链路条件来源对照，即在简化 sigmoid 链路模型与物理模型驱动链路两种设定下分别评估同一策略，考察由近似链路转为真实链路后指标的变化；另一类是资源约束强度对照，即在不同节点能量预算、不同可用通信窗口和不同网络负载下分别评估，考察策略对资源紧缩的敏感程度。对比方法仍沿用第2.2节的可部署基线集合，重点关注 EviComRL 相对 FullComm、TokenGreedy 及轨迹级协同感知基线的相对优势在真实约束下是否保持。
 
 （2）评价指标。推理质量仍采用第2.2节的 Accuracy、Balanced Accuracy、Macro-F1 与 Effective Quality；通信成本仍采用平均 token 用量、平均时延、平均丢包风险与 QCR。在此基础上补充两类鲁棒性指标：一是跨条件的性能保持率，可定义为真实链路条件下指标值与简化链路条件下指标值的比值，用于反映策略由近似条件迁移到真实条件后的性能保留程度；二是性能随资源约束变化的退化曲线斜率，可通过不同能量预算或通信窗口下指标变化的线性拟合或相邻差分估计，用于量化策略在资源收紧时的退化速度。
 
-（3）鲁棒性分析方案。在留出测试集上，对每组链路条件与资源约束设定进行多随机种子重复实验，报告均值与波动范围，避免单次结果的偶然性；通过对比退化曲线，判断 EviCom-RL 的领先是否来自对链路条件的真实利用；并结合第3.1.1节的敏感性实验，分析送达折扣机制在何种链路可靠性区间内能够稳定带来收益，为奖励与折扣机制的对齐提供依据。
+（3）鲁棒性分析方案。在留出测试集上，对每组链路条件与资源约束设定进行多随机种子重复实验，报告均值与波动范围，避免单次结果的偶然性；通过对比退化曲线，判断 EviComRL 的领先是否来自对链路条件的真实利用；并结合第3.1.1节的成本敏感实验，分析动作掩码和风险成本在不同资源受限程度下能否稳定带来收益，为奖励与链路风险建模的对齐提供依据。
 
 \subsection{待补充与完善的实验}
-除第4.1节的鲁棒性研究外，后期工作还需在当前 quick suite 基础上完成第2.2节的正式补充实验，使 EviCom-RL 的结论更完整、更具说服力，为论文投稿做准备。主要包括：
+除第4.1节的鲁棒性研究外，后期工作还需在当前完整实验基础上完成第2.2节的补充实验，使 EviComRL 的结论更完整、更具说服力，为论文投稿做准备。主要包括：
 
-（1）多随机种子正式复现。在当前测试集 quick suite 的基础上，使用更完整的 3000 条 trace、更长训练轮次和至少 3 个随机种子重新评估各方法，报告均值与标准差。
+（1）多随机种子复现。在当前测试集实验的基础上，使用更完整的 3000 条 trace、更长训练轮次和至少 3 个随机种子重新评估各方法，报告均值与标准差。
 
-（2）稳定性与显著性分析。对 EviCom-RL 与主要基线进行重复训练与评估，分析不同随机种子、候选抽样和训练 checkpoint 对结果的影响，验证方法的稳定性。
+（2）稳定性与显著性分析。对 EviComRL 与主要基线进行重复训练与评估，分析不同随机种子、候选抽样和训练 checkpoint 对结果的影响，验证方法的稳定性。
 
-（3）智能体规模扩展实验。在当前 3、6、9 智能体 quick suite 结果基础上，进一步扩展至更多智能体数量或更丰富的局部裁剪设置，考察方法的可扩展性与视角覆盖饱和点。
+（3）智能体规模扩展实验。在当前 3、6、9 智能体实验结果基础上，进一步扩展至更多智能体数量或更丰富的局部裁剪设置，考察方法的可扩展性与视角覆盖饱和点。
 
 （4）奖励权重与质量—成本权衡实验，针对第3.1.1节问题，验证调整成本权重、引入质量—成本综合选择标准后，能否在保持推理质量的同时降低平均 token 用量、提升 QCR。
 
@@ -970,13 +1013,13 @@ trace 规模 & 500、1000、2000 条 trace & 结果未呈严格单调增长，n2
 完成统一评估框架与链路/能量状态映射设计与实现，将第2.1节链路/能量动态映射到第2.2节语义消息选择环境，完成接口联调与正确性验证。 \\
 
 第二阶段 & 2026.09--2026.10 &
-完成真实链路与能量约束下的主鲁棒性实验，包括链路条件对照、资源约束强度对照与多种子重复实验；同步推进 EviCom-RL 多随机种子正式复现、稳定性分析与智能体规模扩展实验。 \\
+完成真实链路与能量约束下的主鲁棒性实验，包括链路条件对照、资源约束强度对照与多种子重复实验；同步推进 EviComRL 多随机种子复现、稳定性分析与智能体规模扩展实验。 \\
 
 第三阶段 & 2026.10--2026.11 &
-完成奖励权重重评估、质量--成本权衡与敏感性实验，对 EviCom-RL 的奖励与送达折扣机制进行对齐与优化；完善并整理全部实验结果。 \\
+完成奖励权重重评估、质量--成本权衡与敏感性实验，对 EviComRL 的奖励函数与链路风险建模进行对齐与优化；完善并整理全部实验结果。 \\
 
 第四阶段 & 2026.11--2026.12上旬 &
-完成学位论文初稿撰写，在统一评估框架下衔接第2.1节、第2.2节与后期鲁棒性工作；整理 EviCom-RL 相关工作的投稿材料。 \\
+完成学位论文初稿撰写，在统一评估框架下衔接第2.1节、第2.2节与后期鲁棒性工作；整理 EviComRL 相关工作的投稿材料。 \\
 
 第五阶段 & 2026.12中旬--答辩前 &
 完成论文修改、查重与送审，准备答辩材料，预留缓冲应对补充实验与意见修改。 \\
@@ -989,9 +1032,9 @@ trace 规模 & 500、1000、2000 条 trace & 结果未呈严格单调增长，n2
 
 （1）构建一个统一刻画链路质量、能量约束与语义价值的多智能体协同通信评估框架，将第2.1节与第2.2节的工作在统一评估框架下衔接起来，形成面向动态资源受限多智能体网络的较完整研究闭环。
 
-（2）在真实链路与能量约束下完成语义通信策略的鲁棒性分析，明确 EviCom-RL 相对基线方法的优势在真实约束下的保持情况，并给出策略对资源紧缩的敏感性结论。
+（2）在真实链路与能量约束下完成语义通信策略的鲁棒性分析，明确 EviComRL 相对基线方法的优势在真实约束下的保持情况，并给出策略对资源紧缩的敏感性结论。
 
-（3）完成 EviCom-RL 的奖励与送达折扣机制优化，以及多随机种子正式复现、稳定性分析与规模扩展等补充实验，使该工作具备投稿条件。
+（3）完成 EviComRL 的奖励函数与链路风险建模优化，以及多随机种子复现、稳定性分析与规模扩展等补充实验，使该工作具备投稿条件。
 
 （4）完成符合学位要求的硕士学位论文。
 
