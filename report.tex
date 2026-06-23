@@ -40,6 +40,18 @@
 
 \graphicspath{{figures/}}
 
+% 图表按章节编号，如图 1-1、表 2-1。
+\makeatletter
+\@addtoreset{figure}{section}
+\@addtoreset{table}{section}
+\renewcommand{\thefigure}{\thesection-\arabic{figure}}
+\renewcommand{\thetable}{\thesection-\arabic{table}}
+\providecommand{\theHfigure}{}
+\providecommand{\theHtable}{}
+\renewcommand{\theHfigure}{\thesection.\arabic{figure}}
+\renewcommand{\theHtable}{\thesection.\arabic{table}}
+\makeatother
+
 % 目录中 section 项前距偏大，局部收紧 subsection 后接下一节时的空白。
 \makeatletter
 \patchcmd{\l@section}
