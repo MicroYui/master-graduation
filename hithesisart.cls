@@ -450,7 +450,7 @@
     }
     \begin{center}
       \vspace{8mm}
-      \songti\sanhao\textcolor[rgb]{1,0,0}{\textbf{（\hit@creporttype）}}
+      \songti\sanhao\textcolor[rgb]{1,0,0}{\textbf{\hit@creporttype}}
     \end{center}
   }
   \parbox[b][3cm][t]{\textwidth}{
