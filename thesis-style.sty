@@ -106,7 +106,8 @@
   \renewcommand{\headrule}{\vbox{\hrule width\headwidth height 1.1pt\vskip1.6pt\hrule width\headwidth height .4pt}}
 }
 \fancypagestyle{plain}{\fancyhf{}\fancyhead[C]{\fontsize{9bp}{12bp}\selectfont 哈尔滨工业大学硕士学位论文}\fancyfoot[C]{\fontsize{9bp}{12bp}\selectfont -\;\thepage\;-}\renewcommand{\headrulewidth}{.5pt}}
-\renewcommand{\bibfont}{\small}
+% Keep each bibliography entry on one page; natbib resets widow/club penalties.
+\renewcommand{\bibfont}{\small\interlinepenalty=10000\relax}
 \setlength{\bibsep}{4pt}
 \newcommand{\unchapter}[1]{\chapter*{#1}\phantomsection\addcontentsline{toc}{chapter}{#1}\markboth{#1}{#1}}
 \endinput
