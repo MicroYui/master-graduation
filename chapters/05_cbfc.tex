@@ -1,9 +1,7 @@
 \chapter{不完备反馈下的语义交付与能量协同控制}
 \label{rq3:chapter}
 
-\section{引言}
-
-在第~\ref{rq1:chapter} 章资源管理与第~\ref{rq2:chapter} 章内容选择的基础上，本章研究消息随机传输、确认不完备条件下的语义交付。图~\ref{rq3:fig:system} 展示了发送端依据本地记录与累计确认，在补发、切换候选和等待之间决策的反馈过程。
+前两章分别研究了传输资源分配和语义内容选择。消息进入发送阶段后，还会受到随机传输失败及确认延迟的影响。本章在候选内容给定的条件下研究交付控制，发送端依据本地记录与累计确认，决定补发、切换候选、等待或停止，系统结构如图~\ref{rq3:fig:system} 所示。
 
 \begin{figure}[htbp]
 \centering
@@ -12,12 +10,13 @@
 \label{rq3:fig:system}
 \end{figure}
 
-本章提出一致性感知的信念反馈控制方法 C-BFC（Consistency-aware Belief Feedback Control）。在固定候选与融合规则下，通过效用网络及分类一致性投影估计任务收益，以接收信念描述未确认状态，再用两步前瞻和跨任务虚拟能量队列协调交付收益、任务时限与通信能耗，并分析不完备反馈下的决策条件与性能取舍。
+针对接收集合不可直接观测、重复传输消耗有限电量的问题，本章设计一致性感知的信念反馈控制方法 C-BFC（Consistency-aware Belief Feedback Control）。该方法估计不同接收集合的任务效用，依据发送和反馈记录更新接收概率，并用有限前瞻选择后续动作。虚拟能量队列记录节点在已完成任务中的支出，使当前交付决策考虑后续任务的通信需要。
 
 \input{chapters/rq3/model}
 \input{chapters/rq3/method}
 \input{chapters/rq3/experiments}
 
 \section{本章小结}
+\label{rq3:subsec:discussion}
 
 本章以效用一致性、接收信念与有限前瞻构建 C-BFC，协调不完备反馈下的语义交付与跨任务能量支出。十七个主条件下，平均正确完成率为 49.84\%，单位正确任务能耗为 3.615 mJ，较 SD-SAC 和 TP-DQN 分别降低 16.59\% 和 14.32\%。方法在相近交付水平下减少通信支出，收益仍受时限与能量条件制约。

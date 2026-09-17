@@ -5,7 +5,8 @@
 | 图号 | 图题 | 题注所在文件 | 图片或绘图源文件 | LaTeX 标签 |
 |---|---|---|---|---|
 | 1-1 | 资源受限无人机网络中的数据回传与语义协同场景 | [chapters/01_introduction.tex](chapters/01_introduction.tex) | [scenario.tex](figures/common/scenario.tex) | `fig:intro:scenario` |
-| 1-2 | 本文三项研究的对象、方法与衔接关系 | [chapters/01_introduction.tex](chapters/01_introduction.tex) | [research-chain.tex](figures/common/research-chain.tex) | `fig:intro:chain` |
+| 1-2 | 本文主要研究内容 | [chapters/01_introduction.tex](chapters/01_introduction.tex) | [research-chain.tex](figures/common/research-chain.tex) | `fig:intro:chain` |
+| 1-3 | 本文整体研究方案 | [chapters/01_introduction.tex](chapters/01_introduction.tex) | [research-framework.tex](figures/common/research-framework.tex) | `fig:intro:framework` |
 | 2-1 | 一次发送尝试中的数据事件与反馈事件 | [chapters/02_foundations.tex](chapters/02_foundations.tex) | [timeline.tex](figures/common/timeline.tex) | `fig:base:timeline` |
 | 2-2 | 语义证据从局部形成到接收端使用的过程 | [chapters/02_foundations.tex](chapters/02_foundations.tex) | [semantic-pipeline.tex](figures/common/semantic-pipeline.tex) | `fig:base:semantic-pipeline` |
 | 2-3 | 语义类别信念与接收状态信念的区别 | [chapters/02_foundations.tex](chapters/02_foundations.tex) | [belief-types.tex](figures/common/belief-types.tex) | `fig:base:beliefs` |

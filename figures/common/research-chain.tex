@@ -1,13 +1,64 @@
-\begin{tikzpicture}[font=\small,>=Stealth,
- box/.style={draw,rounded corners=2pt,align=left,text width=37mm,minimum height=44mm,inner sep=6pt,anchor=north},
- title/.style={font=\small\bfseries,align=center,text width=39mm}]
-\node[box] (a) at (0,2.5) {\textbf{LEADR}\\高动态多跳网络\\数据队列与能量压力\\下一跳和发送功率\\吞吐、丢包与能量分布};
-\node[box] (b) at (4.8,2.5) {\textbf{EviComRL}\\任务相关局部证据\\语义状态与通信预算\\发送来源和消息粒度\\推理质量与通信成本};
-\node[box] (c) at (9.6,2.5) {\textbf{C-BFC}\\候选证据的实际交付\\接收信念与剩余能量\\发送、等待和结束\\完成率与交付能耗};
-\node[title,above=3mm of a.north] {研究一：持续传输};
-\node[title,above=3mm of b.north] {研究二：内容选择};
-\node[title,above=3mm of c.north] {研究三：可靠交付};
-\draw[->,thick] (a.east) -- (b.west);
-\draw[->,thick] (b.east) -- (c.west);
-\draw[->,dashed] (a.south) -- ++(0,-.85) -| node[below,pos=.25,font=\footnotesize]{能量状态与在线队列控制思想} (c.south);
+% Hierarchy arrows denote research decomposition, not an experimental pipeline.
+\begin{tikzpicture}[
+  x=1mm,y=1mm,>=Stealth,
+  font=\fontsize{9bp}{11.5bp}\selectfont,
+  rcbox/.style={draw,line width=.45pt,fill=white,align=center,inner sep=1mm},
+  rctopic/.style={rcbox,text width=43mm,minimum height=15mm},
+  rcquestion/.style={rcbox,text width=43mm,minimum height=11mm},
+  rcmethod/.style={rcbox,text width=43mm,minimum height=24mm},
+  rcarrow/.style={->,line width=.55pt},
+  rclink/.style={fill=white,inner sep=.5mm}
+]
+\path[use as bounding box] (0,0) rectangle (148,-95);
+\node[rcbox,text width=144mm,minimum height=9mm,
+  font=\fontsize{10bp}{13bp}\selectfont] (rctotal) at (74,-4.5)
+  {资源受限无人机网络中的能量感知路由与语义通信方法研究};
+
+\node[rctopic] (rca) at (23.5,-23.5)
+  {研究一\\能量均衡路由\\与功率控制};
+\node[rctopic] (rcb) at (74,-23.5)
+  {研究二\\链路感知的\\选择性语义通信};
+\node[rctopic] (rcc) at (124.5,-23.5)
+  {研究三\\不完备反馈下的语义交付\\与能量控制};
+\draw[line width=.55pt] (rctotal.south) -- (74,-12.5);
+\draw[line width=.55pt] (23.5,-12.5) -- (124.5,-12.5);
+\foreach \x/\target in {23.5/rca,74/rcb,124.5/rcc}
+  \draw[rcarrow] (\x,-12.5) -- (\target.north);
+
+\node[rcquestion] (rcaq) at (23.5,-40)
+  {联合路由与功率决策\\能量均衡与持续服务};
+\node[rcquestion] (rcbq) at (74,-40)
+  {互补证据与冗余识别\\消息粒度、次序及停止};
+\node[rcquestion] (rccq) at (124.5,-40)
+  {接收不确定与延迟确认\\任务收益与能量支出};
+\foreach \parent/\target in {rca/rcaq,rcb/rcbq,rcc/rccq}
+  \draw[rcarrow] (\parent.south) -- (\target.north);
+
+\node[rcmethod] (rcam) at (23.5,-61)
+  {\textbf{LEADR}\\
+   数据队列与虚拟能量队列\\
+   漂移加惩罚与局部功率求解\\
+   能量及地理进度路由评分\\
+   相对运动与 HELLO 更新};
+\node[rcmethod] (rcbm) at (74,-61)
+  {\textbf{EviComRL}\\
+   语义与链路候选检索\\
+   结构化特征及可靠性编码\\
+   历史与中心上下文门控融合\\
+   代理预热、掩码 PPO 序列选择};
+\node[rcmethod] (rccm) at (124.5,-61)
+  {\textbf{C-BFC}\\
+   集合效用与分类一致性投影\\
+   累计确认与接收信念滤波\\
+   两步前瞻及反馈等待估值\\
+   跨任务队列与能量价格};
+\foreach \parent/\target in {rcaq/rcam,rcbq/rcbm,rccq/rccm}
+  \draw[rcarrow] (\parent.south) -- (\target.north);
+
+% Solid edge: fixed EviComRL policy supplies candidate evidence to C-BFC.
+\draw[rcarrow] (rcbm.south) -- (74,-80) -- (124.5,-80) -- (rccm.south);
+\node[rclink] at (99.25,-80) {固定策略候选证据};
+% The delivery model retains the link-energy model and budget constraints.
+\draw[rcarrow] (rcam.south) -- (23.5,-89) -- (139,-89) -- (rccm.south -| 139,0);
+\node[rclink] at (78,-89) {通信能耗与预算约束模型};
 \end{tikzpicture}
