@@ -1,0 +1,11 @@
+\begin{tikzpicture}[font=\small,>=Stealth,
+ box/.style={draw,rounded corners=2pt,align=center,text width=25mm,minimum height=16mm}]
+\node[box] (a) at (0,0){局部图像\\与任务查询};
+\node[box] (b) at (3.5,0){结构化证据\\与多粒度候选};
+\node[box] (c) at (7,0){选择与交付\\资源、链路、反馈};
+\node[box] (d) at (10.5,0){唯一证据融合\\与任务判断};
+\draw[->,thick](a)--(b);\draw[->,thick](b)--(c);\draw[->,thick](c)--(d);
+\node[align=center,font=\footnotesize,text width=28mm,below=4mm of b]{内容是否有用};
+\node[align=center,font=\footnotesize,text width=28mm,below=4mm of c]{内容是否到达};
+\node[align=center,font=\footnotesize,text width=28mm,below=4mm of d]{判断是否正确};
+\end{tikzpicture}

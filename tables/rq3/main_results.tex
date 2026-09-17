@@ -1,0 +1,22 @@
+\begin{table}[t]
+  \centering\small
+  \setlength{\tabcolsep}{3.5pt}
+  \bicaption{十七个主比较条件下的平均性能}{Average performance across the seventeen main evaluation conditions}
+  \label{rq3:tab:main-results}
+  \begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lrrrr@{}}
+    \toprule
+    方法 & \shortstack{正确完成率\\(\%)} & \shortstack{单位正确任务\\能耗 (mJ)} & \shortstack{重复发送\\(\%)} & \shortstack{通信时延\\(ms)}\\
+    \midrule
+    固定冗余 & 40.49 & 4.941 & 29.35 & 11.32\\
+    停等 ARQ & 43.65 & 3.678 & 7.49 & 16.69\\
+    选择重传 & 43.57 & 3.665 & 7.16 & 16.77\\
+    语义阈值 ARQ & 43.39 & 4.090 & 6.71 & 17.63\\
+    队列贪心 & 47.26 & 4.564 & 25.76 & 10.96\\
+    SD-SAC & 48.97 & 4.334 & 15.67 & 17.76\\
+    TP-DQN & 49.18 & 4.219 & 19.11 & 17.13\\
+    \midrule
+    \textbf{C-BFC} & \textbf{49.84} & \textbf{3.615} & \textbf{17.14} & \textbf{16.47}\\
+    \bottomrule
+  \end{tabular*}
+  \par\vspace{4pt}{\footnotesize 各条件等权汇总，共享的参考条件只计入一次。加粗行表示本章方法。}
+\end{table}

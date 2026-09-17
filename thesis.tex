@@ -1,0 +1,32 @@
+% !TeX program = xelatex
+% 中文硕士学位论文主文件；XeLaTeX + BibTeX。
+\documentclass[UTF8,12pt,oneside,openany,fontset=none]{ctexbook}
+\usepackage{thesis-style}
+\input{thesis-meta}
+\begin{document}
+\hypersetup{pageanchor=false}
+\input{front/thesis-cover}
+\frontmatter
+\pagenumbering{Roman}
+\hypersetup{pageanchor=true}
+\pagestyle{thesis}
+\input{front/thesis-abstracts}
+\tableofcontents
+\cleardoublepage
+\input{front/thesis-symbols}
+\mainmatter
+\input{chapters/01_introduction}
+\input{chapters/02_foundations}
+\input{chapters/03_leadr}
+\input{chapters/04_evicom}
+\input{chapters/05_cbfc}
+\input{chapters/06_conclusion}
+\backmatter
+\phantomsection
+\addcontentsline{toc}{chapter}{参考文献}
+\bibliographystyle{gbt7714-numerical}
+\bibliography{thesis-references}
+\input{back/thesis-achievements}
+\input{back/thesis-declaration}
+\input{back/thesis-acknowledgements}
+\end{document}

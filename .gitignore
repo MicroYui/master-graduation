@@ -13,6 +13,12 @@
 *.synctex
 *.pdf
 !figures/*.pdf
+!figures/**/*.pdf
+!output/pdf/thesis.pdf
+build/
+tmp/
+__pycache__/
+*.pyc
 
 # Other common temporary files
 *~

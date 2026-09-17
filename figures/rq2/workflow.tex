@@ -1,0 +1,13 @@
+\begin{tikzpicture}[>=stealth, every node/.style={font=\small}, box/.style={draw, rounded corners=2pt, align=center, minimum height=11mm, text width=34mm}, arr/.style={->,semithick}]
+\node[box] (image) at (0,0) {完整图像与查询\\局部视角裁剪};
+\node[box] (vlm) at (4.7,0) {冻结视觉语言模型\\标签、信念与摘要};
+\node[box] (trace) at (9.4,0) {冻结语义轨迹\\消息、代价与增量};
+\node[box] (candidate) at (9.4,-2) {成本敏感检索\\链路感知重排序};
+\node[box] (policy) at (4.7,-2) {可靠性与历史编码\\掩码策略网络};
+\node[box] (action) at (0,-2) {发送消息或停止\\中心信念与资源更新};
+\draw[arr] (image)--(vlm);\draw[arr] (vlm)--(trace);
+\draw[arr] (trace)--(candidate);\draw[arr] (candidate)--(policy);\draw[arr] (policy)--(action);
+\draw[arr] (action.south)--++(0,-.6)-|node[pos=.3,below]{当前信念、已选集合与剩余预算}(policy.south);
+\node[font=\footnotesize,align=center] at (4.7,.95) {离线构造：参考标签仅用于训练与评价};
+\node[font=\footnotesize,align=center,anchor=north] at (9.4,-3.1) {训练：代理预热与PPO\\测试：固定参数执行};
+\end{tikzpicture}

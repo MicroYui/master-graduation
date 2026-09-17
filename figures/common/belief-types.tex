@@ -1,0 +1,6 @@
+\begin{tikzpicture}[font=\small,>=Stealth,
+ box/.style={draw,rounded corners=2pt,align=left,text width=55mm,inner sep=8pt}]
+\node[box] (a) at (0,0){\textbf{语义类别信念} $\bm b^{\rm sem}$\\随机变量：任务所属类别\\输入：已接收的证据内容\\输出：各类别的概率判断\\关注：这些证据意味着什么};
+\node[box] (b) at (7.5,0){\textbf{接收状态信念} $b^{\rm rec}$\\随机变量：实际接收集合\\输入：发送历史与累计确认\\输出：各接收集合的概率\\关注：接收端可能拥有哪些证据};
+\draw[->,thick] (b.south) -- ++(0,-.6) -| node[below,pos=.25,font=\footnotesize]{对不同接收集合的语义效用求期望} (a.south);
+\end{tikzpicture}

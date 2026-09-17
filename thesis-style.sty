@@ -1,0 +1,112 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{thesis-style}[2026/09/17 Chinese master thesis layout]
+\RequirePackage[a4paper,margin=30mm,headheight=24pt,headsep=7mm,footskip=10mm]{geometry}
+\RequirePackage{fontspec}
+\IfFontExistsTF{Times New Roman}{\setmainfont{Times New Roman}}{\setmainfont{TeX Gyre Termes}}
+\IfFontExistsTF{SimSun}{
+  \setCJKmainfont{SimSun}[AutoFakeBold=1.8]
+}{\IfFontExistsTF{Songti SC}{
+  \setCJKmainfont{Songti SC}[AutoFakeBold=1.8,ItalicFont={Songti SC}]
+}{\setCJKmainfont{FandolSong-Regular.otf}[BoldFont=FandolSong-Bold.otf,ItalicFont=FandolKai-Regular.otf]}}
+\IfFontExistsTF{SimHei}{\setCJKsansfont{SimHei}}{
+  \IfFontExistsTF{Heiti SC}{\setCJKsansfont{Heiti SC}}{\setCJKsansfont{FandolHei-Regular.otf}}}
+\IfFontExistsTF{FandolFang-Regular.otf}{\setCJKmonofont{FandolFang-Regular.otf}}{\setCJKmonofont{Songti SC}}
+\RequirePackage{amsmath,amssymb,amsthm,bm,mathtools}
+\RequirePackage{graphicx,booktabs,tabularx,longtable,array,multirow}
+\AtBeginDvi{\special{pdf:minorversion 7}}
+\RequirePackage{caption,subcaption}
+\RequirePackage{enumitem,float,algpseudocode,placeins}
+\RequirePackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,fit,calc,shapes.geometric,backgrounds,decorations.pathreplacing}
+\RequirePackage{fancyhdr}
+\RequirePackage[super,square,sort&compress]{natbib}
+\RequirePackage{xurl}
+\RequirePackage[unicode,hidelinks,bookmarksnumbered,bookmarksdepth=2,pdfversion=1.7]{hyperref}
+\RequirePackage{gbt7714}
+\pdfstringdefDisableCommands{\def\quad{ }}
+\AtBeginDocument{\hypersetup{pdftitle={\ThesisTitle},pdfauthor={\ThesisAuthor}}}
+\ctexset{
+  chapter={name={第,章},number=\arabic{chapter},format=\centering\sffamily\bfseries\fontsize{18bp}{24bp}\selectfont,
+    beforeskip=18bp,afterskip=26bp,pagestyle=thesis},
+  section={format=\sffamily\bfseries\fontsize{15bp}{22bp}\selectfont,beforeskip=16bp,afterskip=8bp},
+  subsection={format=\sffamily\bfseries\fontsize{14bp}{21bp}\selectfont,beforeskip=12bp,afterskip=6bp},
+  subsubsection={format=\sffamily\bfseries\fontsize{12bp}{20.5bp}\selectfont,beforeskip=9bp,afterskip=3bp},
+  paragraph={format=\bfseries,runin=true,afterskip=1em},
+  contentsname={目\quad 录},listfigurename={插图目录},listtablename={表格目录},bibname={参考文献}}
+\renewcommand{\normalsize}{\fontsize{12bp}{20.5bp}\selectfont}
+\renewcommand{\small}{\fontsize{10.5bp}{16bp}\selectfont}
+\renewcommand{\footnotesize}{\fontsize{9bp}{13bp}\selectfont}
+\AtBeginDocument{\normalsize}
+\setlength{\parindent}{2em}
+\setlength{\parskip}{0pt}
+\setlength{\abovedisplayskip}{8pt plus 2pt minus 2pt}
+\setlength{\belowdisplayskip}{8pt plus 2pt minus 2pt}
+\setlength{\textfloatsep}{16pt plus 3pt minus 3pt}
+\setlength{\intextsep}{12pt plus 3pt minus 3pt}
+\setlength{\floatsep}{12pt plus 2pt minus 2pt}
+\setlength{\emergencystretch}{2em}
+\widowpenalty=10000
+\clubpenalty=10000
+\raggedbottom
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{1}
+\setcounter{topnumber}{3}
+\setcounter{bottomnumber}{2}
+\renewcommand{\topfraction}{.92}
+\renewcommand{\bottomfraction}{.85}
+\renewcommand{\textfraction}{.06}
+\renewcommand{\floatpagefraction}{.70}
+\renewcommand{\thefigure}{\thechapter-\arabic{figure}}
+\renewcommand{\thetable}{\thechapter-\arabic{table}}
+\renewcommand{\theequation}{\thechapter-\arabic{equation}}
+\captionsetup{font=small,labelsep=quad,skip=6pt,justification=centering}
+\captionsetup[table]{position=top}
+\captionsetup[subfigure]{font=small,labelformat=parens,labelsep=space}
+\newcommand{\bicaption}[2]{\caption[#1]{#1\protect\\#2}}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\setlist{itemsep=2pt,topsep=4pt,parsep=0pt,leftmargin=2em}
+\floatstyle{ruled}
+\newfloat{algorithm}{tbp}{loa}[chapter]
+\floatname{algorithm}{算法}
+\renewcommand{\thealgorithm}{\thechapter-\arabic{algorithm}}
+\algrenewcommand\algorithmicrequire{\textbf{输入：}}
+\algrenewcommand\algorithmicensure{\textbf{输出：}}
+\algrenewcommand\algorithmicfor{\textbf{对}}
+\algrenewcommand\algorithmicdo{\textbf{执行}}
+\algrenewcommand\algorithmicwhile{\textbf{当}}
+\algrenewcommand\algorithmicif{\textbf{若}}
+\algrenewcommand\algorithmicthen{\textbf{则}}
+\algrenewcommand\algorithmicelse{\textbf{否则}}
+\algrenewcommand\algorithmicend{\textbf{结束}}
+\algrenewcommand\algorithmicreturn{\textbf{返回}}
+\algrenewcommand\algorithmiccomment[1]{\hfill\(\triangleright\) #1}
+\algrenewtext{EndFor}{\textbf{结束循环}}
+\algrenewtext{EndWhile}{\textbf{结束循环}}
+\algrenewtext{EndIf}{\textbf{结束判断}}
+\theoremstyle{definition}
+\newtheorem{definition}{定义}[chapter]
+\newtheorem{proposition}{命题}[chapter]
+\newtheorem{theorem}{定理}[chapter]
+\newtheorem{lemma}{引理}[chapter]
+\newtheorem{remark}{说明}[chapter]
+\renewcommand{\proofname}{证明}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Prb}{\mathbb{P}}
+\newcommand{\ind}{\mathbb{I}}
+\newcommand{\states}{\mathcal{S}}
+\newcommand{\actions}{\mathcal{A}}
+\newcommand{\history}{\mathcal{H}}
+\newcommand{\method}{C-BFC}
+\newcommand{\pos}[1]{\left[#1\right]^+}
+\newcommand{\resultfigure}[2]{\IfFileExists{figures/rq3/#1}{\includegraphics[width=\linewidth]{figures/rq3/#1}}{\fbox{\parbox[c][55mm][c]{.94\linewidth}{\centering #2}}}}
+\fancypagestyle{thesis}{
+  \fancyhf{}
+  \fancyhead[C]{\fontsize{9bp}{12bp}\selectfont 哈尔滨工业大学硕士学位论文}
+  \fancyfoot[C]{\fontsize{9bp}{12bp}\selectfont -\;\thepage\;-}
+  \renewcommand{\headrule}{\vbox{\hrule width\headwidth height 1.1pt\vskip1.6pt\hrule width\headwidth height .4pt}}
+}
+\fancypagestyle{plain}{\fancyhf{}\fancyhead[C]{\fontsize{9bp}{12bp}\selectfont 哈尔滨工业大学硕士学位论文}\fancyfoot[C]{\fontsize{9bp}{12bp}\selectfont -\;\thepage\;-}\renewcommand{\headrulewidth}{.5pt}}
+\renewcommand{\bibfont}{\small}
+\setlength{\bibsep}{4pt}
+\newcommand{\unchapter}[1]{\chapter*{#1}\phantomsection\addcontentsline{toc}{chapter}{#1}\markboth{#1}{#1}}
+\endinput

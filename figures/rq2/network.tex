@@ -1,0 +1,19 @@
+\begin{tikzpicture}[>=stealth,every node/.style={font=\small},box/.style={draw,rounded corners=2pt,align=center,minimum height=10mm,text width=31mm},arr/.style={->,semithick}]
+\node[box] (input) at (0,0) {候选特征 $M\times41$\\全局状态 $11$维};
+\node[box] (base) at (4.6,1) {共享基础编码\\候选与全局表示};
+\node[box] (branch) at (4.6,-.4) {六类结构分支\\节点、信念与链路};
+\node[box] (hist) at (4.6,-1.8) {已选历史与中心\\候选上下文汇聚};
+\node[box] (gate) at (9.1,0) {关系编码\\门控残差融合};
+\node[box] (actor) at (9.1,-2.5) {消息与停止分数\\合法动作掩码};
+\node[box] (critic) at (4.6,-3.5) {价值网络\\估计后续回报};
+\draw[arr] (input.east)--++(.4,0)|-(base.west);
+\draw[arr] (input.east)--++(.4,0)|-(branch.west);
+\draw[arr] (input.east)--++(.4,0)|-(hist.west);
+\draw[arr] (base.east)--++(.5,0)|-(gate.north);
+\draw[arr] (branch.east)--(gate.west);
+\draw[arr] (hist.east)--++(.5,0)|-(gate.south);
+\draw[arr] (gate.south)--(actor.north);
+\draw[arr] (hist.south)--(critic.north);
+\draw[arr] (gate.east)--++(.5,0)|-(critic.east);
+\node[font=\footnotesize,align=center] at (0,-2.1) {已选消息保留历史表示\\非法动作不参与采样\\共享隐藏维数 $d=64$};
+\end{tikzpicture}

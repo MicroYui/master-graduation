@@ -1,0 +1,13 @@
+\begin{tikzpicture}[font=\small,>=Stealth,
+ box/.style={draw,rounded corners=2pt,align=left,text width=37mm,minimum height=44mm,inner sep=6pt,anchor=north},
+ title/.style={font=\small\bfseries,align=center,text width=39mm}]
+\node[box] (a) at (0,2.5) {\textbf{LEADR}\\高动态多跳网络\\数据队列与能量压力\\下一跳和发送功率\\吞吐、丢包与能量分布};
+\node[box] (b) at (4.8,2.5) {\textbf{EviComRL}\\任务相关局部证据\\语义状态与通信预算\\发送来源和消息粒度\\推理质量与通信成本};
+\node[box] (c) at (9.6,2.5) {\textbf{C-BFC}\\候选证据的实际交付\\接收信念与剩余能量\\发送、等待和结束\\完成率与交付能耗};
+\node[title,above=3mm of a.north] {研究一：持续传输};
+\node[title,above=3mm of b.north] {研究二：内容选择};
+\node[title,above=3mm of c.north] {研究三：可靠交付};
+\draw[->,thick] (a.east) -- (b.west);
+\draw[->,thick] (b.east) -- (c.west);
+\draw[->,dashed] (a.south) -- ++(0,-.85) -| node[below,pos=.25,font=\footnotesize]{能量状态与在线队列控制思想} (c.south);
+\end{tikzpicture}

@@ -1,0 +1,18 @@
+\begin{table}[t]
+  \centering\small
+  \setlength{\tabcolsep}{3.5pt}
+  \bicaption{五档反馈丢失率下的组件比较}{Component comparison at five feedback loss rates}
+  \label{rq3:tab:ablation-results}
+  \begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lrrrr@{}}
+    \toprule
+    方法 & \shortstack{正确完成率\\(\%)} & \shortstack{单位正确任务\\能耗 (mJ)} & \shortstack{重复发送\\(\%)} & \shortstack{通信时延\\(ms)}\\
+    \midrule
+    无接收信念 & 39.69 & 5.814 & 60.46 & 16.91\\
+    无主动等待 & 48.89 & 4.516 & 32.59 & 10.96\\
+    无一致性约束 & 51.28 & 4.064 & 16.96 & 18.63\\
+    \midrule
+    \textbf{C-BFC} & \textbf{50.97} & \textbf{3.674} & \textbf{18.29} & \textbf{17.62}\\
+    \bottomrule
+  \end{tabular*}
+  \par\vspace{4pt}{\footnotesize 各版本分别完成验证参数选择；表中数值为五个反馈丢失条件的等权平均。}
+\end{table}

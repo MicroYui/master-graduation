@@ -1,0 +1,16 @@
+\begin{tikzpicture}[x=1mm,y=1mm,scale=1.15,transform shape,font=\scriptsize,
+  box/.style={draw,rounded corners=1.2mm,align=center,inner sep=3pt,minimum height=11mm},
+  flow/.style={-{Stealth[length=1.5mm]},line width=.55pt},
+  ack/.style={flow,dashed}]
+  \node[box,text width=21mm] (a) at (13,34) {感知节点 A\\局部语义证据};
+  \node[box,text width=21mm] (b) at (13,17) {感知节点 B\\局部语义证据};
+  \node[box,text width=21mm] (c) at (13,0) {其他感知节点\\局部语义证据};
+  \node[box,text width=31mm,minimum height=30mm] (ctrl) at (58,17) {C-BFC 控制器\\[3pt]接收状态概率\\语义效用与能量价格\\发送／重传／等待／停止};
+  \node[box,text width=23mm,minimum height=23mm] (rx) at (104,17) {接收中心\\唯一证据融合\\任务分类结果};
+  \draw[flow] (a.east) -- ++(6,0) |- ($(ctrl.west)+(0,8mm)$);
+  \draw[flow] (b.east) -- (ctrl.west);
+  \draw[flow] (c.east) -- ++(6,0) |- ($(ctrl.west)+(0,-8mm)$);
+  \draw[flow] (ctrl.east) -- node[above,align=center] {无线数据\\链路} (rx.west);
+  \draw[ack] (rx.north) -- ++(0,17) -| node[pos=.25,above] {延迟或丢失的累计确认} (ctrl.north);
+  \node[align=center] at (61,-9) {节点发送能量与任务截止时间约束};
+\end{tikzpicture}

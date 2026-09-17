@@ -1,0 +1,13 @@
+\begin{tikzpicture}[font=\small,>=Stealth,
+ n/.style={draw,rounded corners=2pt,align=center,minimum height=12mm,text width=29mm},
+ edge/.style={->,thick},note/.style={align=center,font=\footnotesize}]
+\node[n] (a) at (0,2.6) {无人机 A\\局部观测与证据};
+\node[n] (b) at (0,0) {无人机 B\\局部观测与证据};
+\node[n] (c) at (4.5,1.3) {感知／中继节点\\路由与功率选择};
+\node[n] (d) at (9,1.3) {边缘决策中心\\语义融合与判断};
+\draw[edge] (a) -- node[note,above,sloped]{时变链路} (c);
+\draw[edge] (b) -- node[note,below,sloped]{有限能量} (c);
+\draw[edge] (c) -- node[note,above=4pt,text width=14mm,inner sep=0pt]{数据／\\语义消息} (d);
+\draw[edge,dashed] (d.south) -- ++(0,-1.2) -| node[note,pos=.25,below]{累计确认与状态反馈} (c.south);
+\node[note,draw,dashed,inner sep=5pt,text width=105mm] at (4.5,-2) {网络传输：下一跳与功率\qquad 内容选择：来源与粒度\\交付控制：新发、重传、等待与停止};
+\end{tikzpicture}

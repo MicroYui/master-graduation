@@ -1,0 +1,18 @@
+\begin{tikzpicture}[x=1mm,y=1mm,scale=1.15,transform shape,font=\scriptsize,
+  box/.style={draw,rounded corners=1mm,align=center,inner sep=3pt,minimum height=12mm},
+  arr/.style={-{Stealth[length=1.5mm]},line width=.55pt}]
+  \node[box,text width=27mm] (f) at (17,35) {候选接收集合\\29 维语义特征};
+  \node[box,text width=27mm] (n) at (59,35) {效用网络\\同类别一致性投影};
+  \node[box,text width=25mm] (q) at (101,35) {任务效用表\\$q_k(S)$};
+  \node[box,text width=27mm] (h) at (17,10) {发送历史与累计确认\\剩余能量与时限};
+  \node[box,text width=27mm] (b) at (59,10) {接收信念 $b_{k,t}$\\可行动作与能量价格};
+  \node[box,text width=25mm] (v) at (101,10) {两步发送前瞻\\反馈等待价值};
+  \node[box,text width=54mm] (a) at (60,-14) {选择并执行发送、重传、等待或停止};
+  \draw[arr] (f) -- (n);
+  \draw[arr] (n) -- (q);
+  \draw[arr] (h) -- (b);
+  \draw[arr] (b) -- (v);
+  \draw[arr] (q) -- (v);
+  \draw[arr] (v.south) |- (a.east);
+  \draw[arr] (a.west) -| node[pos=.25,below] {更新观测} (h.south);
+\end{tikzpicture}
