@@ -1,13 +1,23 @@
-\begin{tikzpicture}[>=stealth, every node/.style={font=\small}, box/.style={draw, rounded corners=2pt, align=center, minimum height=11mm, text width=34mm}, arr/.style={->,semithick}]
-\node[box] (image) at (0,0) {完整图像与查询\\局部视角裁剪};
-\node[box] (vlm) at (4.7,0) {冻结视觉语言模型\\标签、信念与摘要};
-\node[box] (trace) at (9.4,0) {冻结语义轨迹\\消息、代价与增量};
-\node[box] (candidate) at (9.4,-2) {成本敏感检索\\链路感知重排序};
-\node[box] (policy) at (4.7,-2) {可靠性与历史编码\\掩码策略网络};
-\node[box] (action) at (0,-2) {发送消息或停止\\中心信念与资源更新};
-\draw[arr] (image)--(vlm);\draw[arr] (vlm)--(trace);
-\draw[arr] (trace)--(candidate);\draw[arr] (candidate)--(policy);\draw[arr] (policy)--(action);
-\draw[arr] (action.south)--++(0,-.6)-|node[pos=.3,below]{当前信念、已选集合与剩余预算}(policy.south);
-\node[font=\footnotesize,align=center] at (4.7,.95) {离线构造：参考标签仅用于训练与评价};
-\node[font=\footnotesize,align=center,anchor=north] at (9.4,-3.1) {训练：代理预热与PPO\\测试：固定参数执行};
+\begin{tikzpicture}[x=1mm,y=1mm,>=Stealth,
+  font=\fontsize{9bp}{11.5bp}\selectfont,
+  ewbox/.style={draw,line width=.45pt,align=center,text width=38mm,
+    minimum height=10mm,inner sep=1mm},
+  ewarrow/.style={->,line width=.55pt},
+  ewnote/.style={align=center,inner sep=.4mm,fill=white}]
+\path[use as bounding box] (0,1) rectangle (148,-42);
+\node[ewnote] at (74,-1) {离线构造：参考标签仅用于训练与评价};
+\node[ewbox] (image) at (25,-9.5) {完整图像与查询\\局部视角裁剪};
+\node[ewbox] (vlm) at (74,-9.5) {冻结视觉语言模型\\标签、信念与摘要};
+\node[ewbox] (trace) at (123,-9.5) {冻结语义轨迹\\消息、代价与增量};
+\node[ewbox] (candidate) at (123,-25.5) {成本敏感检索\\链路感知重排序};
+\node[ewbox] (policy) at (74,-25.5) {可靠性与历史编码\\掩码策略网络};
+\node[ewbox] (action) at (25,-25.5) {发送消息或停止\\中心信念与资源更新};
+\draw[ewarrow] (image) -- (vlm);
+\draw[ewarrow] (vlm) -- (trace);
+\draw[ewarrow] (trace) -- (candidate);
+\draw[ewarrow] (candidate) -- (policy);
+\draw[ewarrow] (policy) -- (action);
+\draw[ewarrow] (action.south) -- (25,-34.5) -- (74,-34.5) -- (policy.south);
+\node[ewnote] at (49.5,-34.5) {信念、历史与剩余预算};
+\node[ewnote] at (74,-40) {训练：代理预热与 PPO\qquad 测试：固定参数执行};
 \end{tikzpicture}

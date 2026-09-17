@@ -3,6 +3,15 @@
 
 第~\ref{rq1:chapter} 章研究了既定数据的路由与功率分配，本章转向待发内容的选择。在通信资源有限时，策略需要根据接收端的当前判断，从不同节点的局部证据中选择发送方和消息粒度，并决定何时停止通信。
 
+图~\ref{rq2:fig:observation} 示意了多机观测中的互补与重复覆盖。不同视角提供的信息和消息长度不同，中心需要根据已有证据选择后续内容。
+
+\begin{figure}[htbp]
+\centering
+\input{figures/rq2/observation-scenario}
+\bicaption{多视角观测与多粒度语义证据选择示意}{Multi-view observation and multi-granularity semantic evidence selection}
+\label{rq2:fig:observation}
+\end{figure}
+
 EviComRL 利用冻结视觉语言模型生成语义轨迹，将候选证据、发送方可靠性和通信历史编码为策略状态，通过带动作掩码的近端策略优化学习消息序列。以五级证据可见性判断为任务，实验考察预算、链路和观测条件变化时的分类质量与通信成本。
 
 \section{协同语义通信系统模型}

@@ -1,0 +1,83 @@
+% Illustrative events, without numerical timing or performance claims.
+% Solid paths denote data; dashed paths denote cumulative feedback.
+\begin{tikzpicture}[
+  x=1mm,y=1mm,>=Stealth,
+  font=\fontsize{9bp}{11.5bp}\selectfont,
+  dline/.style={-{Stealth[length=1.6mm,width=1.2mm]},line width=.65pt,draw=blue!45!black},
+  aline/.style={-{Stealth[length=1.6mm,width=1.2mm]},dashed,line width=.6pt,draw=orange!65!black},
+  labelbg/.style={fill=white,inner sep=.4mm,align=center},
+  pics/uav/.style={code={
+    \draw[line width=.65pt] (-5.5,-2.5)--(5.5,2.5) (-5.5,2.5)--(5.5,-2.5);
+    \foreach \x/\y in {-5.5/-2.5,-5.5/2.5,5.5/-2.5,5.5/2.5}{
+      \draw[fill=black!3,line width=.45pt] (\x,\y) ellipse (3.4mm and 1.1mm);
+      \draw[line width=.4pt] (\x-2.6,\y)--(\x+2.6,\y);
+    }
+    \draw[fill=black!12,line width=.5pt] (-2.2,-1.6) rectangle (2.2,1.6);
+    \draw[fill=white,line width=.45pt] (-.9,-1.6) rectangle (.9,-3.5);
+    \fill[black!65] (0,-2.8) circle (.45mm);
+  }},
+  pics/evidence/.style={code={
+    \draw[fill=blue!4!white,line width=.4pt] (-4.5,-5.5) rectangle (4.5,5.5);
+    \draw[line width=.35pt,draw=black!55] (-2.9,2.8)--(2.9,2.8)
+      (-2.9,1.3)--(2.9,1.3) (-2.9,-.2)--(1.3,-.2);
+  }}
+]
+\path[use as bounding box] (0,0) rectangle (148,-92);
+
+% Two sensing UAVs and their candidate evidence.
+\pic at (20,-16) {uav};
+\pic at (68,-16) {uav};
+\node at (20,-6) {感知无人机 A};
+\node at (68,-6) {感知无人机 B};
+\pic at (18,-32) {evidence};
+\node at (18,-35) {$m_A$};
+\pic at (65,-32) {evidence};
+\node at (65,-35) {$m_B$};
+\draw[draw=black!45,line width=.35pt] (19,-21)--(18,-26.5);
+\draw[draw=black!45,line width=.35pt] (67,-21)--(65,-26.5);
+\node at (18,-42) {已发送证据};
+\node at (65,-42) {待发候选};
+
+% Ground receiver: antenna and edge terminal, at natural scene proportions.
+\draw[fill=black!2,line width=.45pt] (114,-49) rectangle (146,-52);
+\draw[line width=.6pt] (124,-31)--(119,-49)--(129,-49)--cycle;
+\draw[line width=.4pt] (122,-38)--(126,-38) (121,-43)--(127,-43);
+\draw[line width=.4pt] (120,-47)--(126,-38) (128,-47)--(122,-38);
+\fill[black!65] (124,-31) circle (.8mm);
+\draw[line width=.45pt] (121.5,-28) arc[start angle=140,end angle=40,radius=3.2mm];
+\draw[line width=.4pt] (119.8,-26.6) arc[start angle=140,end angle=40,radius=5.4mm];
+\draw[fill=black!5,line width=.5pt] (132,-40) rectangle (143,-46.5);
+\draw[line width=.5pt] (137.5,-46.5)--(137.5,-49);
+\draw[line width=.5pt] (134,-49)--(141,-49);
+\node at (129.5,-56) {地面接收中心};
+\draw[draw=black!35,line width=.4pt] (3,-53)--(146,-53);
+
+% An already delivered message and a prospective alternative.
+\draw[dline] (29,-18.5) to[out=-7,in=166] (119,-34);
+\node[labelbg] at (84,-28) {$m_A$ 已到达};
+\draw[dline,draw=green!40!black] (77,-18) to[out=0,in=155] (118,-27);
+\node[labelbg] at (101,-16) {可新发 $m_B$};
+\draw[aline] (116,-46.5) -- (36,-46.5) to[out=180,in=-40] (28,-23);
+\node[labelbg] at (80,-48) {累计确认延迟或丢失};
+
+% A short event view separates sender knowledge from receiver reality.
+\draw[draw=black!25,line width=.4pt] (0,-60)--(148,-60);
+\node[anchor=east] at (24,-68) {发送端};
+\node[anchor=east] at (24,-81) {接收端};
+\draw[->,draw=black!55,line width=.4pt] (27,-68)--(146,-68);
+\draw[->,draw=black!55,line width=.4pt] (27,-81)--(146,-81);
+\node[anchor=north east] at (146,-85) {时间};
+\draw[dline] (36,-68)--(57,-81);
+\fill[blue!45!black] (36,-68) circle (.6mm);
+\fill[blue!45!black] (57,-81) circle (.6mm);
+\node[labelbg] at (45,-63.5) {发送 $m_A$};
+\node[labelbg] at (52,-87) {$m_A$ 已接收};
+\draw[aline] (57,-81)--(86,-69.5);
+\draw[draw=orange!65!black,line width=.7pt] (84.8,-70.7)--(87.2,-68.3)
+  (84.8,-68.3)--(87.2,-70.7);
+\node[labelbg] at (74,-77) {确认未到};
+\draw[draw=black!50,line width=.4pt] (96,-62)--(96,-88.5);
+\node[labelbg] at (96,-63.5) {当前};
+\node[labelbg] at (121,-73) {补发 $m_A$ 或新发 $m_B$};
+\node[labelbg] at (120,-86) {实际已收 $\{m_A\}$\\重复不新增证据};
+\end{tikzpicture}

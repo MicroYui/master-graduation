@@ -1,113 +1,96 @@
 % Matches GraphHistoryActorCriticNet and Eqs. (encoders)--(policy).
-% Repeated tensor names denote reuse, not additional encoders or observations.
+% Named tensors are reused; they do not denote additional encoders.
+% Contexts pool the base encoding. The critic pools only legal candidates.
 \begin{tikzpicture}[
   x=1mm,y=1mm,>=Stealth,
   font=\fontsize{9bp}{11.5bp}\selectfont,
-  enbox/.style={draw,line width=.45pt,fill=white,align=center,inner sep=1mm},
-  enencoder/.style={enbox,text width=16.5mm,minimum height=13mm},
-  encontext/.style={enbox,text width=32mm,minimum height=14mm},
+  enbox/.style={draw,line width=.45pt,fill=white,align=center,inner sep=.8mm},
+  enencoder/.style={enbox,text width=18mm,minimum height=13.5mm},
+  encontext/.style={enbox,text width=41.5mm,minimum height=10.5mm},
   enarrow/.style={->,line width=.55pt},
   enwire/.style={line width=.45pt},
-  entag/.style={fill=white,inner sep=.5mm}
+  entag/.style={fill=white,inner sep=.25mm}
 ]
-\path[use as bounding box] (0,0) rectangle (148,-145);
+\path[use as bounding box] (0,0) rectangle (148,-94);
 
-\node[enbox,text width=143mm,minimum height=7mm] (enx) at (74,-3.5)
+\node[enbox,text width=144mm,minimum height=6mm] (enx) at (74,-3)
   {候选特征 $X_t\in\mathbb R^{M\times41}$\qquad 主设置 $M=16$，共享隐藏维数 $d=64$};
-\draw[enwire] (enx.south) -- (74,-10);
-\draw[enwire] (11,-10) -- (137,-10);
+\draw[enwire] (enx.south) -- (74,-8);
+\draw[enwire] (11,-8) -- (137,-8);
 
-\node[enencoder] (enbase) at (11,-19.5)
+\node[enencoder] (enbase) at (11,-16.5)
   {基础编码\\\mbox{$41{\to}d{\to}d$}\\$\bm h_m^0$};
-\node[enencoder] (ensender) at (32,-19.5)
+\node[enencoder] (ensender) at (32,-16.5)
   {发送方\\$3\to d$\\$\bm v_m^s$};
-\node[enencoder] (enreceiver) at (53,-19.5)
+\node[enencoder] (enreceiver) at (53,-16.5)
   {接收方\\$2\to d$\\$\bm v_m^r$};
-\node[enencoder] (enmode) at (74,-19.5)
+\node[enencoder] (enmode) at (74,-16.5)
   {语义模式\\$4\to d$\\$\bm v_m^c$};
-\node[enencoder] (enlink) at (95,-19.5)
+\node[enencoder] (enlink) at (95,-16.5)
   {链路代价\\$7\to d$\\$\bm v_m^l$};
-\node[enencoder] (enbelief) at (116,-19.5)
+\node[enencoder] (enbelief) at (116,-16.5)
   {三方信念\\$15\to d$\\$\bm v_m^b$};
-\node[enencoder] (enreliability) at (137,-19.5)
+\node[enencoder] (enreliability) at (137,-16.5)
   {可靠性\\$5\to d$\\$\bm v_m^q$};
 \foreach \name/\x in {enbase/11,ensender/32,enreceiver/53,enmode/74,enlink/95,enbelief/116,enreliability/137}
-  \draw[enarrow] (\x,-10) -- (\name.north);
+  \draw[enarrow] (\x,-8) -- (\name.north);
 
-% The six structural branches are concatenated at the relation encoder.
-\foreach \name/\x in {ensender/32,enreceiver/53,enmode/74,enlink/95,enbelief/116,enreliability/137}
-  \draw[enwire] (\name.south) -- (\x,-29);
-\draw[enwire] (32,-29) -- (146.5,-29) -- (146.5,-65);
-\foreach \x in {53,74,95,116,137}
-  \fill (\x,-29) circle (.45mm);
+% Seven candidate encodings feed the relation encoder along the left bus.
+\foreach \name/\x in {enbase/11,ensender/32,enreceiver/53,enmode/74,enlink/95,enbelief/116,enreliability/137}
+  \draw[enwire] (\name.south) -- (\x,-25);
+\draw[enwire] (137,-25) -- (1,-25) -- (1,-48);
+\foreach \x in {11,32,53,74,95,116}
+  \fill (\x,-25) circle (.35mm);
 
-% Both contexts pool the base encoding, not the gate-enriched candidates.
-\draw[enwire] (enbase.south) -- (11,-31) -- (80,-31);
-\fill (34,-31) circle (.45mm);
-\draw[enwire] (11,-31) -- (3,-31) -- (3,-86);
-\fill (11,-31) circle (.45mm);
+% Named h_m^0 makes clear that both contexts pool the base encoding.
+\node[encontext] (enselected) at (25,-32)
+  {已选历史 $\bar{\bm h}_t^{\mathrm{sel}}$\\
+   $\bm h_m^0$ 按 $e_m s_m^t$ 加权均值};
+\node[encontext] (encenter) at (74,-32)
+  {中心上下文 $\bar{\bm h}_t^{\mathrm{ctr}}$\\
+   $\bm h_m^0$ 按 $e_m c_m$ 加权均值};
+\node[encontext] (englobal) at (123.5,-32)
+  {全局输入 $\bm g_t\in\mathbb R^{11}$\\
+   $f_g:11\to d$，输出 $\bm z_t$};
+\foreach \name/\x in {enselected/25,encenter/74,englobal/123.5}
+  \draw[enwire] (\name.south) -- (\x,-39);
+\draw[enwire] (25,-39) -- (123.5,-39);
+\fill (74,-39) circle (.35mm);
 
-\node[encontext] (enselected) at (34,-42)
-  {已选历史汇聚\\权重 $e_m s_m^t$ 的均值\\$\bar{\bm h}_t^{\mathrm{sel}}$};
-\node[encontext] (encenter) at (80,-42)
-  {中心上下文汇聚\\权重 $e_m c_m$ 的均值\\$\bar{\bm h}_t^{\mathrm{ctr}}$};
-\node[enbox,text width=39mm,minimum height=14mm] (englobal) at (124,-42)
-  {全局输入 $\bm g_t\in\mathbb R^{11}$\\全局编码 $f_g:11\to d$\\$\bm z_t$};
-\draw[enarrow] (34,-31) -- (enselected.north);
-\draw[enarrow] (80,-31) -- (encenter.north);
-
-\foreach \name/\x in {enselected/34,encenter/80,englobal/124}
-  \draw[enwire] (\name.south) -- (\x,-52.5);
-\draw[enwire] (34,-52.5) -- (124,-52.5);
-\fill (80,-52.5) circle (.45mm);
-\draw[enarrow] (78,-52.5) -- (78,-57);
-
-\node[enbox,text width=126mm,minimum height=16mm] (enrelation) at (78,-65)
-  {关系拼接与编码 $f_{\mathrm{rel}}$\\
-   $[\bm h_m^0,\bm v_m^s,\bm v_m^r,\bm v_m^c,\bm v_m^l,
-     \bm v_m^b,\bm v_m^q,\bar{\bm h}_t^{\mathrm{sel}},\bar{\bm h}_t^{\mathrm{ctr}},\bm z_t]$\\
-   $10d\to d\to d$，输出 $\bm u_m$};
-\draw[enarrow] (146.5,-65) -- (enrelation.east);
-\draw[enarrow] (3,-65) -- (enrelation.west);
-\fill (3,-65) circle (.45mm);
-
-\node[enbox,text width=116mm,minimum height=16mm] (engate) at (78,-86)
+\node[enbox,text width=66mm,minimum height=14.5mm] (enrelation) at (38,-48)
+  {关系编码 $f_{\mathrm{rel}}:10d\to d\to d$\\
+   $[\bm h_m^0,\bm v_m^s,\bm v_m^r,\bm v_m^c,\bm v_m^l,\bm v_m^b,\bm v_m^q,$\\
+   $\bar{\bm h}_t^{\mathrm{sel}},\bar{\bm h}_t^{\mathrm{ctr}},\bm z_t]\to\bm u_m$};
+\node[enbox,text width=66mm,minimum height=14.5mm] (engate) at (113,-48)
   {门控残差融合\\
    $\bm a_m=\sigma\!\left(W_a[\bm h_m^0,\bm u_m,\bm z_t]+\bm b_a\right)$\\
    $\bm h_m=\bm h_m^0+\bm a_m\odot\bm u_m$};
-\draw[enarrow] (enrelation.south) -- (engate.north);
-\draw[enarrow] (3,-86) -- node[entag] {$\bm h_m^0$} (engate.west);
-% Named input reuses the global encoding shown above, avoiding a crossing wire.
-\draw[enarrow] (146.5,-86) -- node[above,font=\fontsize{9bp}{11.5bp}\selectfont] {$\bm z_t$} (engate.east);
+\draw[enarrow] (1,-48) -- (enrelation.west);
+\draw[enarrow] (38,-39) -- (enrelation.north);
+\draw[enarrow] (enrelation.east) -- (engate.west);
 
-\draw[enwire] (engate.south) -- (78,-98);
-\draw[enwire] (42,-98) -- (119,-98);
-\node[entag] at (78,-98) {$\bm h_m$};
-
-\node[enbox,text width=74mm,minimum height=19mm] (enactor) at (42,-112.5)
-  {\textbf{Actor}：消息头与停止头\\
-   $\ell_m=f_{\mathrm{act}}[\bm h_m,\bm z_t,\bar{\bm h}_t^{\mathrm{sel}},\bar{\bm h}_t^{\mathrm{ctr}}]$\\
-   $\ell_0=f_{\mathrm{stop}}[\bm z_t,\bar{\bm h}_t^{\mathrm{sel}},\bar{\bm h}_t^{\mathrm{ctr}}]$\\
-   消息：$4d\to d\to1$；停止：$3d\to d\to1$};
-\node[enbox,text width=50mm,minimum height=19mm] (encritic) at (119,-112.5)
-  {\textbf{Critic}：价值估计\\
-   合法候选的 $\bm h_m$ 掩码均值\\
+% Both decision heads reuse the gate output and the three context tensors.
+\node[enbox,text width=66mm,minimum height=18.5mm] (enactor) at (38,-68.5)
+  {\textbf{Actor}：消息头 $4d\to d\to1$\\
+   $[\bm h_m,\bm z_t,\bar{\bm h}_t^{\mathrm{sel}},\bar{\bm h}_t^{\mathrm{ctr}}]\to\ell_m$\\
+   停止头 $3d\to d\to1$\\
+   $[\bm z_t,\bar{\bm h}_t^{\mathrm{sel}},\bar{\bm h}_t^{\mathrm{ctr}}]\to\ell_0$};
+\node[enbox,text width=66mm,minimum height=18.5mm] (encritic) at (113,-68.5)
+  {\textbf{Critic}：价值头 $4d\to d\to1$\\
+   对合法候选的 $\bm h_m$ 求掩码均值\\
    拼接 $\bm z_t,\bar{\bm h}_t^{\mathrm{sel}},\bar{\bm h}_t^{\mathrm{ctr}}$\\
-   $4d\to d\to1$};
-\draw[enarrow] (42,-98) -- (enactor.north);
-\draw[enarrow] (119,-98) -- (encritic.north);
+   输出价值 $V_\psi(s_t)$};
+\draw[enwire] (engate.south) -- (113,-57.3) -- (38,-57.3);
+\draw[enarrow] (38,-57.3) -- (enactor.north);
+\draw[enarrow] (113,-57.3) -- (encritic.north);
+\fill (113,-57.3) circle (.4mm);
 
-\node[enbox,text width=54mm,minimum height=12mm] (enpolicy) at (42,-134)
-  {非法消息置极小分数，Softmax\\
+\node[enbox,text width=66mm,minimum height=10.5mm] (enpolicy) at (38,-87)
+  {非法消息置极小分数，再作 Softmax\\
    $\pi_\theta(a\mid s_t),\quad a\in\{0,1,\ldots,M\}$};
+\node[enbox,text width=45mm,minimum height=10.5mm] (enmask) at (113,-87)
+  {合法动作掩码 $\bm\mu_t$\\停止动作始终可用};
 \draw[enarrow] (enactor.south) -- (enpolicy.north);
-\node[enbox,text width=17mm,minimum height=10mm] (enmask) at (86.5,-134)
-  {合法掩码\\$\bm\mu_t$};
 \draw[enarrow] (enmask.west) -- (enpolicy.east);
-\draw[enarrow] (enmask.north) -- (86.5,-112.5) -- (encritic.west);
-\node[align=center] (envalue) at (119,-134) {价值 $V_\psi(s_t)$};
-\draw[enarrow] (encritic.south) -- (envalue.north);
-
-\node[align=center,text width=143mm] at (74,-142.8)
-  {同名张量表示结果复用；历史汇聚保留已选消息；停止动作始终可用。};
+\draw[enarrow] (enmask.north) -- (encritic.south);
 \end{tikzpicture}

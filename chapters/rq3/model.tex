@@ -71,6 +71,15 @@
 \subsection{累计确认与可观测历史}
 \label{rq3:subsec:feedback}
 
+图~\ref{rq3:fig:delivery-scene} 示意了数据已送达而累计确认尚未返回的情形。消息是否到达与发送端是否获知其到达是两个不同状态：继续补发可能重复占用链路，切换候选又需要判断此前证据缺失的风险。
+
+\begin{figure}[htbp]
+\centering
+\input{figures/rq3/delivery-scenario}
+\bicaption{语义数据送达与累计确认不同步的通信示意}{Semantic data delivery with delayed or missing cumulative acknowledgment}
+\label{rq3:fig:delivery-scene}
+\end{figure}
+
 每次尝试结束后，接收中心生成携带尝试序号 $j$ 和集合快照 $S_j^{\mathrm{ack}}$ 的累计确认帧。假设短控制头可标识本次调度，因此载荷失败时仍可返回位图，既确认已收证据，也指出此前尝试未送达的证据。
 
 记第 $j$ 次数据发送结束时间为 $t_j^{\mathrm{end}}$，反馈帧长度为 $B^{\mathrm f}$ 比特。反馈按对应链路的预测速率串行发送，完成时间满足
@@ -170,3 +179,4 @@
     \bottomrule
   \end{tabularx}
 \end{table}
+\FloatBarrier

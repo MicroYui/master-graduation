@@ -1,52 +1,59 @@
+% The task utility table is built once; only states and action values recur.
 \begin{tikzpicture}[x=1mm,y=1mm,
-  font=\fontsize{9.5bp}{12bp}\selectfont,
-  cbbox/.style={draw,line width=.45pt,align=center,inner sep=2mm},
+  font=\fontsize{9bp}{11.5bp}\selectfont,
+  cbbox/.style={draw,line width=.45pt,fill=white,align=center,inner sep=.8mm},
   cbarrow/.style={-{Stealth[length=1.6mm,width=1.2mm]},line width=.5pt},
-  cbgroup/.style={draw,line width=.55pt},
-  cbtitle/.style={font=\fontsize{10bp}{13bp}\selectfont\bfseries}]
-  \draw[cbgroup] (0,66) rectangle (66,132);
-  \draw[cbgroup] (74,66) rectangle (137,132);
-  \node[cbtitle] at (33,127) {任务效用表构造};
-  \node[cbtitle] at (105.5,127) {在线状态更新};
-  \node[cbbox,text width=56mm,minimum height=15mm] (sets) at (33,114)
+  cbgroup/.style={draw,line width=.45pt},
+  cbtitle/.style={font=\fontsize{9bp}{11.5bp}\selectfont\bfseries}]
+  \path[use as bounding box] (0,0) rectangle (148,-93);
+  \draw[cbgroup] (0,0) rectangle (48,-48);
+  \draw[cbgroup] (52,0) rectangle (145,-48);
+  \node[cbtitle] at (24,-3.2) {任务效用表构造};
+  \node[cbtitle] at (98.5,-3.2) {在线状态更新};
+
+  \node[cbbox,text width=42mm,minimum height=11mm] (sets) at (24,-13)
     {候选证据 $\mathcal M_k$，$K\le4$\\枚举 $2^K$ 个接收集合};
-  \node[cbbox,text width=56mm,minimum height=14mm] (network) at (33,95)
-    {非空集合特征与效用网络\\$29\rightarrow128\rightarrow96\rightarrow1$};
-  \node[cbbox,text width=56mm,minimum height=14mm] (utility) at (33,76)
-    {同类别非空集合的效用取均值\\$q_k(S)$，$q_k(\varnothing)=0$};
+  \node[cbbox,text width=42mm,minimum height=11mm] (network) at (24,-28)
+    {效用网络（非空集合）\\$29\rightarrow128\rightarrow96\rightarrow1$};
+  \node[cbbox,text width=42mm,minimum height=11mm] (utility) at (24,-42)
+    {分类一致性投影\\$q_k(S)$，$q_k(\varnothing)=0$};
   \draw[cbarrow] (sets.south) -- (network.north);
   \draw[cbarrow] (network.south) -- (utility.north);
-  \node[cbbox,text width=23mm,minimum height=24mm] (history) at (89.5,108)
-    {累计确认\\发送记录\\送达率 $p_{k,m}$};
-  \node[cbbox,text width=23mm,minimum height=24mm] (resources) at (121.5,108)
-    {剩余时限\\节点能量\\$h,E_i,Z_i$};
-  \node[cbbox,text width=23mm,minimum height=18mm] (belief) at (89.5,78)
-    {接收状态滤波\\$b_{k,t}(S)$};
-  \node[cbbox,text width=23mm,minimum height=18mm] (price) at (121.5,78)
-    {动作可行性\\发送价格 $\pi_{k,m}$};
+
+  \node[cbbox,text width=42mm,minimum height=18mm] (history) at (74.5,-17)
+    {累计确认\\已发送记录\\送达率 $p_{k,m}$};
+  \node[cbbox,text width=42mm,minimum height=18mm] (resources) at (122.5,-17)
+    {剩余时限\\节点电量与虚拟队列\\$h,E_i,Z_i$};
+  \node[cbbox,text width=42mm,minimum height=17mm] (belief) at (74.5,-39)
+    {累计快照及后续记录\\接收状态滤波\\$b_{k,t}(S)$};
+  \node[cbbox,text width=42mm,minimum height=17mm] (price) at (122.5,-39)
+    {时限、电量与尝试上限\\动作可行性\\资源价格 $\pi_{k,m}$};
   \draw[cbarrow] (history.south) -- (belief.north);
   \draw[cbarrow] (resources.south) -- (price.north);
-  \node[cbbox,text width=129mm,minimum height=12mm,fill=black!4] (expected) at (68.5,53)
-    {期望任务效用 $U_k(b)=\sum_{S}b(S)q_k(S)$\\在剩余时间、电量和尝试次数约束下评价可行动作};
-  \draw[cbarrow] (utility.south) -- (33,59);
-  \draw[cbarrow] (belief.south) -- (89.5,59);
-  \draw[cbarrow] (price.south) -- (121.5,59);
-  \node[cbbox,text width=36mm,minimum height=20mm] (send) at (23,28)
-    {两步发送前瞻\\新发或重传\\$V_m^{\mathrm{send}}(b;h)$};
-  \node[cbbox,text width=39mm,minimum height=20mm] (wait) at (72.5,28)
-    {反馈等待价值\\至多三个等待候选\\$V^{\mathrm{wait}}(w;b,h)$};
-  \node[cbbox,text width=28mm,minimum height=20mm] (stop) at (120.5,28)
+
+  \node[cbbox,text width=140mm,minimum height=7.5mm,fill=black!3] (expected) at (74,-54)
+    {期望效用 $U_k(b)=\sum_S b(S)q_k(S)$；结合资源价格评价可行动作};
+  \foreach \source in {utility,belief,price}
+    \draw[cbarrow] (\source.south) -- (expected.north -| \source.south);
+
+  \node[cbbox,text width=42mm,minimum height=13mm] (send) at (24,-68.5)
+    {两步发送前瞻：新发/重传\\$V_m^{\mathrm{send}}(b;h)$};
+  \node[cbbox,text width=42mm,minimum height=13mm] (wait) at (74.5,-68.5)
+    {反馈等待：至多三个时长\\$V^{\mathrm{wait}}(w;b,h)$};
+  \node[cbbox,text width=42mm,minimum height=13mm] (stop) at (125,-68.5)
     {停止当前任务\\净增益为零};
-  \draw (68.5,47) -- (68.5,42);
-  \draw (23,42) -- (120.5,42);
-  \draw[cbarrow] (23,42) -- (send.north);
-  \draw[cbarrow] (72.5,42) -- (wait.north);
-  \draw[cbarrow] (120.5,42) -- (stop.north);
-  \node[cbbox,text width=129mm,minimum height=16mm,fill=black!4] (action) at (68.5,0)
-    {选择最大正收益动作并执行；否则停止\\更新发送记录、剩余时间和电量；任务结束后更新 $Z_i(k+1)$};
-  \draw (send.south) -- (23,12) -- (120.5,12) -- (stop.south);
-  \draw (wait.south) -- (72.5,12);
-  \draw[cbarrow] (68.5,12) -- (action.north);
-  \draw[cbarrow,dashed] (action.east) -- (144,0) -- (144,138)
-    -- node[above,font=\fontsize{9bp}{11bp}\selectfont] {未停止时更新} (105.5,138) -- (105.5,132);
+  \draw[line width=.5pt] (expected.south) -- (74,-59.8);
+  \draw[line width=.5pt] (24,-59.8) -- (125,-59.8);
+  \foreach \x/\target in {24/send,74.5/wait,125/stop}
+    \draw[cbarrow] (\x,-59.8) -- (\target.north);
+
+  \node[cbbox,text width=138mm,minimum height=12mm,fill=black!3] (action) at (74,-85)
+    {执行最大正收益的发送/等待动作，否则停止\\
+     未停止则更新历史、时间及电量；任务结束后更新 $Z_i(k+1)$};
+  \foreach \x/\source in {24/send,74.5/wait,125/stop}
+    \draw[line width=.5pt] (\source.south) -- (\x,-77);
+  \draw[line width=.5pt] (24,-77) -- (125,-77);
+  \draw[cbarrow] (74,-77) -- (action.north);
+  % Dashed return enters the online-state group, not the fixed utility table.
+  \draw[cbarrow,dashed] (action.east) -- (147.5,-85) -- (147.5,-3.2) -- (145,-3.2);
 \end{tikzpicture}
