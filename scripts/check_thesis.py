@@ -56,7 +56,8 @@ if len(keys) != len(set(keys)):
 errors += [f"Undefined citation: {key}" for key in sorted(cites - set(keys))]
 body = "\n".join(text for path, text in texts if "chapters" in path.parts)
 body_with_assets = "\n".join(text for path, text in texts if any(part in path.parts for part in ("chapters", "figures", "tables")))
-print(f"正文中文字符：{len(re.findall(r'[\u4e00-\u9fff]', body)):,}")
+chinese_count = len(re.findall(r"[\u4e00-\u9fff]", body))
+print(f"正文中文字符：{chinese_count:,}")
 print(f"输入文件：{len(seen)}；标签：{len(labels)}；实际引用文献：{len(cites)}")
 print(f"编号图：{body_with_assets.count(chr(92) + 'begin{figure}')}；编号表：{body_with_assets.count(chr(92) + 'begin{table}')}；算法：{body_with_assets.count(chr(92) + 'begin{algorithm}')}")
 if errors:
