@@ -15,6 +15,11 @@
 !figures/*.pdf
 !figures/**/*.pdf
 !output/pdf/thesis.pdf
+!thesis/figures/**/*.pdf
+!thesis/output/pdf/thesis.pdf
+*.xdv
+*.loa
+*.lol
 build/
 tmp/
 __pycache__/

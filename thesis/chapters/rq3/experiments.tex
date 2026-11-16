@@ -1,0 +1,199 @@
+\section{实验设置与评价方法}
+\label{rq3:sec:experiments}
+
+\subsection{数据与实现参数}
+\label{rq3:subsec:experiment-data}
+
+实验采用由 VQAv2/COCO 图像构造的预先生成的观测数据\citep{coco,vqa-v2}。每幅图像及查询构成一个任务，局部裁剪提供九个节点的观测，中心不访问原图。离线视觉语言模型生成局部证据与全图参考标签，分为清晰可见、大部分可见、不确定、大部分遮挡和完全遮挡五类。以接收端分类与全图参考标签一致作为正确判据，比较给定语义内容在不同交付策略下的任务表现。
+
+候选由训练完成的 EviComRL 在给定 token 预算下生成。该模块用策略网络选择候选消息，并用价值网络评价后续收益，采用 PPO 训练\citep{ppo}。生成后按固定次序合并去重，保留至多四条。实验中固定该策略的参数，所有交付方法使用相同的候选内容和次序，以比较相同语义内容下的交付控制效果。
+
+训练、验证和测试分区分别含 600、595、611 个任务，图像互不重叠。枚举训练任务的非空集合生成监督样本，同一图像的集合不跨分区。效用网络采用带解耦权重衰减的自适应矩估计优化器 AdamW，学习率 $8\times10^{-4}$、权重衰减 0.02、批量 256，最多训练 60 轮，以验证交叉熵选择参数。
+
+控制参数在参考条件、12 ms 反馈延迟、60\% 反馈丢失及 12 ms 任务时限四种验证条件下选择：优先平均正确完成率，并列时选择低能耗。所得参数用于全部测试。C-BFC 三个训练种子均取 $\eta_E=0.24$、$\eta_T=0$；时限仍通过可行域和等待机会成本作用于决策。
+
+学习方法使用三个训练种子与三个网络种子的九种组合，固定协议使用三个网络种子。每次按相同次序处理 611 个任务，电量连续扣减；各方法对同一任务、候选和尝试使用相同随机条件。误差线为重复实验标准差，重复实验改变初始化及网络条件，视觉样本固定。
+
+\label{rq3:subsec:experiment-settings}
+
+参数见表~\ref{rq3:tab:parameters}。节点距离在 100--260 m 内平滑变化，可用带宽系数为 0.25--1.0；按式~\eqref{rq3:eq:rate} 预测速率，按式~\eqref{rq3:eq:success-probability} 抽样送达。每任务最多九次发送，来自同一节点的不同候选共用电量。
+
+\begin{table}[t]
+  \centering\small
+  \bicaption{语义交付实验的主要通信与控制参数}{Main communication and control parameters for semantic delivery}
+  \label{rq3:tab:parameters}
+  \begin{tabularx}{\linewidth}{@{}Yl@{}}
+    \toprule
+    参数 & 参考值或设置\\
+    \midrule
+    感知节点数／接收中心数 & 9／1\\
+    每任务候选上限 $K_{\max}$ & 4\\
+    标称带宽 & 20 kHz\\
+    数据／反馈发射功率 & 0.2 W／0.1 W\\
+    参考信道增益 $\rho_0$ & $10^{-4}$\\
+    噪声功率谱密度 $N_0$ & $4\times10^{-20}$ W/Hz\\
+    每 token 字节数 $b$ & 4\\
+    数据头部／有效载荷上限 & 64 B／1200 B\\
+    反馈帧长度 & 24 B\\
+    发送时长裕量 $\kappa$ & 1.6\\
+    单次发送时长上限 $\tau_{\max}$ & 8 ms\\
+    任务时限 $D_k$ & 25 ms\\
+    反馈平均额外时延 $\bar d_{\mathrm f}$ & 6 ms\\
+    反馈丢失率 $\epsilon_{\mathrm f}$ & 25\%\\
+    速率波动强度 $\sigma_r$ & 0.55\\
+    每节点初始发送能量 $E_i^{(0)}$ & 0.15 J\\
+    数据尝试上限／基础等待间隔 & 9 次／2 ms\\
+    C-BFC 能量／时间权重 & 0.24／0\\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\subsection{对比方法与评价指标}
+\label{rq3:subsec:baselines}
+
+经典对照采用固定冗余、停等 ARQ、选择重传、语义阈值 ARQ 和队列贪心五种方法。固定冗余按验证集选定的数量和副本数发送，停等 ARQ 等待确认或超时后继续，选择重传则允许窗口内未确认候选独立补发。语义阈值 ARQ 在已确认效用达到阈值时停止；队列贪心结合接收信念与能量价格，选择即时净收益最高的发送。
+
+用于离散动作选择的稳定 Soft Actor-Critic 方法（Stable Discrete SAC，SD-SAC）通过熵惩罚和价值估计修正改善离散动作学习，本实验保留其双 Q 平均、Q 值裁剪和熵变化惩罚\citep{zhou2024sdsac}。两阶段深度 Q 网络控制器（Two-Phase Deep Q-Network，TP-DQN）参考两阶段码率控制，先预测语义效用，再以 Double DQN 训练动作价值\citep{wu2026twophase}。两者适配相同动作空间：四个发送、三个等待及停止；输入为候选、接收概率、效用和资源特征，网络为 $89\rightarrow128\rightarrow64\rightarrow8$。
+
+两个控制器均在本环境重新训练，每个种子执行 80 个各含 600 任务的任务流，覆盖十二种物理与反馈设置。每四次交互更新，批量 128，学习率 $3\times10^{-4}$。SD-SAC 使用训练任务的正确完成奖励，TP-DQN 使用预测效用，二者均加入效用势函数差；测试参数由验证选择。两种对照均使用本章的候选语义表示和通信环境，分别保留其策略更新与两阶段控制机制。
+
+五组条件分别为：速率波动 0.20、0.35、0.55、0.80、1.05；反馈额外时延 0、3、6、9、12 ms；任务时限 10、15、25、35、45 ms；每节点电量 0.06、0.10、0.15、0.24、0.36 J；组件实验反馈丢失率 0\%、15\%、25\%、45\%、60\%。每组仅改变对应参数。前四组去除共同参考点后为十七种链路与资源配置，含组件实验共二十一种配置，累计 1,089 次任务流回放。
+
+主图展示固定冗余、语义阈值 ARQ、队列贪心、SD-SAC、TP-DQN 和 C-BFC，表中补充停等 ARQ 与选择重传。语义对照共享同种子的原始效用网络，C-BFC 另加一致性投影；阈值、重传规则及资源权重均经验证后固定。四联图的子图依次表示按时正确完成率、单位正确任务通信能耗、重复发送比例和平均通信完成时延；除各组所考察的参数外，其余条件保持参考设置。
+
+实验从任务完成、能量支出、重复通信和时延四方面评价交付性能。
+
+\paragraph{按时正确完成率}
+截止前至少接收一条证据且分类正确计为完成：
+\begin{equation}
+  R_{\mathrm c}=\frac{1}{N_{\mathrm{task}}}\sum_{k=1}^{N_{\mathrm{task}}} u_k(S_k^{\mathrm{end}}).
+  \label{rq3:eq:metric-correct}
+\end{equation}
+分母包含能量不足或直接停止的未服务任务。
+
+\paragraph{单位正确任务通信能耗}
+将整个任务流的数据与反馈发送能量除以正确完成的任务数：
+\begin{equation}
+  E_{\mathrm c}=\frac{\sum_{k=1}^{N_{\mathrm{task}}} E_k^{\mathrm{comm}}}
+                         {\sum_{k=1}^{N_{\mathrm{task}}} u_k(S_k^{\mathrm{end}})}.
+  \label{rq3:eq:metric-energy}
+\end{equation}
+单位为 mJ，先逐次回放计算，再跨重复实验及条件平均。
+
+\paragraph{重复发送比例}
+令 $d_{k,a}$ 表示发送开始前该证据是否已成功到达，则
+\begin{equation}
+  R_{\mathrm{dup}}=\frac{\sum_k\sum_{a\in\mathcal T_k}d_{k,a}}
+                         {\sum_k|\mathcal T_k|}.
+  \label{rq3:eq:metric-duplicate}
+\end{equation}
+该指标由实际日志计算；此前从未成功的补发不计为重复。
+
+\paragraph{平均通信完成时延}
+记 $\mathcal K_+=\{k:|\mathcal T_k|>0\}$ 为实际发起数据发送的任务集合，则
+\begin{equation}
+  T_{\mathrm{comm}}=\frac{1}{|\mathcal K_+|}\sum_{k\in\mathcal K_+}T_k.
+  \label{rq3:eq:metric-latency}
+\end{equation}
+时延包含发送与等待，排除未发送任务，须结合正确率解释。
+
+\section{实验结果与分析}
+
+\subsection{总体性能比较}
+\label{rq3:subsec:overall-results}
+
+表~\ref{rq3:tab:main-results} 汇总十七种链路与资源配置。C-BFC 正确完成率为 49.84\%，单位正确任务能耗为 3.615 mJ，较固定冗余和语义阈值 ARQ 分别提高正确率 9.35 和 6.45 个百分点。前者不能按实际交付调整副本，后者在确认未返回时仍依赖超时。
+
+\input{tables/rq3/main_results}
+
+队列贪心正确完成率为 47.26\%，但单位正确任务能耗达 4.564 mJ、重复比例为 25.76\%。缺少主动等待时，即时收益为正的连续发送可能消耗本可通过确认节省的能量。
+
+相较 SD-SAC 和 TP-DQN，C-BFC 正确率提高 0.87、0.66 个百分点，单位正确任务能耗降低 16.59\%、14.32\%，时延降低 7.29\%、3.87\%；正确率分别在十二、十四个条件下更高，能耗在全部十七个条件下更低。其主要收益是在相近正确率下节能。
+
+\input{tables/rq3/reference_results}
+
+参考条件见表~\ref{rq3:tab:reference-results}。C-BFC 正确率为 51.08\%，较学习对照高约 1.1 个百分点，单位正确任务能耗由约 4.3 mJ 降至 3.639 mJ。停等与选择重传虽重复较少，正确率仅约 45.5\%。等待确认能够避免部分重复发送，但也会占用补充有效证据的时间，因而不能仅凭重复比例判断交付效果。
+
+\subsection{信道波动对交付效果的影响}
+\label{rq3:subsec:fading-results}
+
+图~\ref{rq3:fig:fading} 给出了不同速率波动强度下的结果。波动增大后，实际速率更容易偏离预测值，发送难以在预留时间内完成。C-BFC 正确率从 $\sigma_r=0.20$ 时的 57.26\% 降至 $\sigma_r=1.05$ 时的 41.32\%；在固定截止时间下，控制器用于补偿失败发送的机会也受到限制。
+
+\begin{figure}[!htb]
+  \centering
+  \resultfigure{01_fading_compact.pdf}{不同速率波动强度下的性能比较}
+  \bicaption{速率波动强度变化下的性能比较}{Performance under different rate fluctuation levels}
+  \label{rq3:fig:fading}
+\end{figure}
+
+在 $\sigma_r=0.20$ 时，C-BFC、SD-SAC、TP-DQN 正确率均约 57\%，单位正确任务能耗分别为 2.346、3.464、2.831 mJ。重传需求较低时，接收信念和一致性约束有助于及早排除低收益发送。
+
+在 $\sigma_r=1.05$ 时，三者能耗分别为 5.036、5.621、5.610 mJ，正确率差距缩小。与低波动条件相比，三种方法均需为一次正确完成付出更多通信能量，C-BFC 的节能幅度也随之减小。
+
+\subsection{确认反馈延迟的影响}
+\label{rq3:subsec:feedback-results}
+
+图~\ref{rq3:fig:feedback} 比较不同反馈延迟下的交付性能。额外时延为零时，确认仍需串行传送；随着额外时延增加，控制器在较长时间内无法确定接收状态，确认返回后可用于调整发送的时间也相应缩短。
+
+\begin{figure}[!htb]
+  \centering
+  \resultfigure{02_feedback_compact.pdf}{不同反馈延迟下的性能比较}
+  \bicaption{反馈平均额外时延变化下的性能比较}{Performance under different additional feedback delays}
+  \label{rq3:fig:feedback}
+\end{figure}
+
+额外时延为 0 ms 时，C-BFC、SD-SAC、TP-DQN 的正确率为 53.52\%、50.95\%、52.01\%，完成时延为 11.36、15.60、14.42 ms。及时确认使控制器更早停止重复发送或补充互补证据。
+
+额外时延为 12 ms 时，三者正确率降至 48.92\%、48.10\%、48.52\%，单位正确任务能耗为 3.973、4.426、4.526 mJ。C-BFC 能耗较零延迟时的 3.447 mJ 上升，重复比例也有所增加。在给定任务窗口内，晚到确认留下的调整时间较少，主动等待所能节省的发送因而减少。
+
+\subsection{任务截止时间的影响}
+\label{rq3:subsec:deadline-results}
+
+图~\ref{rq3:fig:deadline} 中，10 ms 时限往往只容纳一次主要发送，难以利用返回确认继续调整。C-BFC 与 SD-SAC 正确率分别为 44.48\% 和 44.64\%，差异很小。
+
+\begin{figure}[!htb]
+  \centering
+  \resultfigure{03_deadline_compact.pdf}{不同任务截止时间下的性能比较}
+  \bicaption{任务截止时间变化下的性能比较}{Performance under different task deadlines}
+  \label{rq3:fig:deadline}
+\end{figure}
+
+时限为 45 ms 时，C-BFC 正确率达 54.74\%，较 SD-SAC 的 51.34\% 高 3.40 个百分点；单位正确任务能耗为 3.539 mJ，较其 4.466 mJ 低 20.76\%，两项指标也优于 TP-DQN。
+
+该条件下 C-BFC 平均完成时延为 23.39 ms，低于 SD-SAC 的 28.20 ms 和 TP-DQN 的 26.03 ms。足够的任务窗口允许利用确认补发，并在后续收益不足时提前结束。
+
+\subsection{节点发送能量的影响}
+\label{rq3:subsec:energy-results}
+
+图~\ref{rq3:fig:energy} 考察节点电量对连续任务的影响。每节点 0.06 J 时，C-BFC 正确率为 36.32\%，单位正确任务能耗为 2.427 mJ。由于任务之间不补充电量，当前任务多发送一条消息，就会减少后续任务可用的能量；低电量下这一约束更为明显。
+
+\begin{figure}[!htb]
+  \centering
+  \resultfigure{04_energy_compact.pdf}{不同节点发送能量下的性能比较}
+  \bicaption{每节点初始发送能量变化下的性能比较}{Performance under different initial node transmission energies}
+  \label{rq3:fig:energy}
+\end{figure}
+
+电量增至 0.10 J 时，C-BFC 正确率为 46.03\%，高于 SD-SAC 的 44.66\%；在 0.15 J 时达 51.08\%。各条件采用同一组控制权重，发送价格则随剩余电量和虚拟队列变化，使策略能够根据实际支出调整后续发送。
+
+每节点 0.36 J 时，C-BFC 正确率为 55.74\%，低于 SD-SAC 的 57.57\% 和 TP-DQN 的 56.76\%，但单位正确任务能耗为 4.608 mJ，低于二者的 6.164、6.033 mJ。高能量条件下仍保留节能偏好，因而放弃部分代价较高的交付机会。
+
+\subsection{消融实验}
+\label{rq3:subsec:ablation}
+
+设置三个组件对照：无接收信念只使用最新位图，不传播未确认发送的成功概率，也不计算相应等待价值；无主动等待保留发送前瞻，但禁止主动等待；无一致性约束使用原始效用。各版本分别验证资源权重，再测试五档反馈丢失率，结果见图~\ref{rq3:fig:ablation} 与表~\ref{rq3:tab:ablation-results}。
+
+\begin{figure}[!htb]
+  \centering
+  \resultfigure{05_ablation_compact.pdf}{不同反馈丢失率下的组件比较}
+  \bicaption{不同反馈丢失率下的组件比较}{Component comparison under different feedback loss rates}
+  \label{rq3:fig:ablation}
+\end{figure}
+
+\input{tables/rq3/ablation_results}
+
+去除接收信念使平均正确率由 50.97\% 降至 39.69\%，单位正确任务能耗由 3.674 mJ 增至 5.814 mJ，重复比例达 60.46\%。仅依赖已确认位图会在反馈缺失时低估已有证据，导致重复分配资源。
+
+去除等待后正确率为 48.89\%，单位正确任务能耗为 4.516 mJ，重复比例为 32.59\%。完整方法以完成时延从 10.96 ms 增至 17.62 ms 为代价，换取更准确的状态信息和更少的连续发送。
+
+无一致性约束的正确率为 51.28\%，略高于完整方法的 50.97\%，能耗则为 4.064 mJ。投影将其降至 3.674 mJ，降幅约 9.6\%，伴随 0.31 个百分点的正确率变化；作用主要体现为抑制虚假效用增量、减少通信支出。

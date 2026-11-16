@@ -1,0 +1,25 @@
+\begin{cabstract}
+
+在灾后道路观测等任务中，多架无人机从不同位置采集信息，地面中心需要在规定时间内汇总局部观测并作出判断。信息回传受到通信电量、每项任务允许发送的消息总长度和完成时限的限制：关键中继耗电过快会中断后续回传，重复观测占用有限带宽，数据丢失则可能使中心缺少判断依据。因此，需要在维持传输能力的基础上选择有效内容，再根据接收情况安排发送。本文围绕这一过程，研究通信资源受限下多无人机协同观测任务的可靠完成方法，主要工作如下。
+
+（1）针对降低发射功率容易造成数据积压、集中转发又使关键中继提前耗尽电量的问题，提出基于李雅普诺夫优化的路由与功率联合控制方法 LEADR。根据队列积压和累计能耗调整转发强度，结合链路速率、邻居电量与地理位置选择下一跳及发射功率，并随节点运动更新邻居信息。不同节点数量、通信范围和飞行速度下的仿真表明，方法能够维持任务期间的持续通信，同时保持较高吞吐量和较低丢包率。
+
+（2）针对消息总长度受限时重复或低质量观测占用发送机会的问题，提出语义消息选择方法 EviComRL。固定视觉语言模型将局部图像转为类别判断、陈述和摘要等候选消息，策略结合中心已有信息、来源可靠性和链路代价，选择消息及其表达长度，并决定停止时机。在五类可见性判断实验中，分类准确率为58.17\%，每任务平均通信量为49.70词元；相较全通信和上下文老虎机方法，准确率分别相对提高23.32\%和14.80\%。
+
+（3）消息选定后，接收端返回的确认可能延迟或丢失，发送端因而无法确定数据是否已经收到。针对盲目重传耗电、持续等待可能导致超时的问题，提出一致性感知的信念反馈控制方法 C-BFC。该方法使用 EviComRL 候选消息与 LEADR 链路模型，根据发送记录和累计确认估计接收状态，按消息组合的判断一致性修正收益，比较新发、重传、等待与停止，控制连续任务的能耗。在17种链路与资源配置下，平均按时正确完成率为49.84\%，每个正确完成任务的通信能耗为3.615 mJ，较两种强化学习对照方法减少14.32\%至16.59\%。
+\end{cabstract}
+
+\begin{eabstract}
+
+Collaborative observation by unmanned aerial vehicles (UAVs), such as post-disaster road inspection, requires a ground center to combine local information and decide before a deadline. Limited communication energy, message length, and task time constrain this process. Relay depletion, redundant observations, and data loss can prevent correct decisions. This thesis addresses transmission capacity, message selection, and timely reception as connected requirements for reliable task completion.
+
+First, Lyapunov-based Energy-Aware Decentralized Routing (LEADR) balances throughput and relay energy consumption. Queue backlog, cumulative expenditure, link rates, and neighbor states guide next-hop and power selection; relative motion determines neighbor updates. Simulations varying UAV counts, communication ranges, and flight speeds show sustained communication, high throughput, and low packet loss.
+
+Second, EviComRL selects useful messages under a total-length budget. A fixed vision-language model generates candidate class predictions, statements, and summaries. Source reliability, the center's current information, and link costs guide message selection, representation length, and stopping. Five-class visibility experiments achieve 58.17\% accuracy at 49.70 tokens per task, improving accuracy by 23.32\% and 14.80\% relative to full communication and a contextual-bandit method.
+
+\begingroup
+\clubpenalty=10000
+\widowpenalty=10000
+Third, delayed or lost acknowledgments leave reception uncertain, so retransmission may waste energy and waiting may miss deadlines. Consistency-aware Belief Feedback Control (C-BFC) uses EviComRL candidates and LEADR's link model. It estimates reception from transmission records and cumulative acknowledgments, adjusts utility for message combinations supporting the same decision, and compares sending, retransmission, waiting, and stopping. Across 17 configurations, the on-time correct completion rate averages 49.84\%, with 3.615 mJ per correctly completed task, 14.32\% to 16.59\% below two reinforcement-learning baselines.
+\par\endgroup
+\end{eabstract}

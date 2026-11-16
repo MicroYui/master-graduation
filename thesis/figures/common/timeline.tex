@@ -1,0 +1,12 @@
+\begin{tikzpicture}[font=\small,>=Stealth]
+\draw[->] (0,2.8) -- (12,2.8) node[right]{时间};
+\draw[->] (0,0) -- (12,0);
+\node[left] at (0,2.8){发送端};\node[left] at (0,0){接收端};
+\fill (1,2.8) circle(1.5pt) node[above]{开始发送};
+\fill (4,2.8) circle(1.5pt) node[above]{尝试结束};
+\fill (4,0) circle(1.5pt) node[below,align=center]{载荷接收结果\\生成累计确认};
+\draw[->,thick] (1,2.8)--node[above,sloped]{数据传输}(4,0);
+\draw[->,thick,dashed] (4,0)--node[above,sloped]{反馈发送与延迟}(9.5,2.8);
+\fill (9.5,2.8) circle(1.5pt) node[above]{收到确认};
+\draw[decorate,decoration={brace,amplitude=4pt}] (4,3.6)--(9.5,3.6) node[midway,above=6pt,font=\footnotesize]{接收状态尚未完全确定};
+\end{tikzpicture}

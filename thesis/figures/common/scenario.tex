@@ -1,0 +1,121 @@
+% Illustrative application background, not an experimental deployment.
+% This scene explains the observation and communication requirements;
+% algorithm relationships are given separately in research-framework.tex.
+\begin{tikzpicture}[
+  x=1mm,y=1mm,>=Stealth,
+  font=\fontsize{9bp}{11.5bp}\selectfont,
+  bgnote/.style={align=center,fill=white,inner sep=.6mm},
+  bgview/.style={draw=black!35,line width=.4pt,densely dotted},
+  bgdata/.style={->,draw=black!85,line width=.8pt},
+  bgfeedback/.style={->,draw=black!75,line width=.65pt,
+    dash pattern=on 2.5pt off 2pt},
+  pics/bgdrone/.style={code={
+    \draw[black!85,line width=.7pt]
+      (-3.4,-1.6)--(3.4,1.6) (-3.4,1.6)--(3.4,-1.6);
+    \foreach \px/\py in {-4.1/-1.9,-4.1/1.9,4.1/-1.9,4.1/1.9}
+      \draw[black!80,fill=white,line width=.6pt]
+        (\px,\py) ellipse[x radius=1.8mm,y radius=.75mm];
+    \draw[black!85,fill=black!18,line width=.6pt]
+      (0,0) ellipse[x radius=1.45mm,y radius=1mm];
+    \draw[black!80,line width=.5pt] (-.8,-.7)--(-.8,-1.6)
+      (.8,-.7)--(.8,-1.6);
+    \draw[black!80,fill=white,line width=.45pt]
+      (-.55,-1.7) rectangle (.55,-2.5);
+  }}
+]
+\path[use as bounding box] (0,0) rectangle (148,88);
+\node[anchor=west,font=\fontsize{9bp}{11.5bp}\selectfont\bfseries]
+  at (1,85.5) {灾后道路观测（应用示例）};
+
+% Road and the partially overlapping fields of view, in oblique projection.
+\filldraw[fill=black!2,draw=black!35,line width=.45pt]
+  (3,27)--(91,27)--(110,46)--(22,46)--cycle;
+\filldraw[fill=black!12,draw=black!45,line width=.45pt]
+  (8,31)--(96,31)--(104,39)--(16,39)--cycle;
+\draw[white,line width=.9pt,dash pattern=on 3mm off 2mm]
+  (12,35)--(100,35);
+\fill[black,opacity=.025]
+  (20,62.5)--(7,29)--(46,29)--(61,44)--(22,44)--cycle;
+\fill[black,opacity=.025]
+  (66,58.5)--(44,29)--(90,29)--(105,44)--(59,44)--cycle;
+\draw[black!45,line width=.45pt,densely dotted]
+  (7,29)--(46,29)--(61,44)--(22,44)--cycle
+  (44,29)--(90,29)--(105,44)--(59,44)--cycle;
+\foreach \p in {(7,29),(46,29),(22,44)}
+  \draw[bgview] (20,62.5)--\p;
+\foreach \p in {(44,29),(90,29),(105,44)}
+  \draw[bgview] (66,58.5)--\p;
+
+% A building occludes part of the road from the left-hand viewpoint.
+\filldraw[fill=black!10,draw=black!65,line width=.5pt]
+  (42,38)--(52,38)--(52,47)--(42,47)--cycle;
+\filldraw[fill=black!23,draw=black!65,line width=.5pt]
+  (52,38)--(58,44)--(58,53)--(52,47)--cycle;
+\filldraw[fill=black!5,draw=black!65,line width=.5pt]
+  (42,47)--(52,47)--(58,53)--(48,53)--cycle;
+\node[font=\fontsize{8bp}{10bp}\selectfont] at (47,42.5) {建筑};
+
+% Water on the road is a concrete observation target, with no claimed result.
+\filldraw[fill=black!22,draw=black!55,line width=.45pt]
+  (67,33.2) .. controls (65,35) and (69,37) .. (73,37)
+  .. controls (77,38.8) and (85,37.3) .. (86,35.4)
+  .. controls (89,33.4) and (84,32) .. (79,32.5)
+  .. controls (74,31.8) and (70,32) .. cycle;
+\draw[white,line width=.65pt]
+  (70,34.5) .. controls (73,35.5) and (76,33.8) .. (79,34.8)
+  (77,36) .. controls (79,36.7) and (82,35.5) .. (84,36);
+\node[bgnote,inner sep=.3mm] at (24,28.1) {道路入口};
+\node[bgnote,inner sep=.3mm] at (78,28.1) {中段积水};
+\node[font=\fontsize{8.5bp}{10.5bp}\selectfont,align=center]
+  at (53,22.5) {不同视角提供局部观测，部分区域重复覆盖};
+
+% Observing UAVs and the aerial relay.
+\pic at (20,65) {bgdrone};
+\pic at (66,61) {bgdrone};
+\pic at (92,74) {bgdrone};
+\node[bgnote] at (20,56.6) {观测无人机 A};
+\node[bgnote] at (76,52.8) {观测无人机 B};
+\node[bgnote] at (92,82) {中继无人机};
+
+% Data travels toward the receiver; reception feedback travels back.
+\draw[bgdata] (26.5,66.4)
+  .. controls (44,74) and (64,76) .. (85.2,74.6);
+\node[bgnote] at (51,75.7) {观测信息回传};
+\draw[bgdata] (71.7,63.6)--(86.3,71.5);
+\draw[bgdata] (98.5,72.5)--(123,54.5);
+\node[bgnote,inner sep=.5mm] at (112,66.5) {信息转发};
+\draw[bgfeedback] (139,55)
+  .. controls (150,72) and (122,84) .. (98.8,77);
+\node[bgnote,inner sep=.5mm] at (130,77.5) {接收确认};
+
+% The ground receiver combines delivered observations for the task decision.
+\draw[black!80,fill=white,line width=.7pt]
+  (121,44) rectangle (135,54);
+\draw[black!40,line width=.4pt] (122.2,46)--(133.8,46);
+\draw[black!80,line width=.65pt]
+  (128,44)--(128,41.5) (124,41.5)--(132,41.5);
+\draw[black!65,line width=.5pt]
+  (123,51.8)--(126.5,51.8) (123,49.5)--(130,49.5)
+  (131.5,51.8)--(133,51.8);
+\draw[black!80,line width=.6pt] (138.5,44)--(138.5,53.3);
+\fill[black!80] (138.5,53.7) circle[radius=.6mm];
+\draw[black!65,line width=.5pt]
+  (139.8,52.5) arc[start angle=-40,end angle=40,radius=1.8mm]
+  (140.8,51.7) arc[start angle=-40,end angle=40,radius=3mm];
+\node[bgnote] at (128.5,36.8) {地面接收中心};
+\node[align=center,font=\fontsize{9bp}{11.5bp}\selectfont]
+  at (128.5,26.5) {\textbf{任务目标}\\在时限内汇总信息\\正确判断道路状况};
+
+% Background constraints and their consequences, separate from the methods.
+\draw[black!45,line width=.45pt] (1,17.5)--(147,17.5);
+\draw[black!25,line width=.4pt] (49.5,6)--(49.5,15.5)
+  (98.5,6)--(98.5,15.5);
+\node[align=center] at (25,11)
+  {\textbf{电量有限、链路变化}\\持续回传受到限制};
+\node[align=center] at (74,11)
+  {\textbf{视野受限、观测重叠}\\全量上传占用带宽};
+\node[align=center] at (123,11)
+  {\textbf{数据丢失、反馈延迟}\\按时完成判断更困难};
+\node[align=center,font=\fontsize{8bp}{10bp}\selectfont,text=black!75]
+  at (74,1.5) {点线：观测范围\qquad 实线箭头：观测信息\qquad 虚线箭头：接收确认};
+\end{tikzpicture}

@@ -1,0 +1,23 @@
+\begin{tikzpicture}[x=1mm,y=1mm,>=Stealth,
+  font=\fontsize{9bp}{11.5bp}\selectfont,
+  ewbox/.style={draw,line width=.45pt,align=center,text width=38mm,
+    minimum height=10mm,inner sep=1mm},
+  ewarrow/.style={->,line width=.55pt},
+  ewnote/.style={align=center,inner sep=.4mm,fill=white}]
+\path[use as bounding box] (0,1) rectangle (148,-42);
+\node[ewnote] at (74,-1) {离线构造：参考标签仅用于训练与评价};
+\node[ewbox] (image) at (25,-9.5) {完整图像与查询\\局部视角裁剪};
+\node[ewbox] (vlm) at (74,-9.5) {参数固定的视觉语言模型\\标签、信念与摘要};
+\node[ewbox] (trace) at (123,-9.5) {预先生成的观测数据\\消息、代价与增量};
+\node[ewbox] (candidate) at (123,-25.5) {按质量与代价筛选\\更新候选排序};
+\node[ewbox] (policy) at (74,-25.5) {来源质量与选择历史\\掩码策略网络};
+\node[ewbox] (action) at (25,-25.5) {发送消息或停止\\中心信念与资源更新};
+\draw[ewarrow] (image) -- (vlm);
+\draw[ewarrow] (vlm) -- (trace);
+\draw[ewarrow] (trace) -- (candidate);
+\draw[ewarrow] (candidate) -- (policy);
+\draw[ewarrow] (policy) -- (action);
+\draw[ewarrow] (action.south) -- (25,-34.5) -- (74,-34.5) -- (policy.south);
+\node[ewnote] at (49.5,-34.5) {当前判断、历史与预算};
+\node[ewnote] at (74,-40) {训练：策略预训练与 PPO\qquad 测试：固定参数执行};
+\end{tikzpicture}

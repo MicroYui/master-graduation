@@ -1,0 +1,181 @@
+\chapter{多无人机协同观测通信建模}
+\label{ch:foundations}
+
+本章以地面中心在规定时间内完成正确判断为任务目标，建立多无人机观测信息回传的通信模型。首先描述网络连接、消息内容和接收确认，再定义通信资源约束及任务完成条件，明确路由、消息选择和发送控制如何共同影响最终接收结果。最后介绍各项决策使用的优化与学习方法，为后续章节的具体模型提供依据。
+
+\section{无人机网络与数据传输}
+\subsection{网络连接、链路速率与能耗}
+
+将无人机网络记为时变有向图 $\mathcal G(t)=(\mathcal V,\mathcal E(t))$，其中 $\mathcal V$ 包含无人机与汇聚中心，$\mathcal E(t)$ 表示当前可用链路。节点位置为 $\bm x_i(t)$，相互距离为
+\begin{equation}
+d_{ij}(t)=\|\bm x_i(t)-\bm x_j(t)\|_2.
+\label{eq:base:distance}
+\end{equation}
+邻居集合 $\mathcal N_i(t)=\{j:(i,j)\in\mathcal E(t)\}$ 随移动和信道变化。简化无线模型中的速率为
+\begin{equation}
+r_{ij}(t)=W_{ij}(t)\log_2\left(1+
+\frac{P_i(t)h_{ij}(t)}{I_j(t)+N_j(t)}\right).
+\label{eq:base:rate}
+\end{equation}
+其中 $W_{ij}$、$P_i$、$h_{ij}$ 分别为带宽、功率和增益，$I_j$、$N_j$ 为干扰与噪声。提高功率时，局部速率按对数增长，能耗与对其他链路的干扰也随之增加。在多跳网络中，一份数据会经过多条链路；本文路由实验统计累计转发吞吐，并结合丢包与网络寿命评价服务情况。
+
+设节点 $i$ 的队列积压为 $Q_i(t)$，新到达量为 $A_i(t)$，有效服务量为 $\mu_i(t)$，基本更新为
+\begin{equation}
+Q_i(t+1)=\left[Q_i(t)-\mu_i(t)\right]^++A_i(t),
+\qquad [x]^+=\max\{x,0\}.
+\label{eq:base:queue}
+\end{equation}
+多跳模型的到达量还包括上游转发的数据。积压增大表示当前服务不足，可作为在线路由的拥塞反馈。一次持续 $\tau$ 的发送消耗 $P^{\rm tx}\tau$ 能量；阶段支出为 $e_i(t)$ 时，剩余电量满足
+\begin{equation}
+E_i(t+1)=E_i(t)-e_i(t),\qquad 0\le e_i(t)\le E_i(t).
+\label{eq:base:energy}
+\end{equation}
+各研究章的资源核算范围有所不同：路由研究按网络仿真记录节点能耗，语义选择研究主要度量消息长度与传输代价，交付研究计算数据及确认的发送能耗。本文章节中的能耗指标均按相应通信过程定义。
+
+能量在节点间的分布影响回传路径能维持多久。关键中继耗尽电量可能切断路径，但强求各节点消耗相同，又可能导致绕行或使用较差链路。能量均衡因而需服从实际转发需求，单独减小能量方差未必改善通信。
+
+\subsection{数据传输与接收确认}
+
+消息比特数为 $B_m$、有效速率为 $r_m$ 时，基本发送时长为 $B_m/r_m$。移动接触窗口和任务截止时间限制了可执行的发送次数，消息增长与链路恶化都会压缩后续机会。
+
+\begin{figure}[htbp]
+\centering
+\input{figures/common/timeline}
+\bicaption{一次发送尝试中的数据事件与反馈事件}{Data and feedback events during one transmission attempt}
+\label{fig:base:timeline}
+\end{figure}
+图~\ref{fig:base:timeline} 中，数据发送结束、确认生成和确认返回发生在不同时刻。本地发送结束并不保证接收成功，累计确认也只描述生成时刻的接收集合。确认返回前可能已有新的发送，故发送端需按确认关联的序号处理后续记录，不能只按确认到达的先后判断接收状态的新旧。
+
+\section{观测消息与任务判断}
+\subsection{局部观测与消息表示}
+
+给定局部观测 $o_{i,k}$ 与任务查询 $q_k$，语义提取模块生成证据 $e_{i,k}=\phi(o_{i,k},q_k)$，包含类别、置信度、文本和观测质量。本文采用五级证据可见性任务，类别依次为清晰可见、大部分可见、不确定、大部分遮挡和完全遮挡。图像与问题取自 VQAv2 和 COCO，全图语义判断作为弱参考类别，局部节点仅观察自身视角。该任务以五级可见性类别评价局部证据对问题的支持程度。
+
+接收中心根据已获得的信息，估计任务属于各类别的概率。类别空间 $\mathcal Y$ 上的概率向量记为语义信念：
+\begin{equation}
+\bm b^{\rm sem}=(b_1,\ldots,b_{|\mathcal Y|}),\quad
+b_y\ge0,\quad \sum_{y\in\mathcal Y}b_y=1.
+\label{eq:base:semantic-belief}
+\end{equation}
+最大分量对应预测类别，熵 $H(\bm b^{\rm sem})=-\sum_yb_y\log b_y$ 描述类别不确定性。置信度可供选择策略参考，但高置信度也可能对应错误判断。同一证据可表达为标签、陈述、摘要或完整内容。较长消息通常保留更多细节，所需资源也更多，其新增价值取决于中心已有信息。
+
+设中心已获得的消息集合为 $S$，$F_k(S)$ 表示使用这些消息后的判断质量，则增加消息 $m$ 所带来的质量变化为
+\begin{equation}
+\Delta F_k(m\mid S)=F_k(S\cup\{m\})-F_k(S).
+\label{eq:base:marginal}
+\end{equation}
+重复信息可能几乎不改变判断，互补信息则可能消除现有歧义。随着已选集合变化，同一候选的边际作用也会变化，静态排序因此难以描述整个选择过程。语义选择策略通过更新状态利用这种顺序依赖，交付控制则在较小候选集上直接评价接收组合的效用。
+
+\begin{figure}[htbp]
+\centering
+\input{figures/common/semantic-pipeline}
+\bicaption{局部观测消息的生成、传输与任务判断}{Observation message generation, transmission, and task inference}
+\label{fig:base:semantic-pipeline}
+\end{figure}
+图~\ref{fig:base:semantic-pipeline} 展示了证据的形成、筛选、交付与融合。选择阶段比较候选的发送价值；发送后若未确认，则比较补发与等待；同一证据已被确认接收后，再次发送不会增加接收内容。第二、第三项研究分别处理内容筛选和发送后的交付决策。
+
+\subsection{判断准确性与通信开销}
+
+分类准确率统计预测与参考类别一致的比例，平衡准确率和宏平均 F1 用于观察类别不均衡下的表现。F1 值是精确率与召回率的调和平均，宏平均 F1 对各类别的 F1 值取算术平均。语义选择中的有效信念质量为平均信念质量与平均送达概率的乘积，信念或链路改善均可能提高该指标。交付研究的按时正确完成率还要求接收非空证据并在期限内完成任务，与语义选择中的准确率具有不同含义。
+
+资源指标包括每任务通信词元（token）数、发送时延及能耗。token 数度量语义表达长度，实际字节数还受编码和协议头影响；交付时延包括发送与反馈等待；单位正确任务通信能耗为总通信支出除以按时正确任务数。评价节能效果时同时报告正确完成率，避免把任务质量下降造成的支出减少视为性能改善。
+
+\section{任务完成条件与通信决策}
+\label{sec:base:task-objective}
+
+设第 $k$ 项任务经内容选择得到的候选消息集合为 $\mathcal M_k$，在通信结束时实际收到的不同消息组成 $S_k\subseteq\mathcal M_k$。接收中心依据 $S_k$ 给出预测 $\hat y_k(S_k)$，参考类别为 $y_k^*$，通信完成时间和任务截止时间分别为 $T_k$ 与 $D_k$。一次任务正确完成需要同时满足收到消息、判断正确和未超时三个条件，其按时正确完成率为
+\begin{equation}
+R_{\rm c}=\frac{1}{N_{\rm task}}\sum_{k=1}^{N_{\rm task}}
+\mathbf1\{|S_k|>0,\ \hat y_k(S_k)=y_k^*,\ T_k\le D_k\}.
+\label{eq:base:generic-control}
+\end{equation}
+该指标把信息内容和传输结果联系起来：相同数量的消息可能支持不同判断，同一条有效消息也可能因未送达或超过时限而无法贡献一次正确完成。
+
+通信资源分别限制传输的持续时间和每项任务可发送的内容。设节点在任务流中的累计通信能耗为 $E_i^{\rm comm}$，初始通信电量为 $E_i^{(0)}$；消息 $m$ 的长度为 $\ell_m$，第 $k$ 项任务的消息长度预算为 $B_k$，则资源要求可表示为
+\begin{equation}
+E_i^{\rm comm}\le E_i^{(0)},\qquad
+\sum_{m\in\mathcal M_k}\ell_m\le B_k.
+\label{eq:base:resource-constraints}
+\end{equation}
+其中，消息长度预算作用于候选内容选择；发送和重传还受节点电量及剩余任务时间限制。增加功率可以缩短部分发送过程，但会加快电量消耗；增加候选内容和补发次数则可能改善判断，同时占用后续任务可用资源。因此，资源节约需要结合式~\eqref{eq:base:generic-control} 所描述的任务结果评价。
+
+三个研究问题通过这些变量形成联系。路由与功率控制改变链路速率及一次传输的能量代价；消息选择形成 $\mathcal M_k$ 及其长度；发送与重传控制结合确认信息决定后续动作，最终影响 $S_k$ 和 $T_k$。表~\ref{tab:base:research-map} 给出各项决策对任务完成的作用及其信息联系。
+
+\begin{table}[H]
+\centering\small
+\bicaption{三个研究问题在观测信息回传中的作用与联系}{Roles and information dependencies of the three research problems}
+\label{tab:base:research-map}
+\begin{tabularx}{\linewidth}{@{}p{18mm}YYY@{}}
+\toprule
+比较内容&路由与功率控制&语义消息选择&发送与重传控制\\
+\midrule
+直接问题&持续回传中的积压与中继耗电&有限通信量下的冗余和低质量内容&数据丢失及确认不及时\\
+主要输入&邻居、队列、链路和电量&候选内容、中心判断、链路代价和预算&候选消息、发送记录、确认和剩余资源\\
+决定内容&下一跳及相应发射功率&消息来源、表达长度及停止时机&新发、重传、等待或停止\\
+信息联系&确定速率和能耗计算依据，接收消息转发负载&输出候选内容、来源及长度&使用候选与链路模型，形成实际接收集合\\
+任务作用&维持有限电量下的传输能力&优先传输有助于正确判断的内容&使有用消息在任务时限内到达\\
+评价重点&吞吐量、丢包率与网络寿命&判断准确率与发送消息长度&按时正确完成率与通信能耗\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+各章依据所控制的变量选择直接评价指标。吞吐量和网络寿命反映连续任务可获得的传输能力，分类准确率反映所选内容对判断的作用，按时正确完成率则同时检查最终接收内容和完成时间。研究三使用研究二提供的候选消息，以及与研究一一致的速率与发送能耗计算模型，使内容选择与发送控制在输入和代价计算上保持一致。
+
+\section{通信决策的求解方法}
+\subsection{基于队列的能量分配}
+
+李雅普诺夫方法利用队列状态处理未知未来条件下的长期约束\cite{neely2010stochastic}。对于平均能量要求 $\limsup_{T\rightarrow\infty}T^{-1}\sum_{t<T}\E[e_i(t)]\le\bar e_i$，构造
+\begin{equation}
+Z_i(t+1)=\left[Z_i(t)+e_i(t)-\bar e_i\right]^+.
+\label{eq:base:virtual-queue}
+\end{equation}
+$Z_i$ 记录超过参考额度的累积压力。由非负截断可得 $Z_i(t+1)\ge Z_i(t)+e_i(t)-\bar e_i$，求和得到
+\begin{equation}
+\frac{1}{T}\sum_{t=0}^{T-1}e_i(t)
+\le \bar e_i+\frac{Z_i(T)-Z_i(0)}{T}.
+\label{eq:base:finite-budget}
+\end{equation}
+若队列增长相对时间趋于零，右侧偏差项消失，平均支出满足相应预算。有限任务仍保留终端偏差，因此还需以电量非负约束保证可行性，虚拟队列用于调节支出节奏。
+
+取 $L(\bm Z)=\frac12\sum_iZ_i^2$，对条件漂移 $\Delta(t)=\E[L(\bm Z(t+1))-L(\bm Z(t))\mid\bm Z(t)]$ 展开，在支出有界时可得包含 $\sum_iZ_i(t)(e_i(t)-\bar e_i)$ 的上界。从漂移中减去按 $V$ 加权的服务收益后，时隙目标同时惩罚资源超额使用并鼓励服务。第~\ref{rq1:chapter} 章将路由和功率代入这一目标求解。
+
+\subsection{消息选择策略的强化学习}
+
+消息组合对任务判断的作用难以直接写成解析函数，可以根据交互结果学习选择策略\cite{sutton2018rl}。深度 Q 网络（Deep Q-Network，DQN）通过估计动作价值选择决策，双重深度 Q 网络（Double DQN）分离动作选择与价值估计以缓解过高估计\cite{mnih2015dqn,vanhasselt2016double}。本文消息选择采用直接学习动作概率的策略方法，以候选特征、中心判断和剩余预算作为输入。状态 $s_h$ 随证据选择和资源消耗更新，奖励包含质量增量和通信成本。对不允许重复或超过预算的消息，用可行集合 $\mathcal A(s)$ 对网络输出分数 $z_a$ 加以限制：
+\begin{equation}
+\pi_\theta(a\mid s)=
+\frac{\exp(z_a)\ind\{a\in\mathcal A(s)\}}
+{\sum_{a'\in\mathcal A(s)}\exp(z_{a'})}.
+\label{eq:base:masked-policy}
+\end{equation}
+停止动作始终可行，候选耗尽时任务也能结束。掩码排除违反硬约束的动作，奖励中的成本项则影响其余动作的选择。
+
+近端策略优化（Proximal Policy Optimization，PPO）通过裁剪新旧策略概率比，限制单次更新幅度\cite{ppo}：
+\begin{equation}
+L^{\rm clip}(\theta)=\E\left[
+\min\left(\rho_h(\theta)\widehat A_h,
+\operatorname{clip}(\rho_h(\theta),1-\epsilon,1+\epsilon)\widehat A_h\right)\right],
+\label{eq:base:ppo}
+\end{equation}
+其中 $\rho_h$ 为动作概率比，$\widehat A_h$ 为优势估计，$\epsilon$ 为裁剪范围。价值网络估计后续收益，广义优势估计（Generalized Advantage Estimation，GAE）用于调节估计的偏差与方差\cite{gae}。第~\ref{rq2:chapter} 章采用这一训练方法，并按候选关系、链路条件和选择历史设计策略网络。
+
+\subsection{接收状态估计与重传决策}
+
+未确认的发送也可能已经成功，仅凭当前确认位图无法确定接收状态。部分可观测控制用条件分布概括发送与反馈历史\cite{kaelbling1998pomdp}。设真实接收状态为 $x_h$、发送与反馈历史为 $\mathcal H_h$，给定历史后各接收状态的条件概率称为接收信念：
+\begin{equation}
+b^{\rm rec}_h(x)=\Prb\{x_h=x\mid\mathcal H_h\}.
+\label{eq:base:reception-belief}
+\end{equation}
+给定转移概率 $P(x'\mid x,a)$，未获得反馈时按 $\bar b(x')=\sum_xP(x'\mid x,a)b(x)$ 预测；新确认到达后再据此修正。累计位图确定某个历史状态，其后尚未确认的尝试仍保留概率分支。
+
+\begin{figure}[htbp]
+\centering
+\input{figures/common/belief-types}
+\bicaption{任务类别与消息接收状态的概率表示}{Probability representations of task classes and message reception states}
+\label{fig:base:beliefs}
+\end{figure}
+图~\ref{fig:base:beliefs} 中，语义信念描述任务类别，接收信念描述已到达的证据集合，两者对应不同随机变量。动作与反馈分支随规划深度快速增加，在线控制可限制前瞻范围，每次只执行第一步，再按实际反馈重新求解\cite{mayne2000mpc}。本文采用有限前瞻比较发送与等待的预期收益。
+
+\section{本章小结}
+
+本章建立了多无人机观测信息回传的通信模型，将任务完成定义为在时限内接收有效消息并形成正确判断。路由与功率控制决定传输条件，消息选择确定候选内容，发送与重传控制决定实际接收集合，三者通过通信资源和信息流联系起来。在此基础上，本章介绍了能量分配、消息选择和接收状态估计所需的方法。下一章首先研究持续回传所需的路由与功率控制。

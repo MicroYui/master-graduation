@@ -1,0 +1,226 @@
+{
+  "title": "通信资源受限下多无人机协同观测任务可靠完成方法研究",
+  "pdf_pages": 92,
+  "previous_pages": 94,
+  "pdf_sha256": "c2e608107af86cdbeb71e404d5a0a274b466a400f87aa1de894feca14a5286b9",
+  "annotations": 15,
+  "chapter1_unique_references": 52,
+  "chapter1_pdf_pages": [
+    11,
+    21
+  ],
+  "numbered_figures": 24,
+  "numbered_tables_including_symbols": 15,
+  "algorithms": 4,
+  "unchanged_asset_count": 93,
+  "asset_changes": [
+    "figures/rq2/workflow.tex"
+  ],
+  "asset_change_description": "Only explanatory labels in the native EviComRL workflow diagram changed.",
+  "research_equations": [
+    {
+      "file": "03_leadr.tex",
+      "unchanged_equations": 30
+    },
+    {
+      "file": "04_evicom.tex",
+      "unchanged_equations": 26
+    },
+    {
+      "file": "05_cbfc.tex",
+      "unchanged_equations": 0
+    },
+    {
+      "file": "rq3/model.tex",
+      "unchanged_equations": 16
+    },
+    {
+      "file": "rq3/method.tex",
+      "unchanged_equations": 21
+    },
+    {
+      "file": "rq3/experiments.tex",
+      "unchanged_equations": 4
+    }
+  ],
+  "research_table_numeric_values": [
+    {
+      "file": "03_leadr.tex",
+      "unchanged_numeric_tables": 3
+    },
+    {
+      "file": "04_evicom.tex",
+      "unchanged_numeric_tables": 5
+    },
+    {
+      "file": "05_cbfc.tex",
+      "unchanged_numeric_tables": 0
+    },
+    {
+      "file": "rq3/model.tex",
+      "unchanged_numeric_tables": 1
+    },
+    {
+      "file": "rq3/method.tex",
+      "unchanged_numeric_tables": 0
+    },
+    {
+      "file": "rq3/experiments.tex",
+      "unchanged_numeric_tables": 1
+    }
+  ],
+  "experiment_structure": {
+    "03_leadr.tex": [
+      "仿真环境与参数设置",
+      "对比方法与评价指标"
+    ],
+    "04_evicom.tex": [
+      "数据与实现参数",
+      "对比方法与评价指标"
+    ],
+    "rq3/experiments.tex": [
+      "数据与实现参数",
+      "对比方法与评价指标"
+    ]
+  },
+  "source_pdf_unchanged": true,
+  "output_copies_identical": true,
+  "changed_sources": [
+    "FIGURE_INDEX.md",
+    "README_THESIS.md",
+    "chapters/01_introduction.tex",
+    "chapters/01_related_work.tex",
+    "chapters/02_foundations.tex",
+    "chapters/03_leadr.tex",
+    "chapters/04_evicom.tex",
+    "chapters/05_cbfc.tex",
+    "chapters/06_conclusion.tex",
+    "chapters/rq3/experiments.tex",
+    "chapters/rq3/method.tex",
+    "chapters/rq3/model.tex",
+    "figures/common/belief-types.tex",
+    "figures/common/research-framework.tex",
+    "figures/common/semantic-pipeline.tex",
+    "figures/rq2/workflow.tex",
+    "front/cover.tex",
+    "front/thesis-abstracts.tex",
+    "front/thesis-symbols.tex",
+    "thesis-meta.tex"
+  ],
+  "rendered_pages": 92,
+  "visual_review": {
+    "status": "complete",
+    "full_document_contact_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43,
+      44,
+      45,
+      46,
+      47,
+      48,
+      49,
+      50,
+      51,
+      52,
+      53,
+      54,
+      55,
+      56,
+      57,
+      58,
+      59,
+      60,
+      61,
+      62,
+      63,
+      64,
+      65,
+      66,
+      67,
+      68,
+      69,
+      70,
+      71,
+      72,
+      73,
+      74,
+      75,
+      76,
+      77,
+      78,
+      79,
+      80,
+      81,
+      82,
+      83,
+      84,
+      85,
+      86,
+      87,
+      88,
+      89,
+      90,
+      91,
+      92
+    ],
+    "detailed_pages": [
+      4,
+      5,
+      20,
+      21,
+      25,
+      26,
+      47,
+      72,
+      81
+    ],
+    "findings": "No overlapping text, clipped graphics, blank body pages, or isolated full-page figures/tables found. Covers, abstracts, chapter transitions, and reference numbering checked."
+  },
+  "annotation_review": {
+    "status": "complete",
+    "processed": 15,
+    "total": 15,
+    "chapter1_scope": "Full chapter, including background, research problems, purpose, related work, gaps, contributions, integration, and chapter arrangement."
+  }
+}

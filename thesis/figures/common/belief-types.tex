@@ -1,0 +1,18 @@
+\begin{tikzpicture}[
+ x=1mm,y=1mm,>=Stealth,
+ font=\fontsize{9bp}{11.5bp}\selectfont,
+ box/.style={draw,line width=.45pt,align=left,text width=66mm,
+   minimum height=24mm,inner sep=1mm}]
+\path[use as bounding box] (0,0) rectangle (148,-34);
+\node[box] (a) at (34.5,-12.5)
+  {\textbf{任务类别概率} $\bm b^{\rm sem}$\\
+   随机变量：任务所属类别\\输入：已接收的证据内容\\
+   输出：各类别的概率判断\\作用：评价信息对判断的支持};
+\node[box] (b) at (113.5,-12.5)
+  {\textbf{消息接收概率} $b^{\rm rec}$\\
+   随机变量：实际接收集合\\输入：发送历史与累计确认\\
+   输出：各接收集合的概率\\作用：判断是否需要补发消息};
+\draw[->,line width=.55pt]
+  (b.south) -- (113.5,-30) -- (34.5,-30) -- (a.south);
+\node[fill=white,inner sep=.5mm] at (74,-30) {按接收概率计算任务收益};
+\end{tikzpicture}

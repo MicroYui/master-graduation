@@ -1,0 +1,6 @@
+@default_files = ('thesis.tex');
+$pdf_mode = 5;
+$bibtex_use = 2;
+$recorder = 1;
+$xelatex = 'xelatex -file-line-error -interaction=nonstopmode -halt-on-error -synctex=1 %O %S';
+$bibtex = 'bibtex %O %B';

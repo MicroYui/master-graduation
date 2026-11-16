@@ -1,0 +1,29 @@
+% !TeX program = xelatex
+% 哈尔滨校区中文硕士学位论文；主文件，使用 XeLaTeX + BibTeX。
+% fontset 留空时由 ctex 自动选择系统字体；Windows 下自动使用中易字体。
+% 让模板的 hyperref 正确适配 float，避免重复创建图表链接定位点。
+\AddToHook{package/hyperref/before}{\RequirePackage{float}}
+\documentclass[type=master,campus=harbin]{hithesisbook}
+\usepackage{thesis-content}
+\input{thesis-meta}
+\begin{document}
+\frontmatter
+\input{front/cover}
+\input{front/thesis-abstracts}
+\makecover
+\input{front/thesis-symbols}
+\tableofcontents
+\mainmatter
+\input{chapters/01_introduction}
+\input{chapters/02_foundations}
+\input{chapters/03_leadr}
+\input{chapters/04_evicom}
+\input{chapters/05_cbfc}
+\backmatter
+\input{chapters/06_conclusion}
+\bibliographystyle{gbt7714-numerical-quanjiao}
+\bibliography{thesis-references}
+\input{back/thesis-achievements}
+\input{back/thesis-declaration}
+\input{back/thesis-acknowledgements}
+\end{document}

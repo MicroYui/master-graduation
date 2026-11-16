@@ -1,0 +1,19 @@
+\begin{tikzpicture}[
+ x=1mm,y=1mm,>=Stealth,
+ font=\fontsize{9bp}{11.5bp}\selectfont,
+ box/.style={draw,line width=.45pt,align=center,text width=30mm,
+   minimum height=13mm,inner sep=1mm},
+ edge/.style={->,line width=.55pt},
+ note/.style={align=center,text width=30mm,inner sep=0pt}]
+\path[use as bounding box] (0,0) rectangle (148,-23);
+\node[box] (a) at (16.25,-7.5) {局部图像\\与任务查询};
+\node[box] (b) at (54.75,-7.5) {类别判断\\简短陈述或摘要};
+\node[box] (c) at (93.25,-7.5) {按预算选择消息\\根据确认安排发送};
+\node[box] (d) at (131.75,-7.5) {融合已收到的信息\\形成任务判断};
+\draw[edge] (a.east) -- (b.west);
+\draw[edge] (b.east) -- (c.west);
+\draw[edge] (c.east) -- (d.west);
+\node[note] at (54.75,-20) {保留任务所需内容};
+\node[note] at (93.25,-20) {控制发送与重传};
+\node[note] at (131.75,-20) {检查判断结果};
+\end{tikzpicture}

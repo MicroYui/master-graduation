@@ -1,0 +1,236 @@
+[
+  {
+    "term": "UAV",
+    "file": "chapters/01_introduction.tex",
+    "line": 7,
+    "context": "否积水、通行区域是否被障碍物阻断，并在调度车辆之前获得判断结果。当地面人员难以接近现场，或固定通信设施受损时，获取这些信息就成为任务执行的前提。无人机（Unmanned Aerial Vehicle，UAV）能够携带相机到达目标区域，为地面人员提供远程观测。Erdelj 等讨论了无人机在灾害监测、评估和响应中的作用；Shakhatreh 等将搜救、遥感和基础设施巡检列为无人机的重要民用场景。这些应用对观测信息的要求具有共同点：信息既要反映目标状况，也要在现"
+  },
+  {
+    "term": "FANET",
+    "file": "chapters/01_introduction.tex",
+    "line": 9,
+    "context": "面中心汇集各节点的信息后，再对同一任务作出判断。观测范围扩大后，部分无人机可能无法直接连接地面中心，需要其他无人机转发数据。节点通过无线链路形成飞行自组网（Flying Ad Hoc Network，FANET），使分散的观测能够经空中中继回传。陈新颖等将数据采集和远距离中继列为无人机通信的典型功能；Zeng 等进一步指出，无人机通信的灵活部署能力需要相应的组网与信道设计支持。因此，多机协同观测既包含信息采集，也依赖采集后的通信过程。"
+  },
+  {
+    "term": "ARQ",
+    "file": "chapters/01_introduction.tex",
+    "line": 28,
+    "context": "发送端未收到确认时，既可能是数据未送达，也可能是数据已送达而确认仍在途中。立即重传会增加能耗，持续等待则可能错过补充其他信息的机会。传统自动重传请求（Automatic Repeat Request，ARQ）利用确认与超时处理传输失败，但观测任务还需要考虑缺失消息是否影响最终判断，以及剩余时间是否足以补发。由此，内容选择之后仍需根据接收情况安排新发、重传和等待。"
+  },
+  {
+    "term": "AODV",
+    "file": "chapters/01_related_work.tex",
+    "line": 8,
+    "context": "路由首先需要在不断变化的连接中找到可用路径。自组网按需距离矢量路由（Ad Hoc On-Demand Distance Vector，AODV）在需要通信时发现路径，减少无业务期间的维护开销；优化链路状态路由（Optimized Link State Routing，OLSR）主动交换拓扑信息，并用多点中继减少控制消息的重复转发。两者分别适合按需建立和持续维护路径，但节点移动较快时，都需要处"
+  },
+  {
+    "term": "OLSR",
+    "file": "chapters/01_related_work.tex",
+    "line": 8,
+    "context": "Ad Hoc On-Demand Distance Vector，AODV）在需要通信时发现路径，减少无业务期间的维护开销；优化链路状态路由（Optimized Link State Routing，OLSR）主动交换拓扑信息，并用多点中继减少控制消息的重复转发。两者分别适合按需建立和持续维护路径，但节点移动较快时，都需要处理链路失效和控制信息过期。贪婪周边无状态路由（Greedy Perimeter Stateless Routing，GPSR）利用邻居"
+  },
+  {
+    "term": "GPSR",
+    "file": "chapters/01_related_work.tex",
+    "line": 8,
+    "context": "少控制消息的重复转发。两者分别适合按需建立和持续维护路径，但节点移动较快时，都需要处理链路失效和控制信息过期。贪婪周边无状态路由（Greedy Perimeter Stateless Routing，GPSR）利用邻居和目的节点的位置进行局部转发，降低了维护全局拓扑的需求。地理位置能够反映转发进度，却不能单独反映链路质量和中继电量，因而仍需结合通信状态选择路径。"
+  },
+  {
+    "term": "QGeo",
+    "file": "chapters/01_related_work.tex",
+    "line": 10,
+    "context": "无人机路由在此基础上进一步考虑运动和能量。Lakew 等归纳了飞行自组网中拓扑变化、路径维护与网络寿命之间的关系。基于 Q 学习的地理路由方法 QGeo 利用交互结果更新邻居的转发价值；基于 Q 学习的拓扑感知路由（Q-learning-based Topology-Aware Routing，QTAR）将拓扑状态纳入下一跳选择。这类方法通过历史通信结果适应环境变化，其选择偏好由状态和回报共同决定。L"
+  },
+  {
+    "term": "QTAR",
+    "file": "chapters/01_related_work.tex",
+    "line": 10,
+    "context": "络寿命之间的关系。基于 Q 学习的地理路由方法 QGeo 利用交互结果更新邻居的转发价值；基于 Q 学习的拓扑感知路由（Q-learning-based Topology-Aware Routing，QTAR）将拓扑状态纳入下一跳选择。这类方法通过历史通信结果适应环境变化，其选择偏好由状态和回报共同决定。Li 等提出基于强化学习的节能快速路由，结合电池、信道及一跳邻居状态选择转发节点和功率，并同时考虑投递结果、时延与能耗。Jin 等则面向城市应急网络研究深"
+  },
+  {
+    "term": "V2VNet",
+    "file": "chapters/01_related_work.tex",
+    "line": 22,
+    "context": "早期协同感知方法主要研究如何融合其他节点的信息。车车通信网络 V2VNet 交换压缩的中间特征，用于联合感知与预测；DiscoNet 通过知识蒸馏学习协作关系，对来自不同节点的特征分配权重。这些方法说明了局部观测之间的互补价值，但融合更多特征也需要更多传输资源。因此，后续工作将通信对象和发送内容纳入决策，而不再默认所有节"
+  },
+  {
+    "term": "DiscoNet",
+    "file": "chapters/01_related_work.tex",
+    "line": 22,
+    "context": "早期协同感知方法主要研究如何融合其他节点的信息。车车通信网络 V2VNet 交换压缩的中间特征，用于联合感知与预测；DiscoNet 通过知识蒸馏学习协作关系，对来自不同节点的特征分配权重。这些方法说明了局部观测之间的互补价值，但融合更多特征也需要更多传输资源。因此，后续工作将通信对象和发送内容纳入决策，而不再默认所有节点均提供完整特征。"
+  },
+  {
+    "term": "DeepSC",
+    "file": "chapters/01_related_work.tex",
+    "line": 34,
+    "context": "和解码器，学习适应信道的传输表示。Bourtsoulatze 等研究图像到信道符号的映射，改善受限带宽和噪声条件下的图像传输。深度语义通信模型（Deep Semantic Communication，DeepSC）利用注意力网络提取并传输文本含义；Shao 等面向边缘推理，以信息瓶颈保留有效特征，并采用可变长度表示适应信道。这些方法说明，保留任务所需信息能够减少对完整数据恢复的依赖。用于多源观测时，还需进一步确定应当编码和发送哪些来源，才能避免对重复内容进"
+  },
+  {
+    "term": "VLM",
+    "file": "chapters/01_related_work.tex",
+    "line": 36,
+    "context": "视觉语言模型（Vision-Language Model，VLM）为构造显式观测消息提供了工具。对比语言图像预训练模型（Contrastive Language-Image Pre-training，CLIP）通过图文学习建立共享表示；视觉指令模型能够根据图像和问题生成回答或描述。局部观测由此可以表示为类别判断、置信"
+  },
+  {
+    "term": "CLIP",
+    "file": "chapters/01_related_work.tex",
+    "line": 36,
+    "context": "视觉语言模型（Vision-Language Model，VLM）为构造显式观测消息提供了工具。对比语言图像预训练模型（Contrastive Language-Image Pre-training，CLIP）通过图文学习建立共享表示；视觉指令模型能够根据图像和问题生成回答或描述。局部观测由此可以表示为类别判断、置信度及简短文本，供接收中心融合使用。模型输出仍可能受遮挡和视角偏差影响，因此生成消息后还需评价其来源及其对当前判断的补充作用。"
+  },
+  {
+    "term": "VQA",
+    "file": "chapters/01_related_work.tex",
+    "line": 38,
+    "context": "任务查询决定需要保留的信息。视觉问答（Visual Question Answering，VQA）研究根据问题定位相关区域；视觉问答数据集第二版（VQAv2）利用同一问题对应不同答案的图像对减少语言先验偏差，面向真实场景的组合问答数据集 GQA 则构造多步推理问题。常见物体上下文数据集（Common Objects in Context，COCO）"
+  },
+  {
+    "term": "VQAv2",
+    "file": "chapters/01_related_work.tex",
+    "line": 38,
+    "context": "任务查询决定需要保留的信息。视觉问答（Visual Question Answering，VQA）研究根据问题定位相关区域；视觉问答数据集第二版（VQAv2）利用同一问题对应不同答案的图像对减少语言先验偏差，面向真实场景的组合问答数据集 GQA 则构造多步推理问题。常见物体上下文数据集（Common Objects in Context，COCO）的图像与标注可用于形成局部观测。本文利用图像与任务查询生"
+  },
+  {
+    "term": "GQA",
+    "file": "chapters/01_related_work.tex",
+    "line": 38,
+    "context": "Visual Question Answering，VQA）研究根据问题定位相关区域；视觉问答数据集第二版（VQAv2）利用同一问题对应不同答案的图像对减少语言先验偏差，面向真实场景的组合问答数据集 GQA 则构造多步推理问题。常见物体上下文数据集（Common Objects in Context，COCO）的图像与标注可用于形成局部观测。本文利用图像与任务查询生成候选消息，并保持提取模型参数固定，使不同通信策略面对相同内容，比较内容选择本身对判断结果和"
+  },
+  {
+    "term": "COCO",
+    "file": "chapters/01_related_work.tex",
+    "line": 38,
+    "context": "二版（VQAv2）利用同一问题对应不同答案的图像对减少语言先验偏差，面向真实场景的组合问答数据集 GQA 则构造多步推理问题。常见物体上下文数据集（Common Objects in Context，COCO）的图像与标注可用于形成局部观测。本文利用图像与任务查询生成候选消息，并保持提取模型参数固定，使不同通信策略面对相同内容，比较内容选择本身对判断结果和通信量的影响。"
+  },
+  {
+    "term": "HARQ",
+    "file": "chapters/01_related_work.tex",
+    "line": 42,
+    "context": "失而未被接收。ARQ 依据接收确认和超时安排补发，停等和选择重传分别在协议复杂度、并发能力与资源使用方面作出不同取舍。混合自动重传请求（Hybrid Automatic Repeat Request，HARQ）进一步结合差错控制编码与多轮重传。对观测任务而言，重传的收益不仅取决于分组是否缺失，还取决于缺失内容是否会影响最终判断；因此，传输可靠性需要与任务结果联系起来。"
+  },
+  {
+    "term": "POMDP",
+    "file": "chapters/01_related_work.tex",
+    "line": 48,
+    "context": "部分可观测马尔可夫决策过程（Partially Observable Markov Decision Process，POMDP）用条件概率表示无法直接观察的状态，并结合历史信息选择动作。对于观测消息，可以利用发送成功概率、发送记录和已返回的确认估计接收集合，再计算新发或重传的预期收益。考虑更多未来动作有助于分析等待的作用，但会增加在线计算量；模型预测控制通过限制预测时域、按"
+  },
+  {
+    "term": "LEADR",
+    "file": "chapters/01_introduction.tex",
+    "line": 61,
+    "context": "（1）\\ResearchOneTitle{}。提出基于李雅普诺夫优化的能量感知分布式路由方法（Lyapunov-based Energy-Aware Decentralized Routing，LEADR）。将业务积压与累计能耗纳入逐时隙目标，根据链路状态求解发射功率，再结合邻居剩余能量与地理进度选择下一跳；邻居信息更新间隔随相对运动调整。方法利用本地状态协调转发需求与能量使用，兼顾网络聚合吞吐量和持续通信时间。"
+  },
+  {
+    "term": "EviComRL",
+    "file": "chapters/01_introduction.tex",
+    "line": 63,
+    "context": "（2）\\ResearchTwoTitle{}。提出基于强化学习的语义消息选择方法 EviComRL。固定视觉语言模型生成不同来源与长度的消息，策略结合来源可靠性、中心判断、已选历史和链路代价更新候选评价，学习表达粒度与停止时机，减少重复或低质量内容占用预算。"
+  },
+  {
+    "term": "C-BFC",
+    "file": "chapters/01_introduction.tex",
+    "line": 65,
+    "context": "（3）\\ResearchThreeTitle{}。提出一致性感知的信念反馈控制方法（Consistency-aware Belief Feedback Control，C-BFC）。根据发送记录与累计确认估计接收状态，按同一任务中消息组合的判断结果修正收益，比较新发、重传、等待和停止；利用累计能耗调节后续任务支出，减少确认迟到造成的重复发送。"
+  },
+  {
+    "term": "DQN",
+    "file": "chapters/02_foundations.tex",
+    "line": 144,
+    "context": "消息组合对任务判断的作用难以直接写成解析函数，可以根据交互结果学习选择策略。深度 Q 网络（Deep Q-Network，DQN）通过估计动作价值选择决策，双重深度 Q 网络（Double DQN）分离动作选择与价值估计以缓解过高估计。本文消息选择采用直接学习动作概率的策略方法，以候选特征、中心判断和剩余预算作为输入。状态 $s_h$ 随证据选择和资源消耗更新，奖励包含质量增量和"
+  },
+  {
+    "term": "PPO",
+    "file": "chapters/02_foundations.tex",
+    "line": 153,
+    "context": "近端策略优化（Proximal Policy Optimization，PPO）通过裁剪新旧策略概率比，限制单次更新幅度："
+  },
+  {
+    "term": "GAE",
+    "file": "chapters/02_foundations.tex",
+    "line": 160,
+    "context": "_h$ 为动作概率比，$\\widehat A_h$ 为优势估计，$\\epsilon$ 为裁剪范围。价值网络估计后续收益，广义优势估计（Generalized Advantage Estimation，GAE）用于调节估计的偏差与方差。第~\\ref{rq2:chapter} 章采用这一训练方法，并按候选关系、链路条件和选择历史设计策略网络。"
+  },
+  {
+    "term": "HELLO",
+    "file": "chapters/03_leadr.tex",
+    "line": 13,
+    "context": "LEADR 采用李雅普诺夫优化，将数据积压、累计能耗和虚拟能量队列写入时隙目标，求解候选链路的发送功率，根据邻居能量选择中继，并依据相对运动调整邻居探测消息（HELLO）的更新间隔。实验改变节点规模、通信范围和飞行速度，考察这种局部决策能否在维持转发能力的同时延缓关键节点的能量耗尽。"
+  },
+  {
+    "term": "SINR",
+    "file": "chapters/03_leadr.tex",
+    "line": 72,
+    "context": "表示下一跳选择，$p_{ij}(t)$ 为发射功率。每个节点每时隙至多选择一个接收节点。计入并发干扰后，链路的信干噪比（Signal-to-Interference-plus-Noise Ratio，SINR）及速率为"
+  },
+  {
+    "term": "LB-GPSR",
+    "file": "chapters/03_leadr.tex",
+    "line": 458,
+    "context": "对比策略包括：按地理距离选择邻居的 GPSR；在正地理进度候选间轮询的负载均衡 GPSR（Load-Balanced GPSR，LB-GPSR）；结合能量与距离选择路径的蚁群优化（Ant Colony Optimization，ACO）方法；以数据投递和通信能耗构造回报的强化学习快速路由（Reinforcement Learning based Fast Routing，RLFR）方法"
+  },
+  {
+    "term": "ACO",
+    "file": "chapters/03_leadr.tex",
+    "line": 458,
+    "context": "邻居的 GPSR；在正地理进度候选间轮询的负载均衡 GPSR（Load-Balanced GPSR，LB-GPSR）；结合能量与距离选择路径的蚁群优化（Ant Colony Optimization，ACO）方法；以数据投递和通信能耗构造回报的强化学习快速路由（Reinforcement Learning based Fast Routing，RLFR）方法。各策略均在相同移动、业务与通信条件下比较。"
+  },
+  {
+    "term": "RLFR",
+    "file": "chapters/03_leadr.tex",
+    "line": 458,
+    "context": "优化（Ant Colony Optimization，ACO）方法；以数据投递和通信能耗构造回报的强化学习快速路由（Reinforcement Learning based Fast Routing，RLFR）方法。各策略均在相同移动、业务与通信条件下比较。"
+  },
+  {
+    "term": "MLP",
+    "file": "chapters/04_evicom.tex",
+    "line": 374,
+    "context": "2Comm-Trace 联合考虑协作收益、链路及重复接收代价。二者将原方法的通信选择原则用于本章预先生成的观测数据，并共享相同的候选和资源约束。多层感知机（Multilayer Perceptron，MLP）对照采用相同输入与 PPO 训练流程，记为 PPO-MLP，以共享全连接网络替代结构化关系分支。"
+  },
+  {
+    "term": "MF1",
+    "file": "chapters/04_evicom.tex",
+    "line": 376,
+    "context": "gative，FN）$\\mathrm{FN}_y$，则准确率（Accuracy，Acc）、平衡准确率（Balanced Accuracy，BAcc）和宏平均 F1（Macro-averaged F1，MF1）分别为"
+  },
+  {
+    "term": "BAcc",
+    "file": "chapters/04_evicom.tex",
+    "line": 376,
+    "context": "P）$\\mathrm{FP}_y$ 和假阴性（False Negative，FN）$\\mathrm{FN}_y$，则准确率（Accuracy，Acc）、平衡准确率（Balanced Accuracy，BAcc）和宏平均 F1（Macro-averaged F1，MF1）分别为"
+  },
+  {
+    "term": "QCR",
+    "file": "chapters/04_evicom.tex",
+    "line": 389,
+    "context": "。先对每个任务所选消息的送达概率求平均，再对任务求平均，记为 $\\bar p^{\\mathrm{del}}$；零通信任务的该项约定为1。有效信念质量与质量成本比（Quality-Cost Ratio，QCR）定义为"
+  },
+  {
+    "term": "MTU",
+    "file": "chapters/rq3/model.tex",
+    "line": 43,
+    "context": "语义长度以 token 数表示。设平均每个 token 占用 $b$ 字节，分组的最大传输单元（Maximum Transmission Unit，MTU）约束其长度，有效载荷上限记为 $L_{\\mathrm{MTU}}$ 字节，分组头部长度为 $H$ 字节，则实际发送比特数为"
+  },
+  {
+    "term": "SiLU",
+    "file": "chapters/rq3/method.tex",
+    "line": 31,
+    "context": "隐藏层采用 Sigmoid 线性单元（Sigmoid Linear Unit，SiLU）激活，训练时使用概率为 0.1 的随机失活（Dropout），输出通过 Sigmoid 得到原始效用 $\\hat q_\\theta(S)$。模型共包含 16,321 个可训练参数。"
+  },
+  {
+    "term": "AdamW",
+    "file": "chapters/rq3/experiments.tex",
+    "line": 11,
+    "context": "训练、验证和测试分区分别含 600、595、611 个任务，图像互不重叠。枚举训练任务的非空集合生成监督样本，同一图像的集合不跨分区。效用网络采用带解耦权重衰减的自适应矩估计优化器 AdamW，学习率 $8\\times10^{-4}$、权重衰减 0.02、批量 256，最多训练 60 轮，以验证交叉熵选择参数。"
+  },
+  {
+    "term": "SD-SAC",
+    "file": "chapters/rq3/experiments.tex",
+    "line": 56,
+    "context": "用于离散动作选择的稳定 Soft Actor-Critic 方法（Stable Discrete SAC，SD-SAC）通过熵惩罚和价值估计修正改善离散动作学习，本实验保留其双 Q 平均、Q 值裁剪和熵变化惩罚。两阶段深度 Q 网络控制器（Two-Phase Deep Q-Network，TP-DQN）参考两阶段码率控制，先预测语义效用，再以 Double DQN"
+  },
+  {
+    "term": "TP-DQN",
+    "file": "chapters/rq3/experiments.tex",
+    "line": 56,
+    "context": "ete SAC，SD-SAC）通过熵惩罚和价值估计修正改善离散动作学习，本实验保留其双 Q 平均、Q 值裁剪和熵变化惩罚。两阶段深度 Q 网络控制器（Two-Phase Deep Q-Network，TP-DQN）参考两阶段码率控制，先预测语义效用，再以 Double DQN 训练动作价值。两者适配相同动作空间：四个发送、三个等待及停止；输入为候选、接收概率、效用和资源特征，网络为 $89\\rightarrow128\\rightarrow64\\righta"
+  }
+]

@@ -1,0 +1,551 @@
+\chapter{\ResearchOneTitle}
+\label{rq1:chapter}
+
+本章研究能量约束下的无人机路由与功率联合控制，以提高网络聚合吞吐量、延长网络可用时间。如图\ref{rq1:fig:scenario}所示，路由选择确定下一跳节点，功率控制确定该链路的发射功率；两者共同影响转发速率和能耗，需要结合链路条件、邻居位置及剩余能量决策。
+
+\begin{figure}[!htbp]
+  \centering
+  \includegraphics[width=0.96\textwidth]{figures/rq1/scenario.pdf}
+  \bicaption{无人机集群中的多跳通信与能量感知路由场景}{Multi-hop communication and energy-aware routing in a UAV swarm}
+  \label{rq1:fig:scenario}
+\end{figure}
+
+LEADR 采用李雅普诺夫优化，将数据积压、累计能耗和虚拟能量队列写入时隙目标，求解候选链路的发送功率，根据邻居能量选择中继，并依据相对运动调整邻居探测消息（HELLO）的更新间隔。实验改变节点规模、通信范围和飞行速度，考察这种局部决策能否在维持转发能力的同时延缓关键节点的能量耗尽。
+
+\section{系统模型与问题描述}
+\label{rq1:sec:model}
+
+\subsection{网络结构与节点移动}
+
+考虑 $N$ 架无人机和一个数据中心组成的网络，分别记为 $\mathcal{N}=\{1,2,\ldots,N\}$ 和 $D$。无人机通过多跳转发将地面数据送达中心。任务持续时间 $T$ 划分为 $K$ 个时隙，满足 $T=K\Delta t$，其中 $\Delta t$ 为决策间隔，$t=0,1,\ldots,K-1$。
+
+所有无人机保持固定飞行高度，因此其平面位置和速度分别表示为 $\bm q_i(t)\in\mathbb{R}^{2}$ 与 $\bm v_i(t)\in\mathbb{R}^{2}$。对于任意两个节点，有
+\begin{equation}
+ d_{ij}(t)=\|\bm q_i(t)-\bm q_j(t)\|_2.
+ \label{rq1:eq:distance}
+\end{equation}
+给定通信范围 $R$，节点 $i$ 的当前邻居集合为
+\begin{equation}
+ \mathcal{N}_i(t)=\{j\in\mathcal{N}\setminus\{i\}:d_{ij}(t)\le R,\ E_j(t)>0\}.
+ \label{rq1:eq:neighbors}
+\end{equation}
+若数据中心位于通信范围内，则将其加入候选集合。中心不受无人机通信预算限制，且不再转发已接收数据。
+
+实验采用高斯--马尔可夫移动模型。节点运动保留一定惯性，邻居关系随相对速度逐渐变化。飞行轨迹由任务确定，路由算法根据当前位置与运动状态调整通信决策。
+
+节点通过 HELLO 消息交换标识、时间戳、位置、速度、剩余能量及两类队列长度，据此维护局部邻居表，并移除过期或预测失效的记录。主要符号见表\ref{rq1:tab:notation}。
+
+\begin{table}[!htbp]
+\centering\small
+\bicaption{能量均衡路由模型的主要符号}{Main notation of the energy-balanced routing model}
+\label{rq1:tab:notation}
+\begin{tabularx}{\textwidth}{lX}
+\toprule
+符号 & 含义 \\
+\midrule
+$\mathcal{N},\mathcal{N}_i(t)$ & 无人机集合及节点 $i$ 在时隙 $t$ 的邻居集合 \\
+$T,K,\Delta t$ & 任务持续时间、时隙数与决策间隔 \\
+$\bm q_i(t),\bm v_i(t)$ & 节点位置与速度向量 \\
+$d_{ij}(t),R$ & 节点间距离与通信范围 \\
+$x_{ij}(t),p_{ij}(t)$ & 下一跳选择指示量与链路发射功率 \\
+$h_{ij}(t),I_{ij}(t)$ & 链路增益与接收端并发干扰 \\
+$r_{ij}(t),\mu_i(t),\nu_i(t)$ & 链路速率、节点服务速率与数据到达速率 \\
+$Q_i(t),Q_{\max}$ & 数据积压与缓存容量上限 \\
+$E_i(t),E_{\max}$ & 剩余通信能量与初始通信能量预算 \\
+$\Phi_i(t),F_i(t)$ & 累计能量损耗与虚拟能量队列 \\
+$\beta,\gamma,V$ & 能量损耗、预算偏差与吞吐收益的控制权重 \\
+$W_{ij}(t),W_{ij}^{E,G}(t)$ & 基础链路权重与能量、地理修正后的链路权重 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{链路速率与并发干扰}
+
+无人机之间以视距链路为主，采用自由空间路径损耗模型\cite{qtar}。链路 $(i,j)$ 的信道功率增益表示为
+\begin{equation}
+ h_{ij}(t)=\frac{\rho_0}{d_{ij}^{2}(t)},\qquad
+ \rho_0=\frac{G_iG_j\lambda_c^{2}}{(4\pi)^2},
+ \label{rq1:eq:gain}
+\end{equation}
+其中 $G_i,G_j$ 为天线增益，$\lambda_c$ 为载波波长，$\rho_0$ 为参考增益参数。本章不考虑建筑物遮挡造成的非视距衰落。
+
+令 $x_{ij}(t)\in\{0,1\}$ 表示下一跳选择，$p_{ij}(t)$ 为发射功率。每个节点每时隙至多选择一个接收节点。计入并发干扰后，链路的信干噪比（Signal-to-Interference-plus-Noise Ratio，SINR）及速率为
+\begin{align}
+ I_{ij}(t)&=\sum_{k\in\mathcal{N}\setminus\{i\}}\ \sum_{l\ne k}
+              x_{kl}(t)h_{kj}(t)p_{kl}(t),
+ \label{rq1:eq:interference}\\
+ \operatorname{SINR}_{ij}(t)&=\frac{h_{ij}(t)p_{ij}(t)}{I_{ij}(t)+\sigma^2},
+ \label{rq1:eq:sinr}\\
+ r_{ij}(t)&=B\log_2\!\left(1+\operatorname{SINR}_{ij}(t)\right),
+ \label{rq1:eq:rate}
+\end{align}
+其中 $B$ 为带宽，$\sigma^2$ 为噪声功率。数据量与速率采用一致单位；若速率以比特每秒表示，则队列数据量相应换算为比特。
+
+功率决策通过式\eqref{rq1:eq:interference}中的干扰项相互影响。提高自身发射功率能够改善当前链路的信干噪比，却可能降低其他接收节点的速率。LEADR 在每次决策时固定当前观测干扰，分别评估候选链路，以降低求解开销。后文的闭式解仅对本次评估中增益和背景干扰固定的局部子问题成立；多个节点同时改变功率后，仍需在后续时隙重新观测网络状态。
+
+\subsection{数据队列与通信能量}
+
+每个无人机节点维护有限容量数据缓冲区。记 $Q_i(t)$ 为时隙开始时的积压，$\lambda_i(t)$ 为本地产生的数据速率。节点的可用服务速率与总到达速率分别为
+\begin{equation}
+ \mu_i(t)=\sum_j x_{ij}(t)r_{ij}(t),\qquad
+ \nu_i(t)=\lambda_i(t)+\sum_k s_{ki}(t),
+ \label{rq1:eq:arrival_service}
+\end{equation}
+其中 $s_{ki}(t)$ 为链路 $(k,i)$ 实际成功转发的速率。队列充足且传输成功时，其等于相应服务速率；发送端数据不足时，则由实际积压限制发送量。接收端只计入实际到达的数据，不能直接使用链路的潜在服务能力。缓冲区按先服务、后计入本时隙到达的顺序更新。
+
+先定义不考虑容量截断的时隙末队列
+\begin{equation}
+ Q_i^{+}(t+1)=[Q_i(t)-\mu_i(t)\Delta t]^++\nu_i(t)\Delta t,
+ \label{rq1:eq:queue_uncapped}
+\end{equation}
+其中 $[z]^+=\max\{z,0\}$。有限缓冲区的状态和溢出量为
+\begin{equation}
+ Q_i(t+1)=\min\{Q_i^{+}(t+1),Q_{\max}\},\qquad
+ L_i^{\mathrm{drop}}(t)=[Q_i^{+}(t+1)-Q_{\max}]^+.
+ \label{rq1:eq:queue_capped}
+\end{equation}
+数据积压反映业务压力，有限缓存只能截断队列，不能消除拥塞，因此还需结合丢包率评价服务质量。
+
+路由层直接控制的是通信发射能量。飞行轨迹由任务安排确定，推进能耗在本章中视为外部开销，$E_{\max}$ 表示单架无人机可用于通信的预算。节点总发射功率与能量更新为
+\begin{align}
+ P_i(t)&=\sum_j x_{ij}(t)p_{ij}(t),\qquad e_i(t)=P_i(t)\Delta t,
+ \label{rq1:eq:power_total}\\
+ E_i(t+1)&=E_i(t)-e_i(t),\qquad E_i(0)=E_{\max}.
+ \label{rq1:eq:energy_update}
+\end{align}
+每次发送满足 $e_i(t)\le E_i(t)$，通信能量耗尽后节点退出网络。网络生命周期定义为首个节点通信能量耗尽前的服务时间。由于距离和干扰改变传输功率，均分转发次数也不等于均分能耗。
+
+\subsection{任务周期内的联合优化问题}
+
+令 $\pi$ 表示根据当前可用状态生成下一跳和功率的因果控制策略，以任务周期内全网链路的平均聚合服务速率为优化目标：
+\begin{equation}
+ \overline{U}(\pi)=\frac{1}{K}\sum_{t=0}^{K-1}
+                 \sum_{i\in\mathcal{N}}\E_{\pi}[\mu_i(t)].
+ \label{rq1:eq:utility}
+\end{equation}
+该指标累计各中继的转发服务，包含同一数据的多跳传输，与中心收到的去重业务数据量不同。实验同时报告丢包率和生命周期。
+
+将发射功率、转发对象、缓存容量和可用通信预算写入约束，可得
+\begin{align}
+ \max_{\pi}\quad &\overline{U}(\pi),\label{rq1:eq:problem}\\
+ \text{s.t.}\quad
+ &0\le p_{ij}(t)\le P_{\max},\quad x_{ij}(t)\in\{0,1\},\nonumber\\
+ &\sum_jx_{ij}(t)\le1,\quad x_{ij}(t)=0\ \text{若链路 $(i,j)$ 不可用},\nonumber\\
+ &0\le Q_i(t)\le Q_{\max},\quad 0\le e_i(t)\le E_i(t),\nonumber\\
+ &\sum_{t=0}^{K-1}e_i(t)\le E_{\max},\qquad \forall i\in\mathcal{N}.\nonumber
+\end{align}
+有限缓存和发送前的能量检查保证动作可行，却不能防止预算提前用尽；过于保守的发送又会增加积压。直接求解式\eqref{rq1:eq:problem}需要预测未来拓扑和业务，并处理离散路由、连续功率及干扰的耦合。LEADR 将其分解为逐时隙的能耗调节与局部中继选择，以当前队列、邻居能量和地理位置决定动作。
+
+\section{基于李雅普诺夫漂移的能量控制}
+\label{rq1:sec:lyapunov}
+
+\subsection{虚拟能量队列与预算偏差}
+
+为了描述节点相对于任务时间进度的能量消耗，引入可持续平均功率和平均时隙能量预算
+\begin{equation}
+ P_{\mathrm{avg}}=\frac{E_{\max}}{T},\qquad
+ \bar e=P_{\mathrm{avg}}\Delta t=\frac{E_{\max}}{K}.
+ \label{rq1:eq:average_budget}
+\end{equation}
+平均预算允许随业务和链路条件短时上下浮动。为在后续决策中保留超额消耗的信息，定义虚拟能量队列
+\begin{equation}
+ F_i(t+1)=[F_i(t)+e_i(t)-\bar e]^+,\qquad F_i(0)=0.
+ \label{rq1:eq:virtual_queue}
+\end{equation}
+能耗高于平均预算时，$F_i(t)$ 增大，否则回落至不低于零。该状态记录尚未消化的预算偏差，与实际剩余电量不同。
+
+\begin{proposition}[虚拟队列的累计预算关系]
+\label{rq1:prop:budget}
+对于按式\eqref{rq1:eq:virtual_queue}更新的虚拟能量队列，任意 $1\le m\le K$ 均满足
+\begin{equation}
+ \sum_{t=0}^{m-1}e_i(t)\le m\bar e+F_i(m)-F_i(0).
+ \label{rq1:eq:finite_budget}
+\end{equation}
+\end{proposition}
+\begin{proof}
+由 $[z]^+\ge z$，有 $F_i(t+1)-F_i(t)\ge e_i(t)-\bar e$。对 $t=0,\ldots,m-1$ 求和，左侧相邻项相消，即可得到式\eqref{rq1:eq:finite_budget}。
+\end{proof}
+
+式\eqref{rq1:eq:finite_budget}说明，抑制虚拟队列增长有助于限制累计能耗偏离均匀预算轨迹。无限时域下，若另满足均值速率稳定条件 $\E[F_i(m)]/m\to0$，两边除以 $m$ 并取极限，可得平均能耗不超过 $\bar e$。本章处理有限任务，终端偏差 $F_i(K)$ 不能忽略，故虚拟队列只引导消耗节奏，不能替代真实电量约束；能量可行性仍由式\eqref{rq1:eq:energy_update}和发送前的可用能量检查保证。
+
+\subsection{李雅普诺夫函数与漂移上界}
+
+除虚拟能量队列外，定义累计通信能量损耗
+\begin{equation}
+ \Phi_i(t)=E_{\max}-E_i(t),\qquad
+ \Phi_i(t+1)=\Phi_i(t)+e_i(t).
+ \label{rq1:eq:energy_deficit}
+\end{equation}
+$\Phi_i(t)$ 记录任务开始至今的总消耗，$F_i(t)$ 记录相对平均预算的偏差。前者不会随低负载时隙回落，后者则能在能耗低于预算时下降。两个节点即使剩余能量接近，其近期超额压力也可能不同，因此两类状态分别用于约束累计消耗集中和连续超额使用。
+
+根据队列控制方法\cite{algo1,algo2,intro13}，定义节点李雅普诺夫函数
+\begin{equation}
+ L_i(t)=\frac{1}{2}Q_i^2(t)+\frac{\beta}{2}\Phi_i^2(t)
+                 +\frac{\gamma}{2}F_i^2(t),
+ \label{rq1:eq:lyapunov}
+\end{equation}
+其中 $\beta,\gamma\ge0$ 吸收状态量纲和尺度差异。通信能量在任务中不补充，故累计损耗 $\Phi_i(t)$ 不会通过服务减小，也不要求收敛到零。
+
+令 $\Theta(t)$ 表示时隙 $t$ 已观测到的队列、能量和链路状态，单步条件漂移为
+\begin{equation}
+ \Delta_i(t)=\E[L_i(t+1)-L_i(t)\mid\Theta(t)].
+ \label{rq1:eq:drift}
+\end{equation}
+在漂移中减去 $V\ge0$ 加权的服务收益，得到 $\Delta_i(t)-V\E[\mu_i(t)\mid\Theta(t)]$，以兼顾状态压力与有效转发。
+
+下面分别处理三个状态的平方项。对于数据队列，利用 $([Q-b]^++a)^2\le Q^2+a^2+b^2+2Q(a-b)$，有
+\begin{equation}
+ \frac{Q_i^2(t+1)-Q_i^2(t)}{2}
+ \le\frac{\Delta t^2}{2}\bigl[\nu_i^2(t)+\mu_i^2(t)\bigr]
+       +Q_i(t)\Delta t[\nu_i(t)-\mu_i(t)].
+ \label{rq1:eq:queue_drift}
+\end{equation}
+有限缓存的截断只会减小下一时隙队列，因此不改变该上界的有效性。对于累计能量损耗，由式\eqref{rq1:eq:energy_deficit}直接展开可得
+\begin{equation}
+ \frac{\beta}{2}[\Phi_i^2(t+1)-\Phi_i^2(t)]
+ =\beta\Phi_i(t)e_i(t)+\frac{\beta}{2}e_i^2(t).
+ \label{rq1:eq:energy_drift}
+\end{equation}
+虚拟能量队列满足 $([F+e-\bar e]^+)^2\le(F+e-\bar e)^2$，因而
+\begin{equation}
+ \frac{\gamma}{2}[F_i^2(t+1)-F_i^2(t)]
+ \le\gamma F_i(t)[e_i(t)-\bar e]
+       +\frac{\gamma}{2}[e_i(t)-\bar e]^2.
+ \label{rq1:eq:virtual_drift}
+\end{equation}
+
+若到达和服务速率的条件二阶矩有界，且发射功率有上限，则二次增量项可由有限常数 $C$ 统一上界。该条件允许到达量随机变化，例如有限强度的泊松到达具有有限二阶矩。$C$ 吸收与当前选择无关的有界项，不进入候选链路的比较。取条件期望并相加，有
+\begin{align}
+ &\Delta_i(t)-V\E[\mu_i(t)\mid\Theta(t)]\nonumber\\
+ &\quad\le C+\E\bigl[Q_i(t)\Delta t\nu_i(t)
+       -(Q_i(t)\Delta t+V)\mu_i(t)\nonumber\\
+ &\hspace{42mm}
+       +(\beta\Phi_i(t)+\gamma F_i(t))e_i(t)
+       -\gamma F_i(t)\bar e\mid\Theta(t)\bigr].
+ \label{rq1:eq:dpp_bound}
+\end{align}
+上界中的控制权重由当前队列和能量状态确定，不依赖未来业务与轨迹。
+
+\subsection{路由与功率的局部决策目标}
+
+为简化表达，定义
+\begin{equation}
+ C_i(t)=\beta\Phi_i(t)+\gamma F_i(t),\qquad
+ D_i(t)=Q_i(t)\Delta t+V.
+ \label{rq1:eq:coefficients}
+\end{equation}
+去掉与当前控制无关的常数项后，节点需要降低的局部目标为
+\begin{equation}
+ Q_i(t)\Delta t\nu_i(t)-D_i(t)\mu_i(t)+C_i(t)\Delta tP_i(t).
+ \label{rq1:eq:local_objective}
+\end{equation}
+节点评估自身下一跳和功率时，将当前邻居活动产生的到达项视为给定量。该近似省略了本次发送对接收端积压和其他链路干扰的影响；若联合最小化全网漂移，则需同时考虑收发端队列差与所有功率的耦合。LEADR 采用可在本地计算的权重，并以地理条件和邻居能量修正路由，从而减少全局信息收集与联合求解的开销。
+
+$D_i(t)$ 随积压增大，提高及时发送的收益；$V$ 保留基础服务偏好。$C_i(t)$ 随累计消耗和预算偏差增大，提高相同功率的代价。二者使发送强度随业务与能量状态调整。
+
+累计损耗的二次项还具有抑制消耗集中现象的作用。记全网平均损耗为 $\bar\Phi(t)=N^{-1}\sum_i\Phi_i(t)$，则
+\begin{equation}
+ \sum_i\Phi_i^2(t)=N\bar\Phi^2(t)
+                  +\sum_i[\Phi_i(t)-\bar\Phi(t)]^2.
+ \label{rq1:eq:energy_variance_identity}
+\end{equation}
+总损耗相同时，消耗越集中，右侧第二项越大，因此平方损耗提高了高消耗节点的边际代价。但节点位置和负载不同，适度不均衡仍可能有利于整体转发效率。
+
+增大 $\beta$ 强化累计能耗惩罚，增大 $\gamma$ 抑制连续超额消耗，增大 $V$ 则倾向于提高转发强度。由于存在干扰近似和路由修正，经典全局漂移最小化的最优性间隙不直接适用于 LEADR，后文以局部性质和实验评价其效果。
+
+\section{分布式路由与功率联合决策}
+\label{rq1:sec:algorithm}
+
+\subsection{候选链路的闭式功率控制}
+
+对给定候选下一跳 $j$，记 $N_{ij}(t)=I_{ij}(t)+\sigma^2>0$。在本次链路评估中固定 $h_{ij}(t)$ 和 $N_{ij}(t)$，将式\eqref{rq1:eq:rate}代入局部目标，得到
+\begin{equation}
+ \min_{0\le p\le P_{\max}} f_{ij}(p),\qquad
+ f_{ij}(p)=-D_i(t)B\log_2\!\left(1+\frac{h_{ij}(t)p}{N_{ij}(t)}\right)
+                         +C_i(t)\Delta t\,p.
+ \label{rq1:eq:power_problem}
+\end{equation}
+该一维子问题的一阶与二阶导数分别为
+\begin{align}
+ f'_{ij}(p)&=-\frac{D_i(t)Bh_{ij}(t)}{\ln2\,[N_{ij}(t)+h_{ij}(t)p]}
+                       +C_i(t)\Delta t,
+ \label{rq1:eq:first_derivative}\\
+ f''_{ij}(p)&=\frac{D_i(t)B h_{ij}^2(t)}{\ln2\,[N_{ij}(t)+h_{ij}(t)p]^2}\ge0.
+ \label{rq1:eq:second_derivative}
+\end{align}
+因此，固定干扰条件下的链路功率目标为凸函数。当 $D_i(t)>0$ 且 $h_{ij}(t)>0$ 时，二阶导数严格为正，区间内的最优解唯一。
+
+\begin{proposition}[固定干扰下的链路功率最优解]
+\label{rq1:prop:power}
+若 $C_i(t)>0$、$D_i(t)>0$ 且 $h_{ij}(t)>0$，式\eqref{rq1:eq:power_problem}的解为
+\begin{equation}
+ p_{ij}^{\mathrm{opt}}(t)=
+ \left[\frac{D_i(t)B}{\ln2\,C_i(t)\Delta t}
+            -\frac{N_{ij}(t)}{h_{ij}(t)}\right]_{0}^{P_{\max}},
+ \label{rq1:eq:power_opt}
+\end{equation}
+其中 $[z]_{a}^{b}=\min\{\max\{z,a\},b\}$ 表示区间截断。
+\end{proposition}
+\begin{proof}
+令式\eqref{rq1:eq:first_derivative}为零，得到无约束驻点。由凸性，驻点位于区间内时即为最优解；驻点低于零时，目标在可行区间内递增，取零功率；驻点高于上限时，目标在可行区间内递减，取最大可行功率。合并得到式\eqref{rq1:eq:power_opt}。
+\end{proof}
+
+初始时刻可能有 $C_i(t)=0$，此时若有待发数据、正收益权重和可用链路，目标随功率增加而下降，应取可行上限；否则不发送。为满足剩余能量约束，实际功率上限取 $\min\{P_{\max},E_i(t)/\Delta t\}$。
+
+式\eqref{rq1:eq:power_opt}的第一项由服务需求和能量价格确定，第二项反映链路不利程度。队列增长提高服务紧迫性，累计能耗和虚拟队列增长则降低可接受功率。当高干扰链路的边际收益不足以抵消能耗时，最优功率为零，节点转而评估其他候选；若所有候选均无正收益，则保留数据等待后续时隙。
+
+\subsection{考虑邻居电量与位置的下一跳选择}
+
+得到候选链路的功率后，计算对应速率 $r_{ij}^{\mathrm{opt}}(t)$，并定义基础权重
+\begin{equation}
+ W_{ij}(t)=D_i(t)r_{ij}^{\mathrm{opt}}(t)
+                   -C_i(t)\Delta t\,p_{ij}^{\mathrm{opt}}(t).
+ \label{rq1:eq:base_weight}
+\end{equation}
+该权重为服务收益扣除能量代价后的净值。零功率可行，故在给定干扰和精确计算下有 $W_{ij}(t)\ge0$。将等待权重设为零，可避免选择无正收益的发送。
+
+为衡量下一跳的持续转发能力，定义其归一化剩余能量与相对地理进度
+\begin{equation}
+ \widetilde E_j(t)=\frac{E_j(t)}{E_{\max}},\qquad
+ G_{ij}(t)=\frac{d_{iD}(t)-d_{jD}(t)}{d_{iD}(t)}.
+ \label{rq1:eq:energy_geography}
+\end{equation}
+$G_{ij}(t)>0$ 表示下一跳比当前节点更接近数据中心。在满足正地理进度的候选中，归一化剩余能量用于降低低能量中继的优先级，形成复合权重
+\begin{equation}
+ W_{ij}^{E,G}(t)=
+ \begin{cases}
+ W_{ij}(t)\widetilde E_j(t),&G_{ij}(t)>0,\ j\ne D,\\
+ W_{ij}(t),&j=D\ \text{且链路可用},\\
+ -\infty,&\text{其他情况}.
+ \end{cases}
+ \label{rq1:eq:composite_weight}
+\end{equation}
+数据中心不再承担后续中继，因此无需乘以无人机能量因子。最终下一跳为
+\begin{equation}
+ j^*(t)\in\arg\max_jW_{ij}^{E,G}(t).
+ \label{rq1:eq:next_hop}
+\end{equation}
+若所有候选均不可用或净收益为零，则本时隙不发送，保留数据并等待后续状态更新。
+
+正地理进度仅作为可行性条件，并不强制选择进度最大的邻居。只要能够接近中心，具体下一跳便由链路效率与能量决定，允许多条方向分担负载。在固定拓扑快照内，沿允许链路到中心的距离严格下降；若形成有向环，就要求回到起点时距离仍严格减小，与起点距离固定矛盾。因此当前转发结构无环，这一性质对应当前拓扑快照。
+
+若所有邻居均无法接近中心，则出现暂时转发空洞。LEADR 等待后续移动带来的机会，不执行额外的全局搜索；这降低了计算开销，但稀疏网络中的长时间空洞仍可能导致积压。
+
+\subsection{基于节点相对运动的邻居信息更新}
+
+HELLO 间隔过长会使邻居信息过期，过短则增加控制开销。参考拓扑感知路由\cite{qtar}，LEADR 根据相对运动预测链路寿命，并据此调整广播间隔。
+
+以一次状态更新时刻为起点，记 $\bm r_{ij}=\bm q_j-\bm q_i$、$\bm u_{ij}=\bm v_j-\bm v_i$，在短时间内近似保持当前速度，则经过 $\tau$ 后的相对位置为 $\bm r_{ij}+\tau\bm u_{ij}$。链路到达通信边界时满足
+\begin{equation}
+ \|\bm r_{ij}+\tau\bm u_{ij}\|_2^2=R^2.
+ \label{rq1:eq:let_equation}
+\end{equation}
+令 $a=\|\bm u_{ij}\|_2^2$、$b=\bm r_{ij}^{\mathsf T}\bm u_{ij}$、$c=\|\bm r_{ij}\|_2^2$。对当前范围内的链路，当 $a>0$ 时，其预测离开时间为
+\begin{equation}
+ \widehat\tau_{ij}=
+ \frac{-b+\sqrt{b^2+a(R^2-c)}}{a}.
+ \label{rq1:eq:let_solution}
+\end{equation}
+相对速度接近零时视为局部稳定，已超出范围时记录失效。更新频率由短时匀速预测确定，并随下一次状态广播重新计算。
+
+采用保守邻居预测值时，可将广播间隔写为
+\begin{equation}
+ \tau_i^{\mathrm{hello}}=
+ \operatorname{clip}\!\left(\eta\min_{j\in\mathcal{N}_i}\widehat\tau_{ij},
+                          \tau_{\min},\tau_{\max}\right),\qquad 0<\eta<1.
+ \label{rq1:eq:hello_interval}
+\end{equation}
+其中上下限避免过密或过疏更新，$\eta$ 为提前更新比例。邻居表为空时使用周期性发现消息。
+
+\subsection{算法流程与计算复杂度}
+
+每个节点按算法\ref{rq1:alg:leadr}独立决策。功率评估与中继选择使用时隙开始时的邻居表、队列和能量状态；收发结束后，再按实际传输量与能耗更新状态。
+
+\begin{algorithm}[!htbp]
+\bicaption{LEADR 分布式路由与功率联合决策}{LEADR decentralized routing and power control}
+\label{rq1:alg:leadr}
+\small
+\begin{algorithmic}[1]
+\Require 本地状态 $Q_i(t),E_i(t),F_i(t)$，邻居表，通信与控制参数
+\Ensure 下一跳 $j^*(t)$、路由指示量 $x_{ij}(t)$ 与发射功率
+\State 依据时间戳和相对运动更新邻居表，移除失效记录
+\State 根据式\eqref{rq1:eq:coefficients}计算 $C_i(t)$ 和 $D_i(t)$
+\State 初始化所有 $x_{ij}(t)\gets0$，最优收益 $w^*\gets0$，动作设为等待
+\If{$Q_i(t)>0$ 且 $E_i(t)>0$}
+ \For{每个可用候选 $j\in\mathcal{N}_i(t)\cup\{D\}$}
+  \If{$j$ 满足向数据中心推进的条件}
+   \State 估计 $h_{ij}(t)$ 和 $N_{ij}(t)$，确定当前能量可行的功率上限
+   \State 根据式\eqref{rq1:eq:power_opt}及边界情况计算 $p_{ij}^{\mathrm{opt}}(t)$
+   \State 计算 $r_{ij}^{\mathrm{opt}}(t)$ 与 $W_{ij}^{E,G}(t)$
+   \If{$W_{ij}^{E,G}(t)>w^*$}
+    \State 保存候选 $j$、对应功率及收益，更新 $w^*$
+   \EndIf
+  \EndIf
+ \EndFor
+\EndIf
+\If{存在正收益候选}
+ \State 令 $x_{ij^*}(t)\gets1$，以保存的功率向 $j^*$ 发送待发数据
+\Else
+ \State 不发送，保留队列并等待后续邻居状态更新
+\EndIf
+\State 依据实际数据收发与能耗更新 $Q_i(t+1),E_i(t+1),F_i(t+1)$
+\State 按链路寿命估计调整下一次 HELLO 广播时间
+\end{algorithmic}
+\end{algorithm}
+
+记邻居数为 $n_i(t)$。单链路功率仅涉及常数次四则运算、对数和截断，地理判断与能量修正也为常数复杂度。遍历时直接维护当前最优候选，无需排序或枚举多跳路径，因此单节点每时隙的时间与空间复杂度为
+\begin{equation}
+ \mathcal{C}_{i}^{\mathrm{time}}=O(n_i(t)),\qquad
+ \mathcal{C}_{i}^{\mathrm{space}}=O(n_i(t)).
+ \label{rq1:eq:complexity}
+\end{equation}
+空间开销主要来自邻居表。全网分布式执行的总运算量与各节点邻居数之和同阶。
+
+各机制的输入及作用列于表\ref{rq1:tab:components}。其中，闭式解用于固定干扰下的链路功率优化，能量与地理修正用于确定下一跳的选择权重。
+
+\begin{table}[!htbp]
+\centering\small
+\bicaption{LEADR 各组成机制及其作用}{Components of LEADR and their roles}
+\label{rq1:tab:components}
+\begin{tabularx}{\textwidth}{p{0.22\textwidth}p{0.28\textwidth}X}
+\toprule
+组成机制 & 主要依据 & 对决策的作用 \\
+\midrule
+数据队列反馈 & 当前积压 $Q_i(t)$ & 提高拥塞节点的发送收益权重 \\
+累计能耗惩罚 & 已用能量 $\Phi_i(t)$ & 降低能量消耗集中节点的持续发送强度 \\
+虚拟能量队列 & 实际能耗与平均预算偏差 & 抑制连续超额使用通信能量 \\
+闭式功率控制 & 链路增益、干扰与能量价格 & 以常数计算量平衡发送速率和能耗 \\
+下一跳能量修正 & 邻居归一化剩余能量 & 降低低能量中继的转发优先级 \\
+地理进度限制 & 到数据中心的相对距离 & 限制当前转发方向，减少无效绕行 \\
+自适应 HELLO & 邻居相对位置和速度 & 根据拓扑变化调整状态更新频率 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{实验设置与评价方法}
+\label{rq1:sec:experiments}
+
+\subsection{仿真环境与参数设置}
+
+实验使用 Python 离散事件仿真器模拟移动、数据产生、链路传输、缓存和能耗更新。数据按泊松过程到达，无人机采用高斯--马尔可夫移动模型，物理与通信参数参考 FANET 路由研究\cite{qtar,drlfr}，见表\ref{rq1:tab:settings}。三组实验分别改变节点数量、通信范围和飞行速度，其余因素在组内保持一致。
+
+\begin{table}[!htbp]
+\centering\small
+\bicaption{无人机路由仿真的主要参数}{Main parameters of the UAV routing simulation}
+\label{rq1:tab:settings}
+\begin{tabularx}{\textwidth}{lX}
+\toprule
+参数 & 设置 \\
+\midrule
+仿真区域 & $1000\,\mathrm{m}\times1000\,\mathrm{m}$ \\
+任务持续时间、决策间隔 & $3600\,\mathrm{s}$、$1\,\mathrm{s}$ \\
+移动模型、业务到达模型 & 高斯--马尔可夫移动、泊松数据到达 \\
+信道带宽 $B$ & $20\,\mathrm{MHz}$ \\
+噪声功率 $\sigma^2$ & $0.8\times10^{-12}\,\mathrm{W}$ \\
+参考信道参数 $\rho_0$ & $10^{-4}$ \\
+最大发射功率 $P_{\max}$ & $0.2\,\mathrm{W}$ \\
+数据包大小、缓冲区容量 & $1\,\mathrm{KB}$、$8000\,\mathrm{KB}$ \\
+单节点通信能量预算 $E_{\max}$ & $15\,\mathrm{J}$ \\
+无人机数量实验 & $10,20,30,40,50$ 架 \\
+通信范围实验 & $200,225,250,275,300\,\mathrm{m}$，无人机数量为 30 架 \\
+平均飞行速度实验 & $5,10,15,20,25\,\mathrm{m/s}$ \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{对比方法与评价指标}
+
+对比策略包括：按地理距离选择邻居的 GPSR\cite{gpsr}；在正地理进度候选间轮询的负载均衡 GPSR（Load-Balanced GPSR，LB-GPSR）；结合能量与距离选择路径的蚁群优化（Ant Colony Optimization，ACO）方法\cite{aco}；以数据投递和通信能耗构造回报的强化学习快速路由（Reinforcement Learning based Fast Routing，RLFR）方法\cite{drlfr}。各策略均在相同移动、业务与通信条件下比较。
+
+评价指标包括网络聚合吞吐量（全网成功转发的平均速率，单位 Mbps）、数据包丢失率（未完成传输的比例）、能量均衡指标（归一化剩余能量的离散程度）和网络生命周期（首个节点通信能量耗尽前的时间）。其中丢包率和能量离散程度越低越好，生命周期按观察窗口截断：
+
+\begin{equation}
+ T_{\mathrm{life}}^{\mathrm{obs}}=
+ \min\!\left\{T,\ \inf\{t\Delta t:\exists i,\ E_i(t)\le0\}\right\}.
+ \label{rq1:eq:observed_lifetime}
+\end{equation}
+达到 $3600\,\mathrm{s}$ 表示节点在完整观察窗口内保持通信能力。能量均衡与吞吐量、丢包率共同反映网络的服务状况。
+
+\section{实验结果与分析}
+
+\subsection{无人机数量变化下的性能分析}
+\label{rq1:sec:experiment_size}
+
+第一组实验将无人机数量由 10 架增加至 50 架。节点增多既提供更多候选中继，也增加业务负载与并发竞争，图\ref{rq1:fig:size}给出了这一条件下各策略的表现。
+
+\begin{figure}[!htbp]
+\centering
+\subfigure[网络聚合吞吐量\label{rq1:fig:size_a}]{\includegraphics[width=0.49\textwidth]{figures/rq1/num_a.pdf}}\hfill
+\subfigure[数据包丢失率\label{rq1:fig:size_b}]{\includegraphics[width=0.49\textwidth]{figures/rq1/num_b.pdf}}
+\par\medskip
+\subfigure[能量均衡指标\label{rq1:fig:size_c}]{\includegraphics[width=0.49\textwidth]{figures/rq1/num_c.pdf}}\hfill
+\subfigure[网络生命周期\label{rq1:fig:size_d}]{\includegraphics[width=0.49\textwidth]{figures/rq1/num_d.pdf}}
+\bicaption{不同无人机数量下的路由性能比较}{Routing performance with different numbers of UAVs}
+\label{rq1:fig:size}
+\end{figure}
+
+在五个节点规模下，LEADR 的吞吐量均最高，并总体随节点数增加而上升（图\ref{rq1:fig:size_a}）。GPSR 和 ACO 总体下降，LB-GPSR 先升后降，RLFR 在中等规模附近较平缓，随后下降。仅按地理位置选择下一跳容易重复使用少数有利节点；轮询能够分散转发次数，但不区分链路质量。LEADR 则根据队列压力调节功率，并将邻居剩余能量纳入选择，以利用新增中继并限制局部负载集中。
+
+丢包率的变化见图\ref{rq1:fig:size_b}。LEADR 始终处于较低水平，ACO 和 GPSR 随规模波动，LB-GPSR 与 RLFR 的丢包率较高。结合吞吐结果，LEADR 在增加转发量的同时维持了较低的数据损失。
+
+网络规模扩大后，新增链路能否被利用还取决于负载分配。队列权重提高积压节点的发送优先级，能量价格限制持续高强度传输，邻居能量修正则改变中继分配。
+
+LEADR 的能量离散程度低于 ACO 和 GPSR，高于 LB-GPSR 与 RLFR，且随规模存在上升和波动（图\ref{rq1:fig:size_c}）。它允许负载较重的节点消耗更多能量，因此未取得最小能量方差。生命周期方面，LEADR 和 LB-GPSR 均达到 $3600\,\mathrm{s}$，其余方法较早出现能量耗尽节点（图\ref{rq1:fig:size_d}）。在覆盖相同任务窗口的两种方法中，LEADR 维持了更高吞吐与更低丢包。
+
+\subsection{通信范围变化下的性能分析}
+\label{rq1:sec:experiment_range}
+
+第二组固定 30 架无人机，将通信范围从 $200\,\mathrm{m}$ 增至 $300\,\mathrm{m}$，间隔为 $25\,\mathrm{m}$。范围扩大后，可达邻居增多、路径可能缩短，候选链路距离与并发干扰条件也可能变化。实验结果见图\ref{rq1:fig:range}。
+
+\begin{figure}[!htbp]
+\centering
+\subfigure[网络聚合吞吐量\label{rq1:fig:range_a}]{\includegraphics[width=0.49\textwidth]{figures/rq1/com_a.pdf}}\hfill
+\subfigure[数据包丢失率\label{rq1:fig:range_b}]{\includegraphics[width=0.49\textwidth]{figures/rq1/com_b.pdf}}
+\par\medskip
+\subfigure[能量均衡指标\label{rq1:fig:range_c}]{\includegraphics[width=0.49\textwidth]{figures/rq1/com_c.pdf}}\hfill
+\subfigure[网络生命周期\label{rq1:fig:range_d}]{\includegraphics[width=0.49\textwidth]{figures/rq1/com_d.pdf}}
+\bicaption{不同通信范围下的路由性能比较}{Routing performance under different communication ranges}
+\label{rq1:fig:range}
+\end{figure}
+
+随着通信范围扩大，各方法的聚合吞吐总体下降，LEADR 始终最高且下降较缓（图\ref{rq1:fig:range_a}）。本章吞吐量累计各跳的转发服务，路径缩短会减少同一数据的中继计数；干扰和链路距离变化也可能降低速率。聚合吞吐的变化同时受转发跳数与单跳速率影响，以下结合丢包率比较各策略的业务传输情况。
+
+LEADR 在全部通信范围下保持较低丢包，大范围时接近零；ACO 与 GPSR 总体下降，LB-GPSR 仍较高，RLFR 未呈现稳定下降趋势（图\ref{rq1:fig:range_b}）。增加可达邻居能够缓解部分不可达问题，但不同策略的丢包差异仍然存在，功率控制与中继分配也会影响新增链路的利用。
+
+能量离散程度方面，LEADR 随通信范围变化较平稳，低于 ACO 和 GPSR，高于中大范围下的 LB-GPSR，RLFR 也保持较低数值（图\ref{rq1:fig:range_c}）。LEADR 与 LB-GPSR 均覆盖任务窗口，其余基线的生命周期未随范围严格增长（图\ref{rq1:fig:range_d}）。结合吞吐和丢包结果，LEADR 在各通信范围下均维持了较高的服务量，且没有提前耗尽节点通信能量。
+
+远距离候选虽然可能减少中继次数，却需要更高功率或承担更低速率。LEADR 先按当前干扰计算功率收益，再考虑邻居能量；地理进度仅用于判断方向，不直接决定下一跳。因此，评价路由策略应比较相同通信范围下的结果，而不能只观察扩大范围后的吞吐变化。
+
+\subsection{飞行速度变化下的性能分析}
+\label{rq1:sec:experiment_speed}
+
+第三组将平均速度从 $5\,\mathrm{m/s}$ 增至 $25\,\mathrm{m/s}$。速度提高会加快邻居更替，也可能使原先集中于少数节点的转发任务转移到其他节点。图\ref{rq1:fig:speed}比较了各策略对这种拓扑变化的响应。
+
+\begin{figure}[!htbp]
+\centering
+\subfigure[网络聚合吞吐量\label{rq1:fig:speed_a}]{\includegraphics[width=0.49\textwidth]{figures/rq1/speed_a.pdf}}\hfill
+\subfigure[数据包丢失率\label{rq1:fig:speed_b}]{\includegraphics[width=0.49\textwidth]{figures/rq1/speed_b.pdf}}
+\par\medskip
+\subfigure[能量均衡指标\label{rq1:fig:speed_c}]{\includegraphics[width=0.49\textwidth]{figures/rq1/speed_c.pdf}}\hfill
+\subfigure[网络生命周期\label{rq1:fig:speed_d}]{\includegraphics[width=0.49\textwidth]{figures/rq1/speed_d.pdf}}
+\bicaption{不同平均飞行速度下的路由性能比较}{Routing performance at different average UAV speeds}
+\label{rq1:fig:speed}
+\end{figure}
+
+LEADR 的吞吐量随速度持续上升且始终最高；ACO 与 RLFR 增幅较小，GPSR 在中间速度波动，LB-GPSR 总体下降（图\ref{rq1:fig:speed_a}）。轮询顺序难以反映候选链路的即时变化。LEADR 则在邻居表更新后重新计算权重，并依据相对运动调整刷新频率，使新出现的链路能够及时参与选择。
+
+LEADR 的丢包随速度增加而下降，高速时接近零；ACO 和 GPSR 在部分条件下改善，RLFR 与 LB-GPSR 仍较高（图\ref{rq1:fig:speed_b}）。在本组速度范围内，拓扑变化为转发路径重组提供了更多机会。
+
+LEADR 与多个基线的能量离散程度总体下降，LEADR 仍低于 ACO、GPSR，高于 LB-GPSR、RLFR（图\ref{rq1:fig:speed_c}）。在该移动模型中，节点轮流进入有利位置，为分散负载提供了条件。生命周期见图\ref{rq1:fig:speed_d}：LEADR 在五个条件下均达到 $3600\,\mathrm{s}$；LB-GPSR 仅在最低速度下未覆盖完整窗口，其余方法随速度波动或改善。LEADR 在热点持续的低速条件下维持了完整任务窗口，在替代链路增多时也获得了更高吞吐。
+
+速度实验同时包含拓扑变化和状态反馈的影响。即使节点暂时进入有利位置，其累计能耗和预算偏差仍会进入下一次决策。这些状态共同调节后续发送强度，使策略能够响应链路变化和长期资源消耗。
+
+\subsection{综合讨论}
+
+在不同节点规模、通信范围和飞行速度下，LEADR 均覆盖了任务窗口，并保持较高吞吐和较低丢包。其能量离散程度通常高于 LB-GPSR 和 RLFR，表明维持转发服务仍需允许节点之间存在一定消耗差异。
+
+三组仿真体现了相同的权衡：在通信预算内维持较高转发量，需要根据节点位置、链路效率和剩余能量调整负载，而非要求所有节点具有相同的能量消耗。
+
+\section{本章小结}
+
+本章提出 LEADR 路由与功率联合控制方法。业务积压、累计能耗和虚拟能量队列调节服务收益与发送代价，在固定干扰下得到闭式功率解；邻居电量与地理进度用于选择下一跳，相对运动用于调整 HELLO 间隔，单节点决策保持线性复杂度。三组仿真中，LEADR 在通信预算内覆盖完整任务窗口，保持较高聚合吞吐与较低丢包。该方法处理既定业务分组，下一章进一步研究有限传输机会下的语义证据选择。

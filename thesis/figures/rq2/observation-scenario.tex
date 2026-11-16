@@ -1,0 +1,113 @@
+% Conceptual multi-view communication scene, not an experimental image.
+% The receiver has no image observation. Labels denote candidate message
+% granularities, not ground-truth visibility classes or scheduled decisions.
+\begin{tikzpicture}[
+  x=1mm,y=1mm,>=Stealth,
+  font=\fontsize{9bp}{11.5bp}\selectfont,
+  osnote/.style={align=center,fill=white,inner sep=.5mm},
+  osray/.style={line width=.4pt,dash pattern=on 2pt off 1.5pt},
+  oslink/.style={->,line width=.65pt},
+  pics/osdrone/.style args={#1}{code={
+    \draw[line width=.65pt,draw=black!80] (-3.4,-1.6)--(3.4,1.6)
+      (-3.4,1.6)--(3.4,-1.6);
+    \foreach \px/\py in {-4.1/-1.9,-4.1/1.9,4.1/-1.9,4.1/1.9}
+      \draw[line width=.55pt,draw=black!80,fill=white]
+        (\px,\py) ellipse[x radius=1.8mm,y radius=.65mm];
+    \draw[line width=.55pt,draw=black!80,fill=#1!18]
+      (0,0) ellipse[x radius=1.4mm,y radius=.9mm];
+    \draw[line width=.45pt,draw=black!80] (-.75,-.7)--(-.75,-1.5)
+      (.75,-.7)--(.75,-1.5);
+    \draw[line width=.4pt,draw=black!80,fill=white]
+      (-.5,-1.7) rectangle (.5,-2.4);
+  }}
+]
+\definecolor{osblue}{RGB}{66,104,135}
+\definecolor{osgreen}{RGB}{84,123,99}
+\definecolor{osorange}{RGB}{177,130,76}
+\path[use as bounding box] (0,0) rectangle (148,90);
+
+% Shared ground plane and a road in oblique projection.
+\filldraw[fill=black!2,draw=black!35,line width=.45pt]
+  (4,9)--(119,9)--(144,35)--(29,35)--cycle;
+\filldraw[fill=black!9,draw=black!35,line width=.45pt]
+  (14,19)--(129,19)--(135,25)--(20,25)--cycle;
+\draw[white,line width=.8pt,dash pattern=on 3mm off 2mm]
+  (17,22)--(132,22);
+
+% Light view pyramids and overlapping footprints. A and C see much of the
+% same region; B extends coverage to the right of the occluding structure.
+\fill[osblue,opacity=.035] (24,54.6)--(8,12)--(53,12)--(71,31)--cycle;
+\fill[osorange,opacity=.035] (61,56.6)--(29,13)--(74,13)--(93,32)--cycle;
+\fill[osgreen,opacity=.035] (103,54.6)--(74,10)--(119,10)--(141,32)--cycle;
+\filldraw[fill=osblue,fill opacity=.10,draw=osblue!85,line width=.55pt]
+  (8,12)--(53,12)--(71,31)--(26,31)--cycle;
+\filldraw[fill=osorange,fill opacity=.10,draw=osorange!90,line width=.55pt]
+  (29,13)--(74,13)--(93,32)--(48,32)--cycle;
+\filldraw[fill=osgreen,fill opacity=.10,draw=osgreen!85,line width=.55pt]
+  (74,10)--(119,10)--(141,32)--(95,32)--cycle;
+\foreach \p in {(8,12),(53,12),(71,31),(26,31)}
+  \draw[osray,osblue!65] (24,54.6)--\p;
+\foreach \p in {(29,13),(74,13),(93,32),(48,32)}
+  \draw[osray,osorange!70] (61,56.6)--\p;
+\foreach \p in {(74,10),(119,10),(141,32),(95,32)}
+  \draw[osray,osgreen!65] (103,54.6)--\p;
+
+% A low structure creates a region hidden from some viewing directions.
+\fill[black!12] (68,18)--(87,18)--(94,25)--(76,25)--cycle;
+\draw[black!40,line width=.35pt,densely dashed]
+  (76,18)--(87,18)--(94,25);
+\filldraw[fill=black!13,draw=black!60,line width=.45pt]
+  (58,23)--(73,23)--(73,34)--(58,34)--cycle;
+\filldraw[fill=black!20,draw=black!60,line width=.45pt]
+  (73,23)--(82,32)--(82,43)--(73,34)--cycle;
+\filldraw[fill=black!5,draw=black!60,line width=.45pt]
+  (58,34)--(73,34)--(82,43)--(67,43)--cycle;
+\node[osnote,inner sep=.25mm] at (65.5,28.5) {遮挡物};
+\node[osnote,inner sep=.25mm] (osoccluded) at (87,6.3) {部分视角受遮挡};
+\draw[black!55,line width=.4pt] (osoccluded.north)--(84,18.5);
+\node[fill=white,inner sep=.25mm] at (108,23) {道路};
+\node[fill=white,inner sep=.25mm] at (34,8.1) {共同地面观测区域};
+
+% Line-drawn quadrotors retain a small size relative to their footprints.
+\pic at (24,57) {osdrone=osblue};
+\pic at (61,59) {osdrone=osorange};
+\pic at (103,57) {osdrone=osgreen};
+\node[osnote,text=osblue!90!black] at (24,48.5) {视角 A：局部可见};
+\node[osnote,text=osorange!90!black] at (61,50.5) {视角 C：重叠观测};
+\node[osnote,text=osgreen!90!black] at (108,46.5) {视角 B：补充区域};
+
+% Candidate semantic messages, with illustrative (unmeasured) payload sizes.
+\draw[oslink,osblue] (25,60.2)
+  .. controls (43,83) and (102,86) .. (129.5,75);
+\draw[oslink,osorange] (63,62)
+  .. controls (86,78) and (111,77) .. (129.5,73.2);
+\draw[oslink,osgreen] (105,60)
+  .. controls (116,61) and (126,67) .. (129.5,71.5);
+\filldraw[fill=white,draw=osblue,line width=.45pt]
+  (59,75.8) rectangle (71,83.8);
+\node[text=osblue!90!black] at (65,80.5) {标签};
+\draw[osblue,line width=.6pt] (62.5,77.5)--(67.5,77.5);
+\filldraw[fill=white,draw=osorange,line width=.45pt]
+  (85,70.7) rectangle (105,78.7);
+\node[text=osorange!90!black] at (95,75.5) {陈述};
+\draw[osorange,line width=.6pt] (89,72.5)--(101,72.5);
+\filldraw[fill=white,draw=osgreen,line width=.45pt]
+  (102,60.2) rectangle (126,69.2);
+\node[text=osgreen!90!black] at (114,66.2) {摘要};
+\draw[osgreen,line width=.55pt] (105,63.5)--(123,63.5)
+  (105,61.8)--(119,61.8);
+
+% Blind receiver: a monitor and antenna, not another image sensor.
+\draw[fill=white,draw=black!80,line width=.6pt]
+  (130,68.5) rectangle (138,75);
+\draw[black!55,line width=.35pt] (131,70)--(137,70);
+\draw[black!80,line width=.6pt] (134,68.5)--(134,66.4)
+  (130.7,66.4)--(137.3,66.4);
+\draw[black!75,line width=.5pt] (140,70)--(140,76);
+\draw[black!65,line width=.45pt] (141.1,74.9) arc[start angle=-40,end angle=40,radius=1.6mm]
+  (142.2,74.1) arc[start angle=-40,end angle=40,radius=3mm];
+\node[osnote,text width=25mm] at (134,83.6) {接收中心\\不读取原图};
+
+\node[align=center] at (74,1.8)
+  {虚线：局部视野\qquad 实线箭头：候选语义消息};
+\end{tikzpicture}

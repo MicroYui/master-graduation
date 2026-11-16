@@ -1,0 +1,22 @@
+\chapter{\ResearchThreeTitle}
+\label{rq3:chapter}
+
+前两章分别研究了传输资源分配和语义内容选择。本章针对数据丢失、确认延迟或丢失造成的交付不确定性，在候选内容给定时兼顾任务按时正确完成率与通信能耗。发送端依据发送记录与累计确认，决定新发、重传、等待或停止，系统结构如图~\ref{rq3:fig:system} 所示。
+
+\begin{figure}[htbp]
+\centering
+\input{figures/rq3/system}
+\bicaption{语义可靠交付的逻辑结构与反馈关系}{Logical architecture and feedback flow of reliable semantic delivery}
+\label{rq3:fig:system}
+\end{figure}
+
+针对接收集合不可直接观测、重复传输消耗有限电量的问题，本章设计一致性感知的信念反馈控制方法 C-BFC（Consistency-aware Belief Feedback Control）。该方法估计不同接收集合的任务效用，依据发送和反馈记录更新接收概率，并用有限前瞻选择后续动作。虚拟能量队列记录节点在已完成任务中的支出，使当前交付决策考虑后续任务的通信需要。
+
+\input{chapters/rq3/model}
+\input{chapters/rq3/method}
+\input{chapters/rq3/experiments}
+
+\section{本章小结}
+\label{rq3:subsec:discussion}
+
+本章提出 C-BFC，根据发送记录与累计确认估计接收状态，并比较发送、等待和停止对任务完成的作用。同一任务中，支持相同判断的消息组合采用一致的收益估计，以减少不改变判断结果的重复发送；累计能耗用于调节后续任务的支出。十七种链路与资源配置下，平均正确完成率为 49.84\%，单位正确任务能耗为 3.615 mJ，较 SD-SAC 和 TP-DQN 分别降低 16.59\% 和 14.32\%。方法在相近交付水平下减少通信支出，收益仍受时限与能量条件制约。

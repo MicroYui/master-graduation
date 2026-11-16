@@ -1,0 +1,10 @@
+# Keep generated figures byte-for-byte intact on Windows and other devices.
+*.pdf binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.eps binary
+*.zip binary
+
+# Keep optional shell scripts executable by a Unix shell after checkout.
+*.sh text eol=lf

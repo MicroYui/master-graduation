@@ -1,0 +1,545 @@
+\chapter{\ResearchTwoTitle}
+\label{rq2:chapter}
+
+第~\ref{rq1:chapter} 章研究了既定数据的路由与功率分配，本章研究通信预算约束下的语义信息选择，以提高地面中心对观测任务的判断准确率。策略根据中心已有信息和链路条件，选择有补充作用的观测来源、消息粒度及停止时机。
+
+图~\ref{rq2:fig:observation} 示意了多机观测中的互补与重复覆盖。不同视角提供的信息和消息长度不同，中心需要根据已有证据选择后续内容。
+
+\begin{figure}[htbp]
+\centering
+\input{figures/rq2/observation-scenario}
+\bicaption{多视角观测与多粒度语义证据选择示意}{Multi-view observation and multi-granularity semantic evidence selection}
+\label{rq2:fig:observation}
+\end{figure}
+
+EviComRL 使用参数固定的视觉语言模型预先生成观测消息。选择策略根据消息来源的可靠性、中心已有判断和已选内容决定下一步发送，并排除重复或超出预算的动作。训练采用 PPO；实验通过五级证据可见性分类，考察不同预算、链路和观测条件下的判断质量与通信量。
+
+\section{协同语义通信系统模型}
+\label{rq2:sec:model}
+\subsection{局部观测与可见性分类任务}
+系统包含 $N$ 个局部观测节点与决策中心 $c_0$，节点集合为 $\mathcal N=\{1,\ldots,N\}$。任务 $k$ 由完整图像 $I_k$ 和查询 $q_k$ 确定，节点只能观察局部区域 $o_{i,k}$。不同裁剪模拟视角受限及观测覆盖差异，视觉语言模型参数保持冻结。
+
+基于 VQAv2 的视觉问题与 COCO 图像\cite{vqa-v2,coco}，构造问题相关的证据可见性任务，判断局部视角是否包含支持回答的证据。标签空间为
+\begin{equation}
+\mathcal Y=\{\text{清晰可见},\text{大部分可见},\text{不确定},\text{大部分遮挡},\text{完全遮挡}\}.
+\label{rq2:eq:labels}
+\end{equation}
+五级标签按普通五类任务训练和评价。这里的可见性指局部证据能否支持属性或关系判断，仅观察到目标并不足以回答问题；不同查询需要关注的图像区域也不同\cite{where-to-look-vqa,vqa-hat,gqa}。
+
+冻结模型根据完整图像与查询生成弱监督参考标签 $y_k^*$，局部节点仅根据各自裁剪生成证据。参考标签用于训练奖励和离线评价，不进入策略输入。本章准确率度量通信后的判断与全图参考判断的一致程度，评价对象为五级证据可见性类别。
+
+节点 $i$ 的局部证据表示为
+\begin{equation}
+e_{i,k}=\left(y_{i,k},p_{i,k},u_{i,k},q_{i,k}^{\mathrm{obs}},\ell_{i,k},r_{i,k},\bm b_{i,k}\right),
+\label{rq2:eq:evidence}
+\end{equation}
+其中 $y_{i,k}$ 为局部预测标签，$p_{i,k}$ 为置信度，$u_{i,k}$ 为不确定性，$q_{i,k}^{\mathrm{obs}}$ 表示观测质量，$\ell_{i,k}$ 为裁剪区域，$r_{i,k}$ 为文字摘要。信念向量 $\bm b_{i,k}\in\mathbb R^5$ 满足 $b_{i,k}^{y}\geq0$ 和 $\sum_y b_{i,k}^{y}=1$，其熵为
+\begin{equation}
+H(\bm b_{i,k})=-\sum_{y\in\mathcal Y}b_{i,k}^{y}\log\max\{b_{i,k}^{y},\varepsilon\}.
+\label{rq2:eq:entropy}
+\end{equation}
+置信度、熵和观测质量分别描述结论集中程度、分布不确定性与图像证据质量。低质量裁剪也可能产生高置信度的错误判断，因此选择证据时还需比较不同节点的观测与结论。
+
+基准配置采用盲决策中心，初始信念为 $\bm b_{c_0,k}^{0}=\bm u=(1/5,\ldots,1/5)$。未选节点的信念仅用于构造候选特征，不作为已接收证据参与最终判断。候选元数据视为初始化时可获得的调度信息，其采集成本不计入消息预算。
+
+\subsection{消息表达形式与传输开销}
+对同一局部证据构造四种消息模式
+\begin{equation}
+\mathcal C=\{\mathrm{label},\mathrm{claim},\mathrm{summary},\mathrm{full}\}.
+\label{rq2:eq:modes}
+\end{equation}
+四种模式依次保留类别、主要判断、支持依据与完整结构化证据。消息 $m=(i,j,c)$ 指定发送方、接收方和模式，长度为 $T_m$。同一节点的不同模式共享观测来源，重复选择可能加强结论，也会占用其他视角的预算。
+
+一般节点间定向通信的候选规模至多为 $N(N-1)|\mathcal C|$。盲中心基准配置将候选转换为发送方--模式组合，规模约为 $N|\mathcal C|$，实际决策是证据来源、语义粒度及停止时机的选择。
+
+令节点间距离为 $d_{ij}$，带宽状态和链路质量因子分别为 $\eta_{ij}^{\mathrm{bw}}$ 和 $\eta_{ij}^{\mathrm{link}}$。本章采用与距离和链路状态有关的速率代理模型
+\begin{equation}
+v_{ij}=\left(v_{\max}e^{-\zeta d_{ij}}+v_{\min}\right)
+\max\{0.05,\eta_{ij}^{\mathrm{bw}}\eta_{ij}^{\mathrm{link}}\}.
+\label{rq2:eq:rate}
+\end{equation}
+将每个 token 的平均字节数记为 $b_{\mathrm{tok}}$，则消息大小、传输时延与发送能量分别为
+\begin{equation}
+B_m=b_{\mathrm{tok}}T_m,\qquad
+L_m=\frac{B_m}{v_{ij}},\qquad E_m=P_{\mathrm{tx}}L_m.
+\label{rq2:eq:cost}
+\end{equation}
+该模型将距离、带宽和链路质量转换为各候选消息的传输代价。
+
+以 $D_m$ 表示链路可用窗口，通过平滑映射计算送达概率：
+\begin{equation}
+p_m^{\mathrm{del}}=\frac{1}{1+\exp[-(D_m-L_m)/\tau]},\qquad
+R_m^{\mathrm{drop}}=1-p_m^{\mathrm{del}}.
+\label{rq2:eq:delivery}
+\end{equation}
+温度参数 $\tau$ 控制窗口边界附近的变化幅度。长消息增加时延并降低送达概率，较好的带宽和链路质量则减轻这一风险。
+
+\subsection{观测数据生成与中心判断更新}
+预先生成的观测数据保存参考标签、局部证据、消息及其代价和信念更新信息。原始节点间轨迹的信念增量为
+\begin{equation}
+\Delta\bm b_{i\to j,k}^{c}
+=\kappa_c\left[\mathcal U(o_{j,k},e_{j,k},m_{i\to j,k}^{c})-\bm b_{j,k}^{0}\right].
+\label{rq2:eq:raw_update}
+\end{equation}
+其中 $\mathcal U$ 为冻结的语义更新模块，$\kappa_c$ 为模式融合强度。训练与测试均读取预先生成的轨迹，避免重复调用模型及语义生成波动对策略比较的影响。
+
+盲中心没有初始观测，基准配置将中心消息增量统一定义为
+\begin{equation}
+\begin{aligned}
+\Delta\bm b_{i\to c_0,k}^{c}&=\kappa_c(\bm b_{i,k}-\bm u),\\
+(\kappa_{\mathrm{label}},\kappa_{\mathrm{claim}},\kappa_{\mathrm{summary}},\kappa_{\mathrm{full}})
+&=(0.22,0.42,0.62,0.78).
+\end{aligned}
+\label{rq2:eq:center_update}
+\end{equation}
+各模式对中心的作用由离线节点信念和预设融合强度模拟。后续模式对照比较这种增量设定与消息长度对策略结果的影响。
+
+选择消息 $m_t$ 后，接收方按如下规则更新信念：
+\begin{equation}
+\bm b_j^{t+1}=\mathcal P\!\left[\bm b_j^t+
+\left(p_{m_t}^{\mathrm{del}}\right)^\alpha\Delta\bm b_{m_t}\right].
+\label{rq2:eq:belief_update}
+\end{equation}
+算子 $\mathcal P$ 将负分量截零后归一化，总质量为零时返回均匀分布。基准配置 $\alpha=0.5$，采用平方根折扣；$\alpha=0$ 取消增量折扣，$\alpha=1$ 为线性缩放。取消折扣的结果单独作为对照报告。
+
+上述更新在固定轨迹上融合信念，不抽样逐次分组成功或失败。由于截断与归一化，同一消息在不同信念和已选集合下的边际收益可能不同，选择顺序也会影响最终判断。
+
+\begin{figure}[htbp]
+\centering
+\input{figures/rq2/workflow.tex}
+\bicaption{观测数据生成与消息选择流程}{Observation data generation and message selection}
+\label{rq2:fig:workflow}
+\end{figure}
+
+\subsection{约束条件与优化目标}
+设 $\mathcal S_t$ 为第 $t$ 步之前已经选择的消息集合，$U_t=\sum_{m\in\mathcal S_t}T_m$ 为累计消息长度，$n_j^t$ 为接收方已接收的消息数量，$e_i^t$ 为发送方剩余能量状态。通信预算为 $T_{\mathrm{bud}}$，最大通信步数为 $H$，单个接收方容量为 $C_j$。合法消息需要满足
+\begin{equation}
+\begin{aligned}
+m&\notin\mathcal S_t, & U_t+T_m&\leq T_{\mathrm{bud}},\\
+p_m^{\mathrm{del}}&\geq p_{\min}, & n_j^t&<C_j,\\
+e_i^t&\geq e_{\min}, & t&<H.
+\end{aligned}
+\label{rq2:eq:constraints}
+\end{equation}
+发送后能量更新为 $e_i^{t+1}=\max\{0,e_i^t-E_m\}$。消息超出链路窗口的风险通过代价项体现，累计时延不另设任务硬截止时间；后者将在交付控制中处理。
+
+决策中心的最终预测和信念质量分别定义为
+\begin{equation}
+\hat y_k=\arg\max_{y\in\mathcal Y} b_{c_0,k}^{\tau_k,y},\qquad
+Q_k= b_{c_0,k}^{\tau_k,y_k^*},
+\label{rq2:eq:quality}
+\end{equation}
+其中 $\tau_k\leq H$ 为实际停止步数。在上述可行域中选择策略 $\pi$，最大化最终判断质量与通信代价的加权差：
+\begin{equation}
+\max_{\pi}\ \mathbb E_{k,\pi}\!\left[
+\begin{aligned}
+&\lambda_Q Q_k+\lambda_A\mathbf1\{\hat y_k=y_k^*\}
+-\beta_T\frac{U_{\tau_k}}{T_{\mathrm{bud}}}\\
+&\hspace{1em}-\beta_L\sum_{m\in\mathcal S_{\tau_k}}L_m
+-\beta_R\sum_{m\in\mathcal S_{\tau_k}}R_m^{\mathrm{drop}}
+\end{aligned}\right].
+\label{rq2:eq:objective}
+\end{equation}
+信念更新具有非线性，消息数量和顺序又可变化，直接枚举的代价随候选数与步数快速增长。本章先检索候选，再训练策略学习发送顺序与停止时机。
+
+\section{基于观测质量与已有信息的消息选择方法}
+\label{rq2:sec:algorithm}
+\subsection{候选消息筛选}
+EviComRL 先通过成本敏感检索缩小动作空间。令 $C_{ij}^{\mathrm{conf}}$ 表示发送方与接收方预测之间的冲突程度，$C_{ij}^{\mathrm{comp}}$ 表示由观测区域重合程度得到的互补性，$b_c$ 为模式强度相关项，则初筛分数为
+\begin{equation}
+S_1(m)=\frac{H(\bm b_j^0)+C_{ij}^{\mathrm{conf}}+C_{ij}^{\mathrm{comp}}+q_i^{\mathrm{obs}}+0.2b_c}
+{(T_m/T_{\mathrm{bud}}+L_m+\varepsilon)(1+R_m^{\mathrm{drop}})}.
+\label{rq2:eq:retrieval}
+\end{equation}
+分子衡量中心需求与证据互补性，分母反映资源和风险成本，全部使用通信前可观察的信息。
+
+对初筛得到的前 $K$ 个候选，再按语义收益与链路代价的加权分数重排序：
+\begin{equation}
+\begin{aligned}
+S_2(m)={}&H(\bm b_j^0)+C_{ij}^{\mathrm{conf}}+C_{ij}^{\mathrm{comp}}+q_i^{\mathrm{obs}}
++0.6\mathbf1\{j=c_0\}\\
+&+0.4p_m^{\mathrm{del}}+0.2\eta_{ij}^{\mathrm{link}}+0.1\eta_{ij}^{\mathrm{bw}}
+-0.7T_m/T_{\mathrm{bud}}-0.2L_m-0.4R_m^{\mathrm{drop}}.
+\end{aligned}
+\label{rq2:eq:rerank}
+\end{equation}
+取前 $M$ 个候选作为回合内的固定候选池，基准配置 $K=32$、$M=16$。每步按当前信念和预算更新特征与可行性，由策略选择下一条消息或停止，不再扩充候选池。
+
+基准配置中全部消息发往盲中心，式\eqref{rq2:eq:rerank}的中心偏好为相同常数，不影响排序；只有允许一般节点间通信时，该项才区分中心与其他接收方。
+
+\subsection{消息来源可靠性与策略输入}
+为补充单一置信度的不足，引入五类可观测可靠性特征。对节点 $i$ 的信念从大到小排序为 $b_i^{(1)}\geq b_i^{(2)}\geq\cdots$，定义
+\begin{equation}
+\begin{aligned}
+\bm r_i&=[r_{i,1},r_{i,2},r_{i,3},r_{i,4},r_{i,5}],\\
+r_{i,1}&=b_i^{(1)},\quad r_{i,2}=b_i^{(1)}-b_i^{(2)},\quad
+r_{i,3}=H(\bm b_i)/\log5,\\
+r_{i,4}&=\frac{\sum_{v\ne i}\mathbf1\{q_v^{\mathrm{obs}}<q_i^{\mathrm{obs}}\}}{\max(1,|\mathcal V|-1)},\quad
+r_{i,5}=\frac{\sum_v q_v^{\mathrm{obs}}\mathbf1\{\hat y_v=\hat y_i\}}{\sum_v q_v^{\mathrm{obs}}+\varepsilon}.
+\end{aligned}
+\label{rq2:eq:reliability}
+\end{equation}
+其中 $\mathcal V$ 包含观测质量为零的盲中心。五项依次表示峰值、类别间隔、归一化熵、观测质量排名与质量加权共识。共识权重可减弱低质量视角的影响，但不能排除节点共同误判。
+
+候选特征为41维，组成见表\ref{rq2:tab:features}。11维全局状态包括剩余预算比例、中心最大信念、步数比例、已用预算比例、累计时延、累计能量和中心五维信念。中心最大信念可直接观察，与依赖参考标签的 $Q_k$ 不同。
+
+\begin{table}[htbp]
+\centering
+\bicaption{候选消息的结构化特征组成}{Structured features of each candidate message}
+\label{rq2:tab:features}
+\small
+\setlength{\tabcolsep}{5pt}
+\renewcommand{\arraystretch}{0.92}
+\begin{tabularx}{\textwidth}{l r X}
+\toprule
+特征类别 & 维数 & 具体内容\\
+\midrule
+发送方与证据关系 & 6 & 置信度、不确定性、观测质量、接收方熵、预测冲突、观测互补性\\
+语义粒度 & 4 & 四种消息模式的独热编码\\
+通信与历史状态 & 10 & 消息长度、时延、窗口、送达概率、丢包风险、已选状态、中心标记、链路质量、带宽因子、能量代价\\
+节点信念 & 15 & 发送方、接收方和决策中心各自的五维信念\\
+可靠性信息 & 5 & 信念峰值、类别间隔、归一化熵、观测质量排名、加权共识\\
+候选存在标记 & 1 & 区分真实候选与补齐固定长度的空白项\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+第 $t$ 步输入为 $s_t=(X_t,\bm g_t,\bm\mu_t)$，其中 $X_t\in\mathbb R^{M\times41}$、$\bm g_t\in\mathbb R^{11}$ 分别为候选特征和全局状态，$\bm\mu_t$ 为动作掩码。系统记录节点信念、已选集合、接收次数及剩余能量，发送后按冻结信念增量与消息代价更新这些状态。
+
+\subsection{消息特征编码与选择历史表示}
+网络结构见图\ref{rq2:fig:network}。共享编码器将完整候选与全局状态分别映射为 $\bm h_m^0=f_{\mathrm{cand}}(\bm x_m)$ 和 $\bm z_t=f_g(\bm g_t)$；六个分支 $\bm v_m^a=f_a(\bm x_m^a)$，$a\in\{s,r,c,l,b,q\}$，分别编码发送方、接收方、模式、链路、三方信念和可靠性。候选编码器为两层全连接网络，其余分支使用全连接层与双曲正切激活，隐藏维数为64；各候选共享参数。
+
+为保留先前选择对后续消息价值的影响，令 $e_m$、$s_m^t$ 和 $c_m$ 分别为候选存在标记、已选标记与中心接收标记，计算
+\begin{equation}
+\bar{\bm h}_t^{\mathrm{sel}}=
+\frac{\sum_m e_ms_m^t\bm h_m^0}{\max(1,\sum_m e_ms_m^t)},\qquad
+\bar{\bm h}_t^{\mathrm{ctr}}=
+\frac{\sum_m e_mc_m\bm h_m^0}{\max(1,\sum_m e_mc_m)}.
+\label{rq2:eq:history}
+\end{equation}
+已选上下文保留已经发送、不可再次选择的消息；中心上下文汇聚以决策中心为接收方的候选。两者均用当前步特征计算，会随信念变化更新。将基础表示、六个分支、两种上下文与全局状态拼接，经 $f_{\mathrm{rel}}$ 得到 $\bm u_m$，再通过门控残差融合：
+\begin{equation}
+\bm a_m=\sigma\!\left(W_a[\bm h_m^0,\bm u_m,\bm z_t]+\bm b_a\right),\qquad
+\bm h_m=\bm h_m^0+\bm a_m\odot\bm u_m.
+\label{rq2:eq:gate}
+\end{equation}
+门控偏置初始取负值，以减小训练初期结构分支的随机扰动。该表示通过集合汇聚编码候选关系与选择历史。
+
+\begin{figure}[htbp]
+\centering
+\input{figures/rq2/network.tex}
+\bicaption{消息选择的策略网络结构}{Policy network for message selection}
+\label{rq2:fig:network}
+\end{figure}
+
+动作头由 $\bm h_m$、$\bm z_t$ 及两种上下文计算消息分数 $\ell_m$；停止头不使用单条候选表示，输出 $\ell_0$。动作空间为 $\{0,1,\ldots,M\}$，零表示停止。根据式\eqref{rq2:eq:constraints}构造合法动作掩码，得到
+\begin{equation}
+\pi_\theta(a\mid s_t)=
+\frac{\mu_t(a)\exp(\ell_a)}{\sum_{v=0}^M\mu_t(v)\exp(\ell_v)}.
+\label{rq2:eq:policy}
+\end{equation}
+停止动作始终可用，所有消息均非法时直接停止。价值网络使用合法候选的掩码均值、两种上下文和全局表示，估计后续回报。
+
+\subsection{奖励函数与策略预训练}
+单步奖励以中心信念变化为基础。记 $Q_t=b_{c_0}^{t,y^*}$，则选中消息 $m$ 后的即时奖励为
+\begin{equation}
+\begin{aligned}
+r_t={}&2.5(Q_{t+1}-Q_t)-0.015\frac{T_m}{T_{\mathrm{bud}}}
+-0.01L_m-0.003E_m\\
+&-0.03R_m^{\mathrm{drop}}-0.03\mathbf1\{L_m>D_m\}.
+\end{aligned}
+\label{rq2:eq:reward}
+\end{equation}
+在终止时追加
+\begin{equation}
+r_{\mathrm{end}}=Q_{\tau}+0.5\mathbf1\{\hat y=y^*\}
++0.5\left(b_{c_0}^{\tau,y^*}-\max_{y\ne y^*}b_{c_0}^{\tau,y}\right)
+-0.005\frac{U_{\tau}}{T_{\mathrm{bud}}}.
+\label{rq2:eq:terminal}
+\end{equation}
+即时信念增益使每次发送都有学习反馈，终止正确性和类别间隔用于评价最终分类表现。消息成本惩罚低收益发送，促使策略学习停止。参考标签仅用于计算训练回报，测试时仍依据可观测状态和已训练参数选择动作。
+
+在随机策略下，大量初始动作可能只产生负代价，停止动作也可能过早占据较大概率。为提高初始样本利用率，本章在 PPO 之前加入基于单步回报的策略预训练。对于训练状态 $s$，比较立即停止与执行一个合法消息后停止的回报：
+\begin{equation}
+\widehat U(s,a)=
+\begin{cases}
+r_{\mathrm{end}}(s),&a=0,\\
+r(s,a)+r_{\mathrm{end}}(s'),&a\ne0\text{ 且未终止},\\
+r(s,a),&a\ne0\text{ 且已终止}.
+\end{cases}
+\label{rq2:eq:proxy}
+\end{equation}
+取回报最大的合法动作作为预训练目标 $a^*$。若动作奖励已包含终止项，则不重复计入。预训练目标只根据训练轨迹及参考标签构造，测试阶段不生成该目标。网络采用交叉熵损失 $\mathcal L_{\mathrm{pre}}=-0.2\log\pi_\theta(a^*\mid s)$ 训练三轮，随后进入 PPO。预训练学习单步发送与停止的偏好，后续强化学习再优化多步选择。
+
+\subsection{策略训练与执行过程}
+PPO 在目标函数中裁剪新旧策略的概率比，抑制过大的策略更新\cite{ppo}。设采样时策略为 $\pi_{\theta_{\mathrm{old}}}$，定义
+\begin{equation}
+\begin{aligned}
+\rho_t(\theta)&=\frac{\pi_\theta(a_t\mid s_t)}{\pi_{\theta_{\mathrm{old}}}(a_t\mid s_t)},\\
+\mathcal L_{\mathrm{clip}}&=
+-\mathbb E_t\min\left\{\rho_t(\theta)\widehat A_t,
+\operatorname{clip}[\rho_t(\theta),1-\epsilon,1+\epsilon]\widehat A_t\right\}.
+\end{aligned}
+\label{rq2:eq:ppo}
+\end{equation}
+采样时保存状态、动作掩码、旧动作概率及价值估计，多轮更新沿用同一记录，保证新旧策略比较的是相同可行动作范围。
+
+优势采用广义优势估计\cite{gae}：令 $\delta_t=r_t+\gamma V_\psi(s_{t+1})-V_\psi(s_t)$，按 $\widehat A_t=\delta_t+\gamma\lambda\widehat A_{t+1}$ 反向递推，终止状态价值取零；回报目标为 $\widehat R_t=\widehat A_t+V_\psi(s_t)$。总损失为
+\begin{equation}
+\mathcal L=\mathcal L_{\mathrm{clip}}+
+0.5\mathbb E_t(V_\psi(s_t)-\widehat R_t)^2
+-0.01\mathbb E_t\mathcal H[\pi_\theta(\cdot\mid s_t)].
+\label{rq2:eq:loss}
+\end{equation}
+价值损失拟合回报基线，熵项用于维持探索。每轮采样后进行四轮小批量更新，并采用梯度范数裁剪。按验证集上的确定性平均回报选择参数，测试集仅用于最终评价。基准配置采用普通任务采样，不启用类别平衡重采样。
+
+\begin{algorithm}[!htb]
+\caption{EviComRL 的策略训练过程}
+\label{rq2:alg:training}
+\fontsize{10.5bp}{13.5bp}\selectfont
+\begin{algorithmic}[1]
+\setlength{\itemsep}{0pt}
+\setlength{\parsep}{0pt}
+\Require 预先生成的训练数据 $\mathcal D_{\mathrm{tr}}$、验证数据 $\mathcal D_{\mathrm{val}}$，候选上限 $M$ 与预算 $T_{\mathrm{bud}}$
+\Ensure 通信策略参数 $\theta^*$
+\State 将局部证据映射到盲中心，初始化共享编码器、策略网络与价值网络
+\State 按式\eqref{rq2:eq:proxy}生成一步展望目标，执行三轮交叉熵预训练
+\For{每轮 PPO 训练}
+  \State 清空采样缓存
+  \For{训练集中的每个任务}
+    \State 检索并重排序候选，初始化中心信念、已选集合和资源状态
+    \While{回合尚未结束}
+      \State 更新结构化特征和合法动作掩码
+      \State 从 $\pi_\theta$ 采样动作，记录旧动作概率和状态价值
+      \State 执行动作，更新信念与成本，保存奖励和终止标记
+    \EndWhile
+  \EndFor
+  \State 计算优势与回报，最小化式\eqref{rq2:eq:loss}并裁剪梯度
+  \State 在验证集按最大动作概率执行；若平均回报提高，保存参数为 $\theta^*$
+\EndFor
+\State \Return $\theta^*$
+\end{algorithmic}
+\end{algorithm}
+
+测试时固定网络参数，每步执行概率最大的合法动作，更新信念与资源，直到选择停止或可行消息耗尽；不构造依赖参考标签的预训练目标。
+
+\subsection{计算复杂度}
+设原始候选数量为 $A$，隐藏维数为 $d$。直接排序实现的候选筛选复杂度为 $O(A\log A)$；在基准配置下，$A$ 随局部节点数量近似线性增长。共享候选编码和各结构分支的前向计算复杂度为 $O(Md^2)$，历史与中心上下文汇聚为 $O(Md)$。每个回合至多执行 $H$ 步，策略推理复杂度因而为 $O(A\log A+HMd^2)$。算法不对全部候选排列逐一求解，也不在推理时调用大模型评价每个备选动作。
+
+策略预训练的一次目标构造需枚举合法动作，约执行 $O(M)$ 次信念与资源更新。该开销发生在离线训练阶段，上述推理复杂度不包含局部语义提取的计算成本。
+
+本方法适用于固定标签空间与小规模候选。开放式回答需要更丰富的语义效用表示，实际接收状态未知时则需引入反馈与接收信念控制。
+
+\section{实验设置与评价方法}
+\label{rq2:sec:setup}
+\subsection{数据与实现参数}
+实验使用3000条 VQAv2/COCO 派生轨迹，提取模型为冻结的 Qwen3-VL-8B-Instruct，基准配置包含9个局部视角与一个盲中心。任务按标签分层，以约60\%、20\%、20\%划分训练、验证和测试集，测试任务为600条。划分单位为图像--问题任务，同一图像的不同问题可分布于不同子集。
+
+主要参数见表\ref{rq2:tab:parameters}。实验记录包含28个配置，覆盖视角数、预算、步数、链路、轨迹规模、消息模式及消融；正文重点报告总体比较、视角数量、预算、链路条件和关键组成部分的结果。这些配置均采用一个随机种子训练80轮。可靠性特征另用三个随机种子进行成对消融，均为3000条轨迹、80轮训练，单独报告均值和标准差。
+
+\begin{table}[htbp]
+\centering
+\bicaption{EviComRL 的主要实验参数}{Main experimental parameters of EviComRL}
+\label{rq2:tab:parameters}
+\small
+\setlength{\tabcolsep}{5pt}
+\renewcommand{\arraystretch}{0.92}
+\begin{tabular}{ll ll}
+\toprule
+参数 & 取值 & 参数 & 取值\\
+\midrule
+局部视角数 & 9 & 通信预算 & 120 token\\
+候选上限 $M$ & 16 & 初筛数量 $K$ & 32\\
+最大步数 $H$ & 8 & 接收容量 & 3 条消息\\
+最低送达概率 & 0.45 & 增量折扣指数 $\alpha$ & 0.5\\
+隐藏维数 $d$ & 64 & 候选/全局维数 & 41/11\\
+学习率 & $10^{-3}$ & PPO 裁剪阈值 & 0.2\\
+回报折扣 $\gamma$ & 0.96 & GAE 参数 $\lambda$ & 0.95\\
+小批量大小 & 32 & 梯度范数上限 & 0.5\\
+策略预训练轮次 & 3 & PPO 训练轮次 & 80\\
+平均字节/token & 4 & 发送功率 & 1.5 W\\
+速率参数 $v_{\max}$ & 1000 byte/s & $v_{\min}$ & 10 byte/s\\
+距离衰减系数 $\zeta$ & 0.01 & 窗口温度 $\tau$ & 0.04 s\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+各方法共享局部证据、消息代价、候选上限和动作约束，参数依据训练与验证过程选择，测试时保持固定。时延和能量仅计消息通信成本，不包含语义推理、飞行推进及候选元数据采集。
+
+\subsection{对比方法与评价指标}
+对比方法分为三类。基础通信策略包括不发送的 NoComm、随机选择合法候选的 Random、预算与接收容量内尽可能发送的 FullComm，以及优先选择短消息的 TokenGreedy。FullComm 按候选顺序在接收容量内依次发送语义消息。
+
+单步排序策略包括按语义收益与成本之比选择的 Greedy、采用固定加权分数的 LearnRank、侧重语义属性的 SemanticOnly、侧重链路可靠性与代价的 LinkOnly，以及学习任务上下文下单步动作偏好的 ContextualBandit。
+
+第三类为协同感知原则的轨迹适配与结构对照。Where2Comm-Trace 依据置信度和空间互补性选取信息；How2Comm-Trace 联合考虑协作收益、链路及重复接收代价\cite{where2comm,how2comm}。二者将原方法的通信选择原则用于本章预先生成的观测数据，并共享相同的候选和资源约束。多层感知机（Multilayer Perceptron，MLP）对照采用相同输入与 PPO 训练流程，记为 PPO-MLP，以共享全连接网络替代结构化关系分支。
+
+设测试集大小为 $n$，对每类 $y$ 统计真阳性（True Positive，TP）$\mathrm{TP}_y$、假阳性（False Positive，FP）$\mathrm{FP}_y$ 和假阴性（False Negative，FN）$\mathrm{FN}_y$，则准确率（Accuracy，Acc）、平衡准确率（Balanced Accuracy，BAcc）和宏平均 F1（Macro-averaged F1，MF1）分别为
+\begin{equation}
+\begin{aligned}
+\mathrm{Acc}&=\frac1n\sum_k\mathbf1\{\hat y_k=y_k^*\},\\
+\mathrm{BAcc}&=\frac1{|\mathcal Y_+|}\sum_{y\in\mathcal Y_+}
+\frac{\mathrm{TP}_y}{\mathrm{TP}_y+\mathrm{FN}_y},\\
+\mathrm{MF1}&=\frac15\sum_{y\in\mathcal Y}
+\frac{2\mathrm{TP}_y}{2\mathrm{TP}_y+\mathrm{FP}_y+\mathrm{FN}_y}.
+\end{aligned}
+\label{rq2:eq:metrics}
+\end{equation}
+其中 $\mathcal Y_+$ 为测试集中实际出现的类别，F1 分母为零时该类记零。仅预测常见类别也可能取得一定准确率，平衡准确率与宏平均 F1 则用于观察不同类别的识别情况。
+
+通信代价报告每任务平均通信 token 数、平均消息数、累计时延及风险。其中，通信 token 数先对单个任务内所选消息的长度求和，再对测试任务取平均，记为 $\bar T$。先对每个任务所选消息的送达概率求平均，再对任务求平均，记为 $\bar p^{\mathrm{del}}$；零通信任务的该项约定为1。有效信念质量与质量成本比（Quality-Cost Ratio，QCR）定义为
+\begin{equation}
+Q_{\mathrm{eff}}=\bar Q\,\bar p^{\mathrm{del}},\qquad
+\mathrm{QCR}=\frac{Q_{\mathrm{eff}}}
+{1+\bar T/100+\bar L+0.2\bar E+\bar R^{\mathrm{drop}}+\bar D^{\mathrm{miss}}}.
+\label{rq2:eq:qcr}
+\end{equation}
+有效信念质量是平均信念质量与平均送达概率的乘积，用于综合观察语义判断和链路条件。QCR 的分母包含常数1，NoComm 的数值因而有限，但低成本本身仍可能使其表现偏高，需结合分类指标判断。
+
+\section{实验结果与分析}
+\label{rq2:sec:results}
+\subsection{总体性能比较}
+基准配置下，EviComRL 的准确率、平衡准确率和宏平均 F1 分别为58.17\%、53.05\%和50.58\%，均高于表\ref{rq2:tab:main}中的基线。相比 FullComm，准确率和宏平均 F1 提高11.00、13.20个百分点；相比 ContextualBandit，准确率提高7.50个百分点，每任务平均通信量从69.24降至49.70 token，在减少通信量的同时改善了分类结果。
+
+\begin{table}[htbp]
+\centering\small
+\bicaption{基准配置下不同通信方法的测试结果}{Test results of different communication methods under the main setting}
+\label{rq2:tab:main}
+\setlength{\tabcolsep}{3.2pt}
+\begin{tabular}{lrrrrrr}
+\toprule
+方法 & Acc/\% & BAcc/\% & MF1/\% & \shortstack{每任务平均\\通信量/token} & $Q_{\mathrm{eff}}$ & QCR\\
+\midrule
+\textbf{EviComRL} & \textbf{58.17} & \textbf{53.05} & \textbf{50.58} & 49.70 & \textbf{0.3854} & 0.1780\\
+PPO-MLP & 54.83 & 50.39 & 46.92 & 53.50 & 0.3757 & 0.1664\\
+ContextualBandit & 50.67 & 51.49 & 40.49 & 69.24 & 0.3384 & 0.1267\\
+FullComm & 47.17 & 47.68 & 37.38 & 31.71 & 0.3252 & 0.1814\\
+SemanticOnly & 45.50 & 46.37 & 36.69 & 50.51 & 0.3240 & 0.1423\\
+TokenGreedy & 44.67 & 47.75 & 35.59 & 27.00 & 0.2923 & 0.1708\\
+How2Comm-Trace & 42.67 & 46.44 & 34.15 & 34.56 & 0.3086 & 0.1771\\
+Where2Comm-Trace & 34.33 & 40.57 & 28.30 & 27.00 & 0.2657 & 0.1676\\
+LearnRank & 34.17 & 40.31 & 28.75 & 27.00 & 0.2627 & 0.1645\\
+NoComm & 32.67 & 20.00 & 9.85 & 0.00 & 0.2000 & 0.2000\\
+Greedy & 31.83 & 39.82 & 26.99 & 27.00 & 0.2575 & 0.1629\\
+Random & 31.33 & 36.85 & 26.92 & 44.33 & 0.2369 & 0.1123\\
+LinkOnly & 25.17 & 36.10 & 22.93 & 27.00 & 0.2342 & 0.1491\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+NoComm 的平衡准确率为20\%，对应均匀先验按固定并列规则输出单一类别的情况。LinkOnly 的准确率低于 NoComm，说明只考虑链路容易选入偏离参考判断的证据。仅考虑语义属性的 SemanticOnly 也低于完整策略，消息选择还需兼顾内容与传输条件。
+
+% 对应图片保留在 figures/rq2/，本稿不再引用。
+
+质量与成本的分布见图\ref{rq2:fig:tradeoff}。EviComRL 在约50 token处取得最高有效信念质量，通信成本高于部分基线。FullComm 的 QCR 为0.1814，略高于 EviComRL 的0.1780。EviComRL 获得了较高任务质量，但在本章定义的质量成本比上未超过 FullComm。
+
+\begin{figure}[htbp]
+\centering\includegraphics[width=.98\textwidth]{figures/rq2/quality_cost.pdf}
+\bicaption{基准配置下的有效信念质量与每任务平均通信量}{Effective belief quality versus average token expenditure per task under the main setting}
+\label{rq2:fig:tradeoff}
+\end{figure}
+
+每个任务平均选择2.66条消息，低于8步上限和3条接收容量；部分任务在达到容量前已停止或耗尽可行候选。相较 PPO-MLP，准确率与宏平均 F1 提高3.33、3.65个百分点，每任务平均通信量减少3.80 token。在输入和训练流程相同的条件下，关系分支与历史汇聚对应的策略获得了更高分类质量和更低通信量。
+
+\subsection{局部视角数量的影响}
+局部视角从3个增加到6个、9个时，准确率分别为35.00\%、53.83\%、58.17\%，宏平均 F1 为22.06\%、43.33\%、50.58\%（图\ref{rq2:fig:agents}）。3至6个视角的增幅较大，新增观测为策略提供了更多可选证据。
+
+\begin{figure}[htbp]
+\centering\includegraphics[width=\textwidth]{figures/rq2/agent_count.pdf}
+\bicaption{不同局部视角数量下的质量与通信开销}{Quality and communication cost with different numbers of local views}
+\label{rq2:fig:agents}
+\end{figure}
+
+6至9个视角下，有效信念质量由0.3635提高到0.3854，每任务平均通信量由51.08降至49.70 token。候选来源增多后，策略能够在更大范围内筛选消息，实际通信量不一定增加。但候选上限固定，新增节点能否发挥作用仍取决于检索质量。
+
+\subsection{通信预算的影响}
+通信预算设为60、120、180、240 token，结果见图\ref{rq2:fig:budget}。60与120 token下的准确率为58.00\%和58.17\%，较为接近；宏平均 F1 由48.04\%提高到50.58\%，有效信念质量由0.3729提高到0.3854。总体正确任务比例变化较小，不同类别的综合识别表现与参考类别信念有所改善。
+
+\begin{figure}[htbp]
+\centering\includegraphics[width=\textwidth]{figures/rq2/budget.pdf}
+\bicaption{不同通信预算下的性能变化}{Performance under different communication budgets}
+\label{rq2:fig:budget}
+\end{figure}
+
+180与240 token预算下，准确率为55.50\%和55.33\%，每任务平均通信量仅55.68和55.53 token，接收容量与停止决策限制了实际支出。各预算配置分别训练策略，预算同时影响成本归一化、候选排序和训练目标，因此比较结果反映了预算与策略适应的共同作用。
+
+% 对应图片保留在 figures/rq2/，本稿不再引用。
+
+\subsection{链路可靠性及消息粒度的影响}
+图\ref{rq2:fig:links}比较良好、中等与较差链路。较差条件降低链路状态因子、增加时延，并将最低送达门限设为0.25；良好与中等条件的门限为0.35和0.45。因此，该组同时改变链路状态和可行候选范围。
+
+\begin{figure}[htbp]
+\centering\includegraphics[width=\textwidth]{figures/rq2/link_profile.pdf}
+\bicaption{不同链路条件下的推理质量与成本}{Inference quality and cost under different link conditions}
+\label{rq2:fig:links}
+\end{figure}
+
+链路从中等变为较差后，准确率由58.17\%降至56.00\%，有效信念质量由0.3854降至0.2453，QCR由0.1780降至0.0845。最终类别变化有限，送达概率与信念质量的下降却更明显，仅观察准确率会低估链路退化的影响。
+
+% 对应图片保留在 figures/rq2/，本稿不再引用。
+
+消息模式实验依次开放标签、陈述、摘要及全部模式。仅用标签时，准确率、平衡准确率和宏平均 F1 为57.00\%、53.63\%、51.26\%，通信量为24.14 token；全部模式下，准确率为58.17\%，通信量为49.70 token，有效信念质量由0.3284提高到0.3854。开放更多模式提高了信念质量，各分类指标则未同步改善。
+
+短标签直接携带局部类别判断，已能为五级可见性任务提供线索。长消息模式采用更强的信念增量，同时增加时延与风险，因此更完整的表达不一定带来更好的最终判断。
+
+\subsection{消融实验}
+
+% 对应图片保留在 figures/rq2/，本稿不再引用。
+
+消融结果见表\ref{rq2:tab:ablation}。取消重排序后，准确率由58.17\%降至51.00\%，宏平均 F1 由50.58\%降至43.51\%。该设置改为按轨迹顺序截取候选，同时去除成本敏感检索和重排序，结果反映这两个筛选环节对固定候选池质量的总体影响。
+
+% 对应图片保留在 figures/rq2/，本稿不再引用。
+
+\begin{table}[htbp]
+\centering\small
+\bicaption{主要消融设置的分类质量与通信代价}{Classification quality and communication cost of main ablation settings}
+\label{rq2:tab:ablation}
+\begin{tabular}{lrrrrr}
+\toprule
+设置 & Acc/\% & BAcc/\% & MF1/\% & \shortstack{每任务平均\\通信量/token} & $Q_{\mathrm{eff}}$\\
+\midrule
+完整方法 & 58.17 & 53.05 & 50.58 & 49.70 & 0.3854\\
+取消重排序 & 51.00 & 46.39 & 43.51 & 44.48 & 0.3500\\
+取消链路排序 & 56.50 & 52.16 & 48.66 & 46.66 & 0.3785\\
+取消中心偏好 & 58.17 & 53.05 & 50.58 & 49.70 & 0.3854\\
+取消长度代价 & 56.33 & 50.55 & 48.61 & 51.20 & 0.3766\\
+取消风险代价 & 56.67 & 54.17 & 50.62 & 52.80 & 0.3815\\
+取消预训练 & 55.00 & 51.41 & 48.33 & 55.94 & 0.3723\\
+取消盲中心 & 27.17 & 36.41 & 25.19 & 16.90 & 0.2726\\
+取消增量折扣 & 58.50 & 53.20 & 50.79 & 49.51 & 0.3957\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+取消链路排序后，准确率与宏平均 F1 下降1.67、1.92个百分点；取消预训练后，准确率为55.00\%，通信量增加至55.94 token。两项对照中，移除相应机制均降低了准确率。
+
+取消风险代价时，平衡准确率略升，但准确率、有效信念质量及QCR下降。
+
+取消中心偏好不改变结果，与单中心常数项的性质一致。取消盲中心同时改变接收端观测、候选方向和更新规则，属于任务设定对照。取消增量折扣后，准确率为58.50\%、有效信念质量为0.3957，说明基准配置的平方根折扣在该任务下偏保守，折扣强度仍需校准。
+
+可靠性特征对照将五维输入置零，并与完整输入比较。三个随机种子的结果见表\ref{rq2:tab:reliability}，误差为样本标准差；两组使用相同训练规模、回报系数与轮次。
+
+\begin{table}[htbp]
+\centering\small
+\bicaption{发送方可靠性特征的三次重复实验}{Three-run comparison of sender reliability features}
+\label{rq2:tab:reliability}
+\begin{tabular}{lrrrr}
+\toprule
+设置 & Acc/\% & BAcc/\% & MF1/\% & \shortstack{每任务平均\\通信量/token}\\
+\midrule
+无可靠性特征 & $56.56\pm0.42$ & $50.70\pm0.34$ & $49.28\pm1.02$ & $53.43\pm2.06$\\
+完整方法 & $58.50\pm0.88$ & $52.66\pm2.57$ & $51.48\pm3.15$ & $50.35\pm1.13$\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% 对应图片保留在 figures/rq2/，本稿不再引用。
+
+加入可靠性特征后，平均准确率由56.56\%提高到58.50\%，宏平均 F1 由49.28\%提高到51.48\%，每任务平均通信量减少3.08 token。平均结果有所改善，但平衡准确率和宏平均 F1 在重复实验中仍有较大波动，对来源可靠性的判断还需结合这种训练差异。
+
+\section{本章小结}
+\label{rq2:sec:summary}
+本章提出语义消息选择方法 EviComRL，以减少有限通信量下的重复和低质量信息。方法先按观测质量与传输代价筛选候选，再根据消息来源、中心已有判断和选择历史更新评价，通过策略预训练与 PPO 学习消息选择和停止时机。
+
+基准配置准确率为58.17\%，较 FullComm、ContextualBandit 提高11.00、7.50个百分点。增加观测视角有助于补充候选证据，开放更长消息则不一定改善全部分类指标；可靠性特征的成对实验取得了较好的平均分类结果，并减少了通信量。
+
+本章通过送达概率折扣评价候选消息对判断的作用。下一章在这些候选的基础上引入数据发送与确认事件，根据不完备反馈估计实际接收状态，并选择新发、重传、等待或停止。

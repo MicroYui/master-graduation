@@ -1,0 +1,22 @@
+\begin{table}[t]
+  \centering\small
+  \setlength{\tabcolsep}{3.5pt}
+  \bicaption{参考条件下的性能比较}{Performance comparison under the reference condition}
+  \label{rq3:tab:reference-results}
+  \begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lrrrr@{}}
+    \toprule
+    方法 & \shortstack{正确完成率\\(\%)} & \shortstack{单位正确任务\\能耗 (mJ)} & \shortstack{重复发送\\(\%)} & \shortstack{通信时延\\(ms)}\\
+    \midrule
+    固定冗余 & 41.68 & 5.023 & 29.86 & 11.79\\
+    停等 ARQ & 45.66 & 3.627 & 7.72 & 17.46\\
+    选择重传 & 45.50 & 3.615 & 7.40 & 17.46\\
+    语义阈值 ARQ & 46.32 & 3.948 & 7.07 & 18.16\\
+    队列贪心 & 47.66 & 4.706 & 27.20 & 11.36\\
+    SD-SAC & 49.95 & 4.356 & 15.66 & 18.24\\
+    TP-DQN & 49.86 & 4.329 & 21.49 & 17.74\\
+    \midrule
+    \textbf{C-BFC} & \textbf{51.08} & \textbf{3.639} & \textbf{17.40} & \textbf{17.56}\\
+    \bottomrule
+  \end{tabular*}
+  \par\vspace{4pt}{\footnotesize 参考条件为 25 ms 任务时限、6 ms 反馈延迟、25\% 反馈丢失率及每节点 0.15 J 发送能量。}
+\end{table}

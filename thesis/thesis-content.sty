@@ -1,0 +1,63 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{thesis-content}[2026/10/13 Thesis content support for hithesisbook]
+% 页面、字体、标题、目录、页眉页码及定理环境由 hithesisbook 提供。
+% 本文件只提供现有正文所需的数学、绘图、算法与双语题注支持。
+\RequirePackage{bm,mathtools,array}
+\RequirePackage{float,algpseudocode}
+\RequirePackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,fit,calc,shapes.geometric,backgrounds,decorations.pathreplacing}
+\RequirePackage{xurl}
+\AtBeginDvi{\special{pdf:minorversion 7}}
+\hypersetup{hidelinks,bookmarksdepth=2}
+\renewcommand{\hit@ekeywords@separator}{,\space}
+\pretocmd{\makecover}{\hypersetup{pageanchor=false}}{}{%
+  \PackageError{thesis-content}{Unable to disable cover page anchors}{}}
+\pretocmd{\hit@makeabstract}{\hypersetup{pageanchor=true}}{}{%
+  \PackageError{thesis-content}{Unable to enable abstract page anchors}{}}
+\pdfstringdefDisableCommands{\def\quad{ }}
+\AtBeginDocument{\hypersetup{pdftitle={\ThesisTitle},pdfauthor={\ThesisAuthor}}}
+\setlength{\emergencystretch}{2em}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\floatstyle{ruled}
+\newfloat{algorithm}{tbp}{loa}[chapter]
+\floatname{algorithm}{算法}
+\renewcommand{\thealgorithm}{\thechapter-\arabic{algorithm}}
+\algrenewcommand\algorithmicrequire{\textbf{输入：}}
+\algrenewcommand\algorithmicensure{\textbf{输出：}}
+\algrenewcommand\algorithmicfor{\textbf{对}}
+\algrenewcommand\algorithmicdo{\textbf{执行}}
+\algrenewcommand\algorithmicwhile{\textbf{当}}
+\algrenewcommand\algorithmicif{\textbf{若}}
+\algrenewcommand\algorithmicthen{\textbf{则}}
+\algrenewcommand\algorithmicelse{\textbf{否则}}
+\algrenewcommand\algorithmicend{\textbf{结束}}
+\algrenewcommand\algorithmicreturn{\textbf{返回}}
+\algrenewcommand\algorithmiccomment[1]{\hfill\(\triangleright\) #1}
+\algrenewtext{EndFor}{\textbf{结束循环}}
+\algrenewtext{EndWhile}{\textbf{结束循环}}
+\algrenewtext{EndIf}{\textbf{结束判断}}
+% 沿用正文的双参数接口；图、表使用模板的 ccaption 排版。
+% 英文题注不递增计数器，紧随其后的 \label 指向中文题注的同一对象。
+\renewcommand{\bicaption}[2]{%
+  \ifdefstring{\@captype}{algorithm}{%
+    \caption[#1]{#1\protect\\\normalfont Algorithm~\thealgorithm\enspace #2}%
+  }{%
+    \caption{#1}%
+    \begingroup
+      \setlength{\abovecaptionskip}{0pt}%
+      \setlength{\belowcaptionskip}{0pt}%
+      \ifdefstring{\@captype}{table}{\def\tablename{Table}}{\def\figurename{Fig.}}%
+      \@contcaption{\@captype}{#2}%
+    \endgroup
+  }%
+}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Prb}{\mathbb{P}}
+\newcommand{\ind}{\mathbb{I}}
+\newcommand{\states}{\mathcal{S}}
+\newcommand{\actions}{\mathcal{A}}
+\newcommand{\history}{\mathcal{H}}
+\newcommand{\method}{C-BFC}
+\newcommand{\pos}[1]{\left[#1\right]^+}
+\newcommand{\resultfigure}[2]{\includegraphics[width=.90\linewidth]{figures/rq3/#1}}
+\endinput
