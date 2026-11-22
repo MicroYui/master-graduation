@@ -1,0 +1,89 @@
+{
+  "revision_date": "2026-11-22",
+  "revision": "按用户再次精简的原文替换摘要，保留原版式后重新检查分页",
+  "branch": "final",
+  "previous_revision": "2026-11-22-abstract-revision.json",
+  "user_text_preservation": {
+    "chinese_body_preserved": true,
+    "english_body_preserved": true,
+    "normalization": "仅将粘贴的百分号转义和行尾反斜杠恢复为正常LaTeX语法；摘要标题和关键词继续使用原模板接口。",
+    "language_changes": [],
+    "typography_changes": [],
+    "keywords_unchanged": true
+  },
+  "compile": {
+    "command": "powershell -NoProfile -ExecutionPolicy Bypass -File .\\thesis\\scripts\\build_thesis.ps1",
+    "exit_code": 0,
+    "output": "thesis/output/pdf/thesis.pdf",
+    "pdf_sha256": "6acaca295729a6436762bc2bbf02642655bff6d8698f0ecf596daa7162921d24"
+  },
+  "static_check": {
+    "command": "python -X utf8 thesis/scripts/check_thesis.py",
+    "exit_code": 0,
+    "input_files": 33,
+    "source_labels": 221,
+    "cited_references": 64,
+    "numbered_figures": 25,
+    "numbered_body_tables": 14,
+    "algorithms": 4
+  },
+  "layout": {
+    "previous_pdf_pages": 94,
+    "current_pdf_pages": 93,
+    "chinese_abstract_pdf_pages": [
+      4
+    ],
+    "english_abstract_pdf_pages": [
+      5,
+      6
+    ],
+    "one_page_chinese": true,
+    "one_page_english": false,
+    "english_second_page_body_lines": 4,
+    "english_second_page_keyword_lines": 2,
+    "abstract_body_font_size_bp": 12,
+    "original_template_and_spacing_preserved": true,
+    "symbol_table_pdf_page": 7,
+    "toc_pdf_pages": [
+      8,
+      9,
+      10
+    ],
+    "first_body_pdf_page": 11,
+    "main_text_page_numbers_unchanged": true
+  },
+  "checks": {
+    "source_and_asset_files_checked": 121,
+    "unchanged_source_and_asset_files": 120,
+    "changed_source_and_asset_files": [
+      "thesis/front/thesis-abstracts.tex"
+    ],
+    "pdf_copies_identical": true,
+    "all_pdf_fonts_embedded": true,
+    "pdf_font_entries_checked": 97,
+    "fatal_or_unresolved_or_overfull_log_messages": [],
+    "nonfatal_log_messages": [
+      "Underfull \\hbox (badness 1014) in paragraph at lines 13--13",
+      "Underfull \\hbox (badness 10000) in paragraph at lines 410--410",
+      "Underfull \\hbox (badness 1248) in paragraph at lines 501--502",
+      "Package glossaries Warning: No \\printglossary or \\printglossaries found. "
+    ],
+    "visual_inspection": {
+      "renderer": "Poppler pdftoppm",
+      "pdf_pages": [
+        4,
+        5,
+        6
+      ],
+      "readable_without_clipping_or_overlaps": true,
+      "original_keyword_wrapping_preserved": true
+    },
+    "unaffected_page_comparison": {
+      "renderer": "PyMuPDF 72dpi RGB",
+      "cover_pages": 3,
+      "body_and_back_matter_pages": 83,
+      "all_pixels_identical": true
+    }
+  },
+  "pending_user_action": "中文摘要已满足一页；英文仍需用户自行修改文字以容纳正文及关键词，不调整字号、行距或间距。"
+}

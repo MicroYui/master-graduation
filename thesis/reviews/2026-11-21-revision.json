@@ -1,0 +1,102 @@
+{
+  "revision_date": "2026-11-21",
+  "branch": "final",
+  "base_commit": "84178b7e1c9fa7f300a65c6a85c15ebe5e85ca7a",
+  "scope": "绪论1.1、背景图1-1、政策文献与进度说明",
+  "feedback": [
+    "以通信资源受限下多无人机协同观测任务可靠完成为主线，灾后道路观测仅作为应用示例。",
+    "第一段由无人机广泛应用及政策背景，过渡至灾后观测与通信受限。",
+    "第二段说明任务过程与三类通信资源约束，图1-1位于正文第1页。",
+    "持续回传、有效信息选择、及时交付三项挑战分别用一个段落展开。",
+    "参照参考论文的背景与意义组织方式，将研究问题融入背景，删除独立的研究问题的提出小节。"
+  ],
+  "reference_thesis": {
+    "author": "王腾",
+    "title": "基于仿真的微服务系统治理方案评估与优化方法",
+    "year": 2024,
+    "toc_pdf_page": 9,
+    "background_and_significance_pdf_pages": [
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "usage": "仅参考目录层次与绪论组织；未沿用课题来源或研究内容。"
+  },
+  "policy_source": {
+    "title": "通用航空装备创新应用实施方案（2024—2030年）",
+    "published": "2024-03-27",
+    "accessed": "2026-11-21",
+    "url": "https://www.miit.gov.cn/zwgk/zcwj/wjfb/tz/art/2024/art_4ce8d09c15ee4fb1aefc3d5dfbbb6584.html",
+    "attachment_checked": true,
+    "bibtex_key": "miit2024aviation"
+  },
+  "compile": {
+    "command": "powershell -NoProfile -ExecutionPolicy Bypass -File .\\thesis\\scripts\\build_thesis.ps1",
+    "exit_code": 0,
+    "output": "thesis/output/pdf/thesis.pdf"
+  },
+  "static_check": {
+    "command": "python -X utf8 thesis/scripts/check_thesis.py",
+    "exit_code": 0,
+    "input_files": 32,
+    "labels": 220,
+    "cited_references": 60,
+    "numbered_figures": 24,
+    "numbered_body_tables": 14,
+    "algorithms": 4
+  },
+  "checks": {
+    "page_count": 90,
+    "figure_1_1_body_page": 1,
+    "figure_1_1_pdf_page": 11,
+    "figure_caption_on_first_body_page": true,
+    "three_constraints_on_first_body_page": true,
+    "intro_1_1_headings": [
+      "研究背景",
+      "研究目的与意义"
+    ],
+    "old_research_question_heading_removed": true,
+    "three_challenge_paragraphs": 3,
+    "toc_has_new_1_1_2": true,
+    "policy_reference_in_bibliography": true,
+    "latex_fatal_or_unresolved_warning": false,
+    "research_models_results_meta_and_framework_unchanged": true,
+    "pdf_copies_identical": true,
+    "pdf_sha256": "023b33b603c25b435a3e772b621b1b2c37e79eefb3f3f702eae356571a1b9502",
+    "known_nonfatal_log_messages": [
+      "Underfull \\hbox (badness 2460) in paragraph at lines 22--23",
+      "Underfull \\hbox (badness 10000) in paragraph at lines 422--422",
+      "Underfull \\hbox (badness 1248) in paragraph at lines 517--518",
+      "Package glossaries Warning: No \\printglossary or \\printglossaries found. "
+    ]
+  },
+  "visual_review": {
+    "rendered_pdf_pages": [
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      81,
+      87
+    ],
+    "detail_review_pdf_pages": [
+      11,
+      13,
+      81
+    ],
+    "review_result": "图1-1完整显示于正文第一页；目录层级及页码正确；正文第二页完整展开三项挑战；研究目的与意义从第三页开始；新增政策文献可读；未发现重叠、裁切或超出页边界。",
+    "scope_note": "本轮检查针对目录、绪论及发生变化的文献页面，不构成对全文研究结论的重新评审。"
+  }
+}

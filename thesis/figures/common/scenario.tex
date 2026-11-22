@@ -2,7 +2,8 @@
 % This scene explains the observation and communication requirements;
 % algorithm relationships are given separately in research-framework.tex.
 \begin{tikzpicture}[
-  x=1mm,y=1mm,>=Stealth,
+  % Compact vertical positions while keeping the label fonts at their native size.
+  x=1mm,y=.75mm,>=Stealth,
   font=\fontsize{9bp}{11.5bp}\selectfont,
   bgnote/.style={align=center,fill=white,inner sep=.6mm},
   bgview/.style={draw=black!35,line width=.4pt,densely dotted},
@@ -25,7 +26,7 @@
 ]
 \path[use as bounding box] (0,0) rectangle (148,88);
 \node[anchor=west,font=\fontsize{9bp}{11.5bp}\selectfont\bfseries]
-  at (1,85.5) {灾后道路观测（应用示例）};
+  at (1,85.5) {多无人机协同观测任务（道路观测示例）};
 
 % Road and the partially overlapping fields of view, in oblique projection.
 \filldraw[fill=black!2,draw=black!35,line width=.45pt]
@@ -83,7 +84,7 @@
 \node[bgnote] at (51,75.7) {观测信息回传};
 \draw[bgdata] (71.7,63.6)--(86.3,71.5);
 \draw[bgdata] (98.5,72.5)--(123,54.5);
-\node[bgnote,inner sep=.5mm] at (112,66.5) {信息转发};
+\node[bgnote,inner sep=.5mm] at (112,66.5) {共享回传链路};
 \draw[bgfeedback] (139,55)
   .. controls (150,72) and (122,84) .. (98.8,77);
 \node[bgnote,inner sep=.5mm] at (130,77.5) {接收确认};
@@ -104,18 +105,18 @@
   (140.8,51.7) arc[start angle=-40,end angle=40,radius=3mm];
 \node[bgnote] at (128.5,36.8) {地面接收中心};
 \node[align=center,font=\fontsize{9bp}{11.5bp}\selectfont]
-  at (128.5,26.5) {\textbf{任务目标}\\在时限内汇总信息\\正确判断道路状况};
+  at (128.5,25.8) {\textbf{任务目标}\\在时限内汇总信息\\正确判断道路状况};
 
 % Background constraints and their consequences, separate from the methods.
 \draw[black!45,line width=.45pt] (1,17.5)--(147,17.5);
 \draw[black!25,line width=.4pt] (49.5,6)--(49.5,15.5)
   (98.5,6)--(98.5,15.5);
 \node[align=center] at (25,11)
-  {\textbf{电量有限、链路变化}\\持续回传受到限制};
+  {\textbf{通信能量有限}\\持续回传能力受限};
 \node[align=center] at (74,11)
-  {\textbf{视野受限、观测重叠}\\全量上传占用带宽};
+  {\textbf{消息总长度有限}\\多源信息难以全量上传};
 \node[align=center] at (123,11)
-  {\textbf{数据丢失、反馈延迟}\\按时完成判断更困难};
+  {\textbf{任务时间有限}\\丢包与迟到确认挤占时限};
 \node[align=center,font=\fontsize{8bp}{10bp}\selectfont,text=black!75]
   at (74,1.5) {点线：观测范围\qquad 实线箭头：观测信息\qquad 虚线箭头：接收确认};
 \end{tikzpicture}

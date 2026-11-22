@@ -1,0 +1,173 @@
+{
+  "revision_date": "2026-11-22",
+  "revision": "机载视觉语言模型与语义回传背景补充及挑战编号调整",
+  "branch": "final",
+  "previous_revision": "2026-11-21-intro-pagination.json",
+  "changes": [
+    "在语义消息生成段前补充轻量视觉语言模型、无人机机载验证和巡检语义回传的研究依据，新增3条文献引用。",
+    "以机载语义理解能力承接类别判断、简短陈述与摘要形式的消息生成；在背景首次解释VLM，删除综述的重复展开。",
+    "三项通信挑战段首改为（1）（2）（3），其余文字保留。",
+    "精简章节安排的重复介绍，避免章末少量文字单独占页。"
+  ],
+  "verified_primary_sources": [
+    {
+      "bibkey": "yao2025minicpmv",
+      "citation_number": 5,
+      "title": "Efficient GPT-4V level multimodal large language model for deployment on edge devices",
+      "venue": "Nature Communications 16, 5509 (2025)",
+      "url": "https://www.nature.com/articles/s41467-025-61040-5",
+      "full_text_mirror": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12215907/",
+      "doi": "10.1038/s41467-025-61040-5",
+      "evidence_scope": "移动设备视觉理解与文本生成；不作为无人机飞行实验依据。"
+    },
+    {
+      "bibkey": "tayar2026vlnonthefly",
+      "citation_number": 6,
+      "title": "VLN on the Fly: An Onboard Vision-Language Navigation Stack for Aerial Robots",
+      "venue": "IMAV 2026",
+      "url": "https://www.imavs.org/pdf/imav.2026.3",
+      "author_project": "https://vln-on-the-fly.github.io/",
+      "evidence_scope": "Jetson Orin NX上部署量化视觉语言模型，完成室内真实飞行目标定位与导航验证；位姿由外部OptiTrack提供。"
+    },
+    {
+      "bibkey": "farahani2026evlm",
+      "citation_number": 7,
+      "title": "EVLM: Intent-Driven Edge Vision Language Model for UAV-Based Power Line Inspection",
+      "venue": "2026 IEEE International Conference on Edge Computing and Communications (EDGE), 32-42",
+      "url": "https://doi.org/10.1109/EDGE72783.2026.00014",
+      "author_institution_summary": "https://athena.itec.aau.at/2026/05/evlm-intent-driven-edge-vision-language-model-for-uav-based-power-line-inspection/",
+      "metadata_source": "https://informatics.tuwien.ac.at/people/reza-farahani/",
+      "doi": "10.1109/EDGE72783.2026.00014",
+      "evidence_scope": "根据出版社及作者机构摘要，Jetson嵌入式平台使用预录巡检视频生成结构化报告并保留证据帧；不表述为真实飞行测试或完全取消图像传输。"
+    }
+  ],
+  "scope": "说明具备相应算力时本地语义处理的技术可行性，不增加本文已开展机载部署实验的主张。",
+  "compile": {
+    "command": "powershell -NoProfile -ExecutionPolicy Bypass -File .\\thesis\\scripts\\build_thesis.ps1",
+    "exit_code": 0,
+    "output": "thesis/output/pdf/thesis.pdf"
+  },
+  "static_check": {
+    "command": "python -X utf8 thesis/scripts/check_thesis.py",
+    "exit_code": 0,
+    "chinese_characters": 33839,
+    "input_files": 33,
+    "labels": 221,
+    "cited_references": 64,
+    "numbered_figures": 25,
+    "numbered_body_tables": 14,
+    "algorithms": 4
+  },
+  "checks": {
+    "protected_files_unchanged": 111,
+    "first_body_page_source_unchanged": true,
+    "challenge_paragraphs_unchanged_except_prefixes": true,
+    "existing_bibliography_entries_unchanged": true,
+    "related_work_change_only_removes_duplicate_acronym_expansion": true,
+    "label_set_preserved": true,
+    "pdf_copies_identical": true,
+    "latex_fatal_or_unresolved_or_overfull_messages": [],
+    "known_nonfatal_log_messages": [
+      "Underfull \\hbox (badness 2460) in paragraph at lines 22--23",
+      "Underfull \\hbox (badness 10000) in paragraph at lines 410--410",
+      "Underfull \\hbox (badness 1248) in paragraph at lines 501--502",
+      "Package glossaries Warning: No \\printglossary or \\printglossaries found. "
+    ]
+  },
+  "layout": {
+    "page_count_before": 90,
+    "page_count_after": 91,
+    "toc_pdf_pages": [
+      7,
+      8,
+      9
+    ],
+    "first_body_pdf_page": 10,
+    "onboard_vlm_background_pdf_page": 11,
+    "challenge_pdf_pages": [
+      12,
+      13
+    ],
+    "bibliography_pdf_pages": [
+      81,
+      82,
+      83,
+      84,
+      85,
+      86,
+      87,
+      88
+    ],
+    "new_reference_entries_pdf_page": 81,
+    "key_locations": {
+      "fig:intro:scenario": {
+        "number": "1-1",
+        "body_page": 1,
+        "pdf_page": 10
+      },
+      "fig:intro:task-flow": {
+        "number": "1-2",
+        "body_page": 3,
+        "pdf_page": 12
+      },
+      "fig:intro:framework": {
+        "number": "1-3",
+        "body_page": 11,
+        "pdf_page": 20
+      },
+      "ch:foundations": {
+        "number": "2",
+        "body_page": 12,
+        "pdf_page": 21
+      },
+      "rq1:chapter": {
+        "number": "3",
+        "body_page": 19,
+        "pdf_page": 28
+      },
+      "rq2:chapter": {
+        "number": "4",
+        "body_page": 34,
+        "pdf_page": 43
+      },
+      "rq3:chapter": {
+        "number": "5",
+        "body_page": 50,
+        "pdf_page": 59
+      }
+    }
+  },
+  "visual_review": {
+    "rendered_pdf_pages": [
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      81,
+      82,
+      88
+    ],
+    "focus_pdf_pages": [
+      11,
+      12,
+      13,
+      19,
+      20,
+      81
+    ],
+    "result": "新增背景与语义消息生成自然衔接，挑战编号及新增文献排版正确；图1-1保留首页，正文第10页连续排文，框架图与章节安排同处第11页；受影响页面未见新增重叠、裁切或缺字。"
+  },
+  "previous_pdf_sha256": "931fdab35233fdf4e180fa3fbcb4598220d01ad6f5572dac0f634bf1db3e325e",
+  "pdf_sha256": "9dcce34f1849ab1d203cb2c96b14e2ca3491e31ef97ed60fdc25a1b9c1f0f806"
+}

@@ -1,0 +1,454 @@
+{
+  "revision_date": "2026-11-22",
+  "revision": "用户改写绪论与相关工作后的重编译、图片与分页检查",
+  "branch": "final",
+  "previous_revision": "2026-11-22-onboard-vlm.json",
+  "user_prose_preservation": {
+    "chapter_files_byte_identical_to_user_input": true,
+    "sha256": {
+      "thesis/chapters/01_introduction.tex": "ca0268e9982d653a061305666a7cc828d900103486f9b7e86c32fb738c755040",
+      "thesis/chapters/01_related_work.tex": "47a5b6794a5e5a127f44be65562acd6a72df5a98d41fec6ee1f9b83def59d49c"
+    }
+  },
+  "layout_changes": [
+    {
+      "file": "thesis/figures/common/scenario.tex",
+      "change": "纵向坐标单位改为0.75 mm，微调任务目标位置，保留宽度、文字与字号，使图1-1回到首页。",
+      "approximate_size_mm": [
+        148,
+        66
+      ]
+    },
+    {
+      "file": "thesis/figures/common/research-framework.tex",
+      "change": "压紧框线与行间距，保留完整研究题目和全部图中文字，再按0.93等比显示，使章节安排与框架图同处一页。",
+      "approximate_size_mm": [
+        138,
+        108
+      ]
+    }
+  ],
+  "compile": {
+    "command": "powershell -NoProfile -ExecutionPolicy Bypass -File .\\thesis\\scripts\\build_thesis.ps1",
+    "exit_code": 0,
+    "output": "thesis/output/pdf/thesis.pdf"
+  },
+  "static_check": {
+    "command": "python -X utf8 thesis/scripts/check_thesis.py",
+    "exit_code": 0,
+    "chinese_characters": 35073,
+    "input_files": 33,
+    "source_labels": 221,
+    "cited_references": 64,
+    "numbered_figures": 25,
+    "numbered_body_tables": 14,
+    "algorithms": 4
+  },
+  "checks": {
+    "source_and_asset_files_checked": 121,
+    "unchanged_source_and_asset_files": 119,
+    "changed_source_and_asset_files": [
+      "thesis/figures/common/research-framework.tex",
+      "thesis/figures/common/scenario.tex"
+    ],
+    "diagram_labels_and_research_titles_preserved": true,
+    "compiled_label_set_preserved": true,
+    "compiled_labels_including_template": 233,
+    "pdf_copies_identical": true,
+    "all_pdf_fonts_embedded": true,
+    "pdf_font_entries_checked": 97,
+    "latex_fatal_or_unresolved_or_overfull_messages": [],
+    "known_nonfatal_log_messages": [
+      "Underfull \\hbox (badness 10000) in paragraph at lines 410--410",
+      "Underfull \\hbox (badness 1248) in paragraph at lines 501--502",
+      "Package glossaries Warning: No \\printglossary or \\printglossaries found. "
+    ],
+    "known_pdf_converter_warning": "An included PDF is tagged; xdvipdfmx ignores its tags. Rendered content checked."
+  },
+  "layout": {
+    "previous_delivered_pdf_pages": 91,
+    "initial_build_of_user_prose_pages": 93,
+    "final_pdf_pages": 92,
+    "toc_pdf_pages": [
+      7,
+      8,
+      9
+    ],
+    "first_body_pdf_page": 10,
+    "chapter_arrangement_pdf_page": 21,
+    "key_locations": {
+      "fig:intro:scenario": {
+        "number": "1-1",
+        "body_page": 1,
+        "pdf_page": 10
+      },
+      "fig:intro:task-flow": {
+        "number": "1-2",
+        "body_page": 3,
+        "pdf_page": 12
+      },
+      "fig:intro:framework": {
+        "number": "1-3",
+        "body_page": 12,
+        "pdf_page": 21
+      },
+      "ch:foundations": {
+        "number": "2",
+        "body_page": 13,
+        "pdf_page": 22
+      },
+      "rq1:chapter": {
+        "number": "3",
+        "body_page": 20,
+        "pdf_page": 29
+      },
+      "rq2:chapter": {
+        "number": "4",
+        "body_page": 35,
+        "pdf_page": 44
+      },
+      "rq3:chapter": {
+        "number": "5",
+        "body_page": 51,
+        "pdf_page": 60
+      }
+    }
+  },
+  "visual_review": {
+    "renderer": "Poppler pdftoppm",
+    "render_exit_code": 0,
+    "rendered_pdf_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43,
+      44,
+      45,
+      46,
+      47,
+      48,
+      49,
+      50,
+      51,
+      52,
+      53,
+      54,
+      55,
+      56,
+      57,
+      58,
+      59,
+      60,
+      61,
+      62,
+      63,
+      64,
+      65,
+      66,
+      67,
+      68,
+      69,
+      70,
+      71,
+      72,
+      73,
+      74,
+      75,
+      76,
+      77,
+      78,
+      79,
+      80,
+      81,
+      82,
+      83,
+      84,
+      85,
+      86,
+      87,
+      88,
+      89,
+      90,
+      91,
+      92
+    ],
+    "reviewed_intro_and_toc_pdf_pages": [
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22
+    ],
+    "reviewed_figure_pdf_pages": [
+      10,
+      12,
+      21,
+      23,
+      24,
+      28,
+      29,
+      40,
+      41,
+      42,
+      44,
+      47,
+      50,
+      55,
+      56,
+      57,
+      60,
+      62,
+      66,
+      76,
+      77,
+      78,
+      79,
+      80
+    ],
+    "figures": [
+      {
+        "label": "fig:intro:scenario",
+        "number": "1-1",
+        "body_page": 1,
+        "pdf_page": 10,
+        "title": "通信资源受限的多无人机协同观测任务示意"
+      },
+      {
+        "label": "fig:intro:task-flow",
+        "number": "1-2",
+        "body_page": 3,
+        "pdf_page": 12,
+        "title": "多无人机协同观测的信息流与任务完成条件"
+      },
+      {
+        "label": "fig:intro:framework",
+        "number": "1-3",
+        "body_page": 12,
+        "pdf_page": 21,
+        "title": "本文整体研究框架"
+      },
+      {
+        "label": "fig:base:timeline",
+        "number": "2-1",
+        "body_page": 14,
+        "pdf_page": 23,
+        "title": "一次发送尝试中的数据事件与反馈事件"
+      },
+      {
+        "label": "fig:base:semantic-pipeline",
+        "number": "2-2",
+        "body_page": 15,
+        "pdf_page": 24,
+        "title": "局部观测消息的生成、传输与任务判断"
+      },
+      {
+        "label": "fig:base:beliefs",
+        "number": "2-3",
+        "body_page": 19,
+        "pdf_page": 28,
+        "title": "任务类别与消息接收状态的概率表示"
+      },
+      {
+        "label": "rq1:fig:scenario",
+        "number": "3-1",
+        "body_page": 20,
+        "pdf_page": 29,
+        "title": "无人机集群中的多跳通信与能量感知路由场景"
+      },
+      {
+        "label": "rq1:fig:size",
+        "number": "3-2",
+        "body_page": 31,
+        "pdf_page": 40,
+        "title": "不同无人机数量下的路由性能比较"
+      },
+      {
+        "label": "rq1:fig:range",
+        "number": "3-3",
+        "body_page": 32,
+        "pdf_page": 41,
+        "title": "不同通信范围下的路由性能比较"
+      },
+      {
+        "label": "rq1:fig:speed",
+        "number": "3-4",
+        "body_page": 33,
+        "pdf_page": 42,
+        "title": "不同平均飞行速度下的路由性能比较"
+      },
+      {
+        "label": "rq2:fig:observation",
+        "number": "4-1",
+        "body_page": 35,
+        "pdf_page": 44,
+        "title": "多视角观测与多粒度语义证据选择示意"
+      },
+      {
+        "label": "rq2:fig:workflow",
+        "number": "4-2",
+        "body_page": 38,
+        "pdf_page": 47,
+        "title": "观测数据生成与消息选择流程"
+      },
+      {
+        "label": "rq2:fig:network",
+        "number": "4-3",
+        "body_page": 41,
+        "pdf_page": 50,
+        "title": "消息选择的策略网络结构"
+      },
+      {
+        "label": "rq2:fig:tradeoff",
+        "number": "4-4",
+        "body_page": 46,
+        "pdf_page": 55,
+        "title": "基准配置下的有效信念质量与每任务平均通信量"
+      },
+      {
+        "label": "rq2:fig:agents",
+        "number": "4-5",
+        "body_page": 47,
+        "pdf_page": 56,
+        "title": "不同局部视角数量下的质量与通信开销"
+      },
+      {
+        "label": "rq2:fig:budget",
+        "number": "4-6",
+        "body_page": 48,
+        "pdf_page": 57,
+        "title": "不同通信预算下的性能变化"
+      },
+      {
+        "label": "rq2:fig:links",
+        "number": "4-7",
+        "body_page": 48,
+        "pdf_page": 57,
+        "title": "不同链路条件下的推理质量与成本"
+      },
+      {
+        "label": "rq3:fig:system",
+        "number": "5-1",
+        "body_page": 51,
+        "pdf_page": 60,
+        "title": "语义可靠交付的逻辑结构与反馈关系"
+      },
+      {
+        "label": "rq3:fig:delivery-scene",
+        "number": "5-2",
+        "body_page": 53,
+        "pdf_page": 62,
+        "title": "语义数据送达与累计确认不同步的通信示意"
+      },
+      {
+        "label": "rq3:fig:controller",
+        "number": "5-3",
+        "body_page": 57,
+        "pdf_page": 66,
+        "title": "C-BFC 的整体计算流程"
+      },
+      {
+        "label": "rq3:fig:fading",
+        "number": "5-4",
+        "body_page": 67,
+        "pdf_page": 76,
+        "title": "速率波动强度变化下的性能比较"
+      },
+      {
+        "label": "rq3:fig:feedback",
+        "number": "5-5",
+        "body_page": 68,
+        "pdf_page": 77,
+        "title": "反馈平均额外时延变化下的性能比较"
+      },
+      {
+        "label": "rq3:fig:deadline",
+        "number": "5-6",
+        "body_page": 69,
+        "pdf_page": 78,
+        "title": "任务截止时间变化下的性能比较"
+      },
+      {
+        "label": "rq3:fig:energy",
+        "number": "5-7",
+        "body_page": 70,
+        "pdf_page": 79,
+        "title": "每节点初始发送能量变化下的性能比较"
+      },
+      {
+        "label": "rq3:fig:ablation",
+        "number": "5-8",
+        "body_page": 71,
+        "pdf_page": 80,
+        "title": "不同反馈丢失率下的组件比较"
+      }
+    ],
+    "result": "全部页面渲染成功；目录、绪论及25幅编号图所在页面已检查，未见缺图、图文重叠或裁切。图1-1保留首页，框架图与完整章节安排同处正文第12页。"
+  },
+  "downstream_render_comparison": {
+    "method": "MuPDF at 72 dpi; page region y=0..755 pt, excluding footer only",
+    "pages_compared": 71,
+    "old_pdf_pages": [
+      21,
+      91
+    ],
+    "new_pdf_pages": [
+      22,
+      92
+    ],
+    "pixel_identical_except_footer": true,
+    "different_page_pairs": []
+  },
+  "previous_pdf_sha256": "9dcce34f1849ab1d203cb2c96b14e2ca3491e31ef97ed60fdc25a1b9c1f0f806",
+  "initial_build_pdf_sha256": "3d8414ff0f8b4d721b85c73a53147f71878909e61387e823f1853d26e18399c9",
+  "pdf_sha256": "8d83e3aedca19c0955d3b15ad89e4bf7600d7a9273306e33f83d3da62b3d559a"
+}

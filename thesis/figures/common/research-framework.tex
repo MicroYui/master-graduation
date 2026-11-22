@@ -1,119 +1,123 @@
 % Read study 1 first, then studies 2 and 3 from left to right.
 % Dashed arrows show functional relations; solid inter-study arrows show
 % candidate messages or calculations already reused in the experiments.
+% Compact spacing and a small uniform reduction keep this figure and the
+% chapter arrangement together without changing any labels or research titles.
 \begingroup
+\scalebox{.93}{%
 \begin{tikzpicture}[
   x=1mm,y=1mm,>=Stealth,
-  font=\fontsize{8.7bp}{10.9bp}\selectfont,
+  font=\fontsize{8.7bp}{9.8bp}\selectfont,
   rfborder/.style={draw=black,line width=.5pt},
   rfbox/.style={rfborder,fill=white,align=center,inner sep=.6mm,outer sep=0pt},
   rfhead/.style={align=center,text width=61mm,inner sep=0pt,
-    font=\fontsize{9bp}{11.4bp}\selectfont\bfseries},
+    font=\fontsize{9bp}{10.5bp}\selectfont\bfseries},
   rfbody/.style={align=left,anchor=north west,text width=61mm,
     inner sep=0pt,outer sep=0pt},
   rfmethod/.style={align=center,inner sep=0pt,
-    font=\fontsize{10bp}{12bp}\selectfont\bfseries},
+    font=\fontsize{10bp}{11bp}\selectfont\bfseries},
   rflinktext/.style={align=left,inner sep=0pt,
-    font=\fontsize{8.4bp}{10.6bp}\selectfont},
+    font=\fontsize{8.4bp}{10bp}\selectfont},
   rfedge/.style={-{Stealth[length=1.5mm,width=1.05mm]},
     draw=black,line width=.6pt},
   rffunction/.style={rfedge,line width=.55pt,dashed,
     dash pattern=on 1.4mm off .8mm}
 ]
-\path[use as bounding box] (0,0) rectangle (148,-145);
+\path[use as bounding box] (0,0) rectangle (148,-116);
 
-\node[rfbox,text width=145mm,minimum height=7mm,
+\node[rfbox,text width=145mm,minimum height=6mm,
   font=\fontsize{10.2bp}{12.8bp}\selectfont\bfseries]
-  at (74,-3.5) {\ThesisTitle};
+  at (74,-3) {\ThesisTitle};
 
-\draw[rfborder] (0,-10) rectangle (148,-27);
+\draw[rfborder] (0,-8) rectangle (148,-20.5);
 \node[align=left,text width=144mm,inner sep=0pt,
-  font=\fontsize{8.9bp}{11.4bp}\selectfont] at (74,-18.5)
+  font=\fontsize{8.9bp}{10.2bp}\selectfont] at (74,-14.25)
   {\textbf{应用场景：}多无人机回传不同视角的局部信息，由地面中心汇集信息并判断现场状况。\\
    \textbf{共同约束：}通信电量有限，每项任务允许发送的消息总长度和完成时间受限。\\
    \textbf{总体目标：}在时限内汇集有效信息并正确判断，以较低通信能耗完成连续观测任务。};
-\draw[rfedge] (74,-27) -- (74,-32);
+\draw[rfedge] (74,-20.5) -- (74,-23);
 
 % Study 1: routing and power are distinct but coupled control variables.
-\draw[rfborder] (0,-32) rectangle (148,-64);
-\node[rfhead,text width=144mm] at (74,-36)
+\draw[rfborder] (0,-23) rectangle (148,-48.6);
+\node[rfhead,text width=144mm] at (74,-26.1)
   {研究问题1：\ResearchOneTitle};
-\draw[rfborder,line width=.35pt] (2,-39.5) -- (146,-39.5);
+\draw[rfborder,line width=.35pt] (2,-29) -- (146,-29);
 \node[align=center,text width=144mm,inner sep=0pt,
-  font=\fontsize{8.7bp}{10.9bp}\selectfont\bfseries] at (74,-43)
+  font=\fontsize{8.7bp}{9.8bp}\selectfont\bfseries] at (74,-31.6)
   {目标：在通信能量约束下最大化网络聚合吞吐量，并延长网络可用时间。};
-\draw[rfborder,line width=.35pt] (48,-46.5) -- (48,-62);
-\draw[rfborder,line width=.35pt] (98,-46.5) -- (98,-62);
-\node[rfbody,text width=43mm] at (3,-47)
+\draw[rfborder,line width=.35pt] (48,-34.2) -- (48,-47.4);
+\draw[rfborder,line width=.35pt] (98,-34.2) -- (98,-47.4);
+\node[rfbody,text width=43mm] at (3,-34.4)
   {\textbf{具体问题}\\
    功率偏低导致积压与丢包，\\
    高功率及集中转发加快耗电，\\
    难以兼顾吞吐量与使用时间。};
-\node[rfbody,text width=45mm] at (51,-47)
+\node[rfbody,text width=45mm] at (51,-34.4)
   {\textbf{方法与输出（LEADR）}\\
    联合确定下一跳和发射功率；\\
    按积压与能耗调整转发强度；\\
    随节点运动更新邻居信息。};
-\node[rfbody,text width=44mm] at (101,-47)
+\node[rfbody,text width=44mm] at (101,-34.4)
   {\textbf{创新点}\\
    在吞吐量优化中引入累计能耗，\\
    抑制持续高耗能发送；\\
    按邻居电量修正转发权重。};
 
 % The two directions describe a functional dependency, not online integration.
-\draw[rffunction] (10,-64) -- (10,-80);
-\node[rflinktext,anchor=west,text width=47mm] at (14,-69.5)
+\draw[rffunction] (10,-48.6) -- (10,-59.5);
+\node[rflinktext,anchor=west,text width=47mm] at (14,-52)
   {传输速率与发送耗能};
-\draw[rffunction] (62,-80) -- (62,-64);
-\node[rflinktext,anchor=east,text width=47mm,align=right] at (58,-76)
+\draw[rffunction] (62,-59.5) -- (62,-48.6);
+\node[rflinktext,anchor=east,text width=47mm,align=right] at (58,-56.5)
   {消息数量与长度形成转发负载};
 % Study 3 reuses the link-rate and energy calculations, not the LEADR policy.
-\draw[rfedge] (99,-64) -- (99,-80);
-\node[rflinktext,anchor=west,text width=44mm] at (102,-72)
+\draw[rfedge] (99,-48.6) -- (99,-59.5);
+\node[rflinktext,anchor=west,text width=44mm] at (102,-54.1)
   {LEADR 的速率与能耗模型\\计算发送时间与能耗};
 
 % Studies 2 and 3 follow in left-to-right reading order.
-\draw[rfborder] (0,-80) rectangle (65,-140);
-\draw[rfborder] (83,-80) rectangle (148,-140);
-\node[rfhead] at (32.5,-86.6)
+\draw[rfborder] (0,-59.5) rectangle (65,-111.5);
+\draw[rfborder] (83,-59.5) rectangle (148,-111.5);
+\node[rfhead] at (32.5,-65.6)
   {研究问题2：\\\ResearchTwoTitle};
-\node[rfhead] at (115.5,-86.6)
+\node[rfhead] at (115.5,-65.6)
   {研究问题3：\\\ResearchThreeTitle};
-\node[rfmethod] at (32.5,-96) {EviComRL};
-\node[rfmethod] at (115.5,-96) {C-BFC};
-\draw[rfborder,line width=.35pt] (2,-98.9) -- (63,-98.9);
-\draw[rfborder,line width=.35pt] (85,-98.9) -- (146,-98.9);
+\node[rfmethod] at (32.5,-73.2) {EviComRL};
+\node[rfmethod] at (115.5,-73.2) {C-BFC};
+\draw[rfborder,line width=.35pt] (2,-76) -- (63,-76);
+\draw[rfborder,line width=.35pt] (85,-76) -- (146,-76);
 
-\node[rfbody] at (2,-101)
+\node[rfbody] at (2,-77.5)
   {\textbf{具体问题：}消息总长度受限；\\
    重复或不可靠的观测占用发送机会，\\
    中心缺少的有效信息可能未被选中。};
-\node[rfbody] at (2,-113.1)
+\node[rfbody] at (2,-88.6)
   {\textbf{目标：在有限通信量下提高判断准确率。}};
-\node[rfbody] at (2,-118)
+\node[rfbody] at (2,-92.7)
   {\textbf{方法：}按观测质量与发送代价筛选消息，\\学习消息来源、长度和停止时机。};
-\node[rfbody] at (2,-126.3)
+\node[rfbody] at (2,-100.4)
   {\textbf{创新点：}结合来源可靠性与选择历史，\\随中心判断更新候选评价，\\减少重复或低质量内容的发送。};
 
-\node[rfbody] at (85,-101)
+\node[rfbody] at (85,-77.5)
   {\textbf{具体问题：}确认延迟或丢失时，\\
    发送端难以确定已收消息；\\
    重复补发耗电，持续等待可能超时。};
-\node[rfbody] at (85,-113.1)
+\node[rfbody] at (85,-88.6)
   {\textbf{目标：提高按时正确完成率并控制能耗。}};
-\node[rfbody] at (85,-118)
+\node[rfbody] at (85,-92.7)
   {\textbf{方法：}按发送记录与确认估计接收状态；\\
    比较继续发送、等待和停止的收益。};
 % This equality applies to correctness of nonempty sets within one task.
-\node[rfbody] at (85,-126.3)
+\node[rfbody] at (85,-100.4)
   {\textbf{创新点：}同一任务中，相同类别的\\非空消息组合采用一致收益；\\
    结合接收概率评价重传与等待。};
 
-\draw[rfedge] (65,-114.5) -- (83,-114.5);
-\node[rflinktext,align=center,text width=17mm] at (74,-108.5)
+\draw[rfedge] (65,-91.4) -- (83,-91.4);
+\node[rflinktext,align=center,text width=17mm] at (74,-85.4)
   {候选消息\\及其长度};
 \node[align=center,inner sep=0pt,text width=148mm,
-  font=\fontsize{8.2bp}{10.3bp}\selectfont] at (74,-143.3)
+  font=\fontsize{8.2bp}{9.8bp}\selectfont] at (74,-114.3)
   {虚线表示传输条件与负载的联系；实线表示候选消息与链路计算模型的使用关系};
 \end{tikzpicture}
+}
 \endgroup

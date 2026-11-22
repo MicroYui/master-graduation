@@ -1,0 +1,135 @@
+{
+  "revision_date": "2026-11-22",
+  "revision": "按用户原文替换中英文摘要，保留原有字号、行距及间距；仅报告超页，由用户自行删改文字",
+  "branch": "final",
+  "previous_revision": "2026-11-22-user-prose-recompile.json",
+  "user_text_preservation": {
+    "attachment_sha256": "e5a999cc1bc0a536a673e22d83c9226d27957522d154eb6d227fd73c36373a4a",
+    "chinese_body_exact_match": true,
+    "english_body_exact_match": true,
+    "formatting": "Original abstract environments and final-English-paragraph widow/orphan controls retained. No font, line spacing, paragraph spacing or margin changes.",
+    "chinese_keywords_exact_match": true,
+    "english_keywords_exact_match": true,
+    "headings_and_keyword_layout": "沿用现有 hithesisbook 环境和关键词排版接口"
+  },
+  "layout_changes": [],
+  "compile": {
+    "command": "powershell -NoProfile -ExecutionPolicy Bypass -File .\\thesis\\scripts\\build_thesis.ps1",
+    "exit_code": 0,
+    "output": "thesis/output/pdf/thesis.pdf",
+    "pdf_sha256": "91ed3c8da54ec5f5e2f7bfc665179c5d7775259a2aa5c273661c3474abe92421"
+  },
+  "static_check": {
+    "command": "python -X utf8 thesis/scripts/check_thesis.py",
+    "exit_code": 0,
+    "input_files": 33,
+    "source_labels": 221,
+    "cited_references": 64,
+    "numbered_figures": 25,
+    "numbered_body_tables": 14,
+    "algorithms": 4
+  },
+  "checks": {
+    "source_and_asset_files_checked": 121,
+    "unchanged_source_and_asset_files": 119,
+    "changed_source_and_asset_files": [
+      "thesis/front/cover.tex",
+      "thesis/front/thesis-abstracts.tex"
+    ],
+    "original_template_and_style_files_unchanged": true,
+    "pdf_copies_identical": true,
+    "all_pdf_fonts_embedded": true,
+    "pdf_font_entries_checked": 97,
+    "latex_fatal_or_unresolved_or_overfull_messages": [],
+    "known_nonfatal_log_messages": [
+      "Underfull \\hbox (badness 10000) in paragraph at lines 410--410",
+      "Underfull \\hbox (badness 1248) in paragraph at lines 501--502",
+      "Package glossaries Warning: No \\printglossary or \\printglossaries found. "
+    ],
+    "visual_inspection": {
+      "renderer": "Poppler pdftoppm",
+      "pdf_pages": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "readable_without_clipping_or_overlaps": true,
+      "unmodified_natural_keyword_wrapping": "中文不完备反馈跨行；英文 semantic 按模板自动断词。"
+    },
+    "unchanged_page_render_comparison": {
+      "renderer": "PyMuPDF 72dpi RGB",
+      "cover_pages_compared": 3,
+      "body_and_back_matter_pages_compared": 83,
+      "previous_body_pdf_pages": [
+        10,
+        92
+      ],
+      "current_body_pdf_pages": [
+        12,
+        94
+      ],
+      "differing_pages": []
+    }
+  },
+  "layout": {
+    "previous_pdf_pages": 92,
+    "current_pdf_pages": 94,
+    "chinese_abstract_pdf_pages": [
+      4,
+      5
+    ],
+    "english_abstract_pdf_pages": [
+      6,
+      7
+    ],
+    "chinese_abstract_page_count": 2,
+    "english_abstract_page_count": 2,
+    "one_page_per_language_requirement_met": false,
+    "second_page_line_counts_including_keywords": {
+      "Chinese": 16,
+      "English": 28
+    },
+    "abstract_body_font_size_bp": 12,
+    "abstract_body_baseline_gap_bp": 20.5,
+    "page_metrics": {
+      "Chinese": [
+        {
+          "pdf_page": 4,
+          "printed_page": "I",
+          "body_and_keyword_lines": 29,
+          "most_common_baseline_gap_bp": 20.5
+        },
+        {
+          "pdf_page": 5,
+          "printed_page": "II",
+          "body_and_keyword_lines": 16,
+          "most_common_baseline_gap_bp": 20.5
+        }
+      ],
+      "English": [
+        {
+          "pdf_page": 6,
+          "printed_page": "III",
+          "body_and_keyword_lines": 29,
+          "most_common_baseline_gap_bp": 20.5
+        },
+        {
+          "pdf_page": 7,
+          "printed_page": "IV",
+          "body_and_keyword_lines": 28,
+          "most_common_baseline_gap_bp": 20.5
+        }
+      ]
+    },
+    "symbol_table_pdf_page": 8,
+    "toc_pdf_pages": [
+      9,
+      10,
+      11
+    ],
+    "first_body_pdf_page": 12,
+    "main_text_page_numbers_unchanged": true
+  },
+  "pending_user_action": "用户自行修改摘要文字，以适应各一页；不得擅自删改措辞或压缩字号、行距、段间距。"
+}

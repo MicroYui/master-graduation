@@ -43,7 +43,7 @@ xelatex -interaction=nonstopmode -halt-on-error thesis.tex
 | `thesis.pdf` | 构建脚本生成的本地副本，不纳入 Git |
 | `build/thesis/` | 编译日志及缓存，不纳入 Git |
 
-正常编译只需 MiKTeX 排版工具和本目录文件，无需原始实验仓库、Python、模型权重或重新生成图片。最后确认的整稿为92页；不同机器的字体或 TeX 包版本可能使个别换行和页数变化。
+正常编译只需 MiKTeX 排版工具和本目录文件，无需原始实验仓库、Python、模型权重或重新生成图片。2026-11-22采用用户再次精简的英文摘要，保留中文摘要及原字号、行距和间距后，整稿为92页，目录为3页。中英文摘要连同关键词均各占一页，分别位于PDF第4、5页；不同机器的字体或 TeX 包版本可能使个别换行和页数变化。
 
 ## 在哪里修改
 
@@ -67,6 +67,6 @@ xelatex -interaction=nonstopmode -halt-on-error thesis.tex
 
 有 Python 时可运行 `python scripts/check_thesis.py`，检查输入文件、图片、标签及文献引用；此检查不依赖第三方 Python 包。最终排版仍以编译后的 PDF 为准。
 
-最新批注处理记录：[逐条修改与自查报告](output/review-comments-20261103.html)。原批注和检查结果保存在 [reviews/2026-11-03/](reviews/2026-11-03/)。该报告是2026-11-03稿件的快照，后续修订需更新进度，不应将旧页码视为新版本的验收结果。
+最新修改说明见 [PROGRESS.md](PROGRESS.md)，本轮验证结果见 [摘要各一页验证记录](reviews/2026-11-22-abstract-onepage.json)。[精简摘要试排记录](reviews/2026-11-22-abstract-retry.json)和[摘要原文替换与超页检查记录](reviews/2026-11-22-abstract-revision.json)分别保留为此前93页和94页版本的快照。[用户改稿重编译与图片检查记录](reviews/2026-11-22-user-prose-recompile.json)保留为此前92页版本的快照，[机载语义处理背景记录](reviews/2026-11-22-onboard-vlm.json)保留为此前91页版本的快照。[绪论分页记录](reviews/2026-11-21-intro-pagination.json)、[图示与标题精简记录](reviews/2026-11-21-structure-compact.json)、[背景扩写记录](reviews/2026-11-21-background-enrichment.json)与[五条意见修订记录](reviews/2026-11-21-revision.json)分别保留为此前90页、91页、92页和90页版本的快照；[逐条修改与自查报告](output/review-comments-20261103.html)及 [reviews/2026-11-03/](reviews/2026-11-03/) 中的原批注和检查结果是2026-11-03稿件的快照，不应将旧页码视为新版本的验收结果。
 
 论文编译使用已生成的 PDF 图片。只有需要修改图形时，才运行 `figures/rq2/render_figures.py` 或 `scripts/compact_rq3_figures.py`；其 Python 依赖分别为 matplotlib/numpy 和 pypdf。研究一的裁图脚本用于历史图形提取，需要另备原论文，日常编译不使用它。

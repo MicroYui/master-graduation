@@ -1,8 +1,10 @@
-\section{系统模型与问题建模}
+\section{系统模型与问题描述}
 \label{rq3:sec:model}
 
-\subsection{候选消息与任务完成条件}
+\subsection{观测任务与传输反馈}
 \label{rq3:subsec:tasks}
+\label{rq3:subsec:channel}
+\label{rq3:subsec:feedback}
 
 考虑由感知节点集合 $\mathcal N=\{1,\ldots,N\}$ 与接收中心 $d$ 组成的系统，依次处理 $N_{\mathrm{task}}$ 个任务。任务 $k$ 的相对截止时间为 $D_k$。节点电量跨任务连续扣减，接收状态与确认记录在任务开始时初始化。
 
@@ -29,10 +31,7 @@
 
 模型假设短任务内单跳接触持续存在，数据动作串行执行，反馈使用独立控制信道，各次速率扰动独立。候选描述与条件融合效果预先给定。能耗统计包含数据及确认发送，不含候选元数据分发、感知推理和飞行开销。
 
-\subsection{数据传输与丢失模型}
-\label{rq3:subsec:channel}
-
-本章采用 LEADR 建模中的视距路径损耗、香农速率与发送能耗计算方法。由于数据串行发送、反馈使用独立信道，速率表达式中的并发数据干扰项为零。设候选 $m$ 的有效预测速率为 $\bar r_{k,m}$，根据节点距离、有效带宽和发射功率，有
+在数据传输方面，本章采用 LEADR 建模中的视距路径损耗、香农速率与发送能耗计算方法。由于数据串行发送、反馈使用独立信道，速率表达式中的并发数据干扰项为零。设候选 $m$ 的有效预测速率为 $\bar r_{k,m}$，根据节点距离、有效带宽和发射功率，有
 \begin{equation}
   h_{k,i}=\frac{\rho_0}{\max\{d_{k,i},1\}^2},\qquad
   \bar r_{k,i}=W_k\log_2\left(1+\frac{P^{\mathrm d}h_{k,i}}{N_0W_k}\right),
@@ -68,10 +67,7 @@
 
 每次尝试按完整证据的成功接收或擦除处理，重传通过增加独立发送机会提高至少一次送达的概率。
 
-\subsection{累计确认与接收状态估计}
-\label{rq3:subsec:feedback}
-
-图~\ref{rq3:fig:delivery-scene} 示意了数据已送达而累计确认尚未返回的情形。消息是否到达与发送端是否获知其到达是两个不同状态：继续补发可能重复占用链路，切换候选又需要判断此前证据缺失的风险。
+发送端通过累计确认获知接收情况。图~\ref{rq3:fig:delivery-scene} 示意了数据已送达而累计确认尚未返回的情形。消息是否到达与发送端是否获知其到达是两个不同状态：继续补发可能重复占用链路，切换候选又需要判断此前证据缺失的风险。
 
 \begin{figure}[htbp]
 \centering
@@ -103,8 +99,9 @@
 \end{equation}
 数据成功与反馈丢失相互独立，确认未到达时，控制器仍须按发送记录估计接收概率；等待能否获得新信息则取决于反馈的到达概率。
 
-\subsection{通信能耗与可执行动作}
+\subsection{通信资源与优化目标}
 \label{rq3:subsec:energy}
+\label{rq3:subsec:objective}
 
 节点 $i$ 的初始发送能量为 $E_i^{(0)}$。一次数据发送及其反馈所消耗的能量分别为
 \begin{equation}
@@ -132,10 +129,7 @@
 \end{equation}
 等待满足 $0<w\le D_k-t$，停止始终可行。时限、电量与尝试次数均由硬约束保证。
 
-\subsection{优化目标}
-\label{rq3:subsec:objective}
-
-记策略 $\pi$ 在任务 $k$ 上的停止时刻为 $T_k$，终止接收集合为 $S_k^{\mathrm{end}}$，该任务总通信能耗为
+在上述资源与动作约束下，记策略 $\pi$ 在任务 $k$ 上的停止时刻为 $T_k$，终止接收集合为 $S_k^{\mathrm{end}}$，该任务总通信能耗为
 \begin{equation}
   E_k^{\mathrm{comm}}=\sum_{a\in\mathcal{T}_k}
     \left(e_{k,m_a}^{\mathrm d}+e_{k,m_a}^{\mathrm f}\right),

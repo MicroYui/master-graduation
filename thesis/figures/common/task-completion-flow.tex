@@ -1,0 +1,41 @@
+% Conceptual observation process, not an integrated implementation of the
+% three proposed policies. Feedback returns to transmission control.
+\begin{tikzpicture}[
+  x=1mm,y=1mm,>=Stealth,
+  font=\fontsize{8.8bp}{11.5bp}\selectfont,
+  taskbox/.style={draw=black,line width=.5pt,align=center,
+    text width=22mm,minimum height=19mm,inner sep=1mm,outer sep=0pt},
+  taskedge/.style={-{Stealth[length=1.6mm,width=1.1mm]},line width=.55pt},
+  tasknote/.style={align=center,inner sep=0pt}
+]
+\path[use as bounding box] (0,0) rectangle (148,-38);
+
+\node[taskbox] (observe) at (12,-24)
+  {\textbf{局部观测}\\多节点观测\\互补或重叠};
+\node[taskbox] (message) at (40,-24)
+  {\textbf{生成与选择}\\确定信息来源\\与表达长度};
+\node[taskbox] (transmit) at (68,-24)
+  {\textbf{发送与转发}\\安排路径功率\\及发送时机};
+\node[taskbox] (receive) at (96,-24)
+  {\textbf{接收与融合}\\汇集已收消息\\形成任务判断};
+\draw[taskedge] (observe.east) -- (message.west);
+\draw[taskedge] (message.east) -- (transmit.west);
+\draw[taskedge] (transmit.east) -- (receive.west);
+
+\draw[taskedge,dashed] (receive.north) -- (96,-3.5)
+  -- node[fill=white,inner sep=1mm] {接收确认} (68,-3.5)
+  -- (transmit.north);
+\node[tasknote,font=\fontsize{8.3bp}{10.5bp}\selectfont]
+  at (82,-9.5) {可能迟到或丢失};
+\draw[taskedge] (receive.east) -- (116,-24);
+
+\draw[line width=.5pt] (116,-10) rectangle (148,-37);
+\node[tasknote,font=\fontsize{9bp}{11.5bp}\selectfont\bfseries]
+  at (132,-14) {任务可靠完成};
+\draw[line width=.35pt] (118,-17) -- (146,-17);
+\node[tasknote,font=\fontsize{8bp}{10bp}\selectfont]
+  at (132,-20.5) {同时满足以下条件};
+\node[tasknote] at (132,-25) {收到观测信息};
+\node[tasknote] at (132,-29.5) {任务判断正确};
+\node[tasknote] at (132,-34) {未超过任务时限};
+\end{tikzpicture}

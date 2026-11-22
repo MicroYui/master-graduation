@@ -1,0 +1,100 @@
+{
+  "revision_date": "2026-11-22",
+  "revision": "采用用户再次精简的英文摘要，保持原字号与间距后中英文摘要各一页",
+  "branch": "final",
+  "previous_revision": "2026-11-22-abstract-retry.json",
+  "user_text_preservation": {
+    "english_body_matches_supplied_prose": true,
+    "chinese_source_bytes_unchanged": true,
+    "keywords_unchanged": true,
+    "normalization": "仅处理粘贴文本的百分号转义和行尾反斜杠，沿用原摘要环境和关键词接口。",
+    "language_changes": [],
+    "typography_changes": []
+  },
+  "compile": {
+    "command": "powershell -NoProfile -ExecutionPolicy Bypass -File .\\thesis\\scripts\\build_thesis.ps1",
+    "exit_code": 0,
+    "output": "thesis/output/pdf/thesis.pdf",
+    "pdf_sha256": "dd7675799790ed800132c54fd76e08d9f8784f8c466d1b57d533f450c215b30f"
+  },
+  "static_check": {
+    "command": "python -X utf8 thesis/scripts/check_thesis.py",
+    "exit_code": 0,
+    "input_files": 33,
+    "source_labels": 221,
+    "cited_references": 64,
+    "numbered_figures": 25,
+    "numbered_body_tables": 14,
+    "algorithms": 4
+  },
+  "layout": {
+    "previous_pdf_pages": 93,
+    "current_pdf_pages": 92,
+    "chinese_abstract_pdf_pages": [
+      4
+    ],
+    "english_abstract_pdf_pages": [
+      5
+    ],
+    "one_page_per_language_requirement_met": true,
+    "keywords_fit_with_each_abstract": true,
+    "page_metrics": [
+      {
+        "pdf_page": 4,
+        "body_and_keyword_lines": 26,
+        "font_sizes_bp": [
+          12.0
+        ],
+        "common_baseline_gap_bp": 20.5
+      },
+      {
+        "pdf_page": 5,
+        "body_and_keyword_lines": 27,
+        "font_sizes_bp": [
+          12.0
+        ],
+        "common_baseline_gap_bp": 20.5
+      }
+    ],
+    "symbol_table_pdf_page": 6,
+    "toc_pdf_pages": [
+      7,
+      8,
+      9
+    ],
+    "first_body_pdf_page": 10,
+    "main_text_page_numbers_unchanged": true
+  },
+  "checks": {
+    "source_and_asset_files_checked": 121,
+    "unchanged_source_and_asset_files": 120,
+    "changed_source_and_asset_files": [
+      "thesis/front/thesis-abstracts.tex"
+    ],
+    "pdf_copies_identical": true,
+    "all_pdf_fonts_embedded": true,
+    "pdf_font_entries_checked": 97,
+    "fatal_or_unresolved_or_overfull_log_messages": [],
+    "nonfatal_log_messages": [
+      "Underfull \\hbox (badness 10000) in paragraph at lines 410--410",
+      "Underfull \\hbox (badness 1248) in paragraph at lines 501--502",
+      "Package glossaries Warning: No \\printglossary or \\printglossaries found. "
+    ],
+    "visual_inspection": {
+      "renderer": "Poppler pdftoppm",
+      "pdf_pages": [
+        5
+      ],
+      "readable_without_clipping_or_overlaps": true,
+      "original_keyword_wrapping_preserved": true
+    },
+    "unaffected_page_comparison": {
+      "renderer": "PyMuPDF 72dpi RGB",
+      "cover_pages": 3,
+      "chinese_abstract_pages": 1,
+      "body_and_back_matter_pages": 83,
+      "all_pixels_identical": true
+    }
+  },
+  "pending_abstract_layout_work": null
+}
