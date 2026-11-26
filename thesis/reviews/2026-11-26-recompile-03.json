@@ -1,0 +1,119 @@
+{
+  "revision_date": "2026-11-26",
+  "revision": "第四章修改后原样重编译",
+  "branch": "final",
+  "compile": {
+    "exit_code": 0,
+    "output": "thesis/output/pdf/thesis.pdf",
+    "pdf_sha256": "b721aee863f798b53fa4c5cad0b44821e46299baa976b8433a7e4be6a8293bfd"
+  },
+  "static_check": {
+    "exit_code": 0,
+    "chinese_body_characters": 42073,
+    "input_files": 32,
+    "labels": 219,
+    "references": 64,
+    "figures": 24,
+    "body_tables": 13,
+    "algorithms": 4
+  },
+  "user_changed_files": [
+    "thesis/chapters/04_evicom.tex"
+  ],
+  "source_preservation": {
+    "files_checked": 121,
+    "changed_since_start": []
+  },
+  "layout": {
+    "previous_pages": 102,
+    "current_pages": 101,
+    "changed_before_chapter5_pdf_pages": [
+      10,
+      11,
+      50,
+      51,
+      52,
+      53,
+      54,
+      55,
+      56,
+      57,
+      58,
+      59,
+      60,
+      61,
+      62,
+      63,
+      64,
+      65
+    ],
+    "chapter4_pdf_pages": [
+      50,
+      65
+    ],
+    "old_chapter5_pdf_page": 67,
+    "chapter5_pdf_page": 66,
+    "chinese_abstract_pdf_pages": [
+      4,
+      5
+    ],
+    "english_abstract_pdf_pages": [
+      6,
+      7
+    ],
+    "chapter4_end_pdf_page": 65,
+    "chapter4_end_printed_page": 54,
+    "figure_4_3_pdf_page": 57,
+    "algorithm_4_1_pdf_page": 59
+  },
+  "verification": {
+    "log_problems": [],
+    "pdf_copies_identical": true,
+    "toc_entries_checked": 71,
+    "toc_mismatches": [],
+    "chapter5_onward_pages_compared": 36,
+    "chapter5_onward_mismatches_excluding_footer": [],
+    "comparison": "MuPDF at 72 dpi; compared through y=750 pt, excluding footer page numbers.",
+    "rendered_and_reviewed_pdf_pages": [
+      10,
+      11,
+      50,
+      51,
+      52,
+      53,
+      54,
+      55,
+      56,
+      57,
+      58,
+      59,
+      60,
+      61,
+      62,
+      63,
+      64,
+      65
+    ],
+    "enlarged_pages_reviewed": [
+      57,
+      59,
+      65
+    ],
+    "unchanged_pages_before_chapter5": 47,
+    "source_hashes_rechecked_after_visual_review": true,
+    "no_missing_or_clipped_figures_observed": true
+  },
+  "new_layout_issues": [
+    {
+      "pdf_page": 59,
+      "printed_page": 48,
+      "description": "算法4-1下方单独留下“节。”，与前页末尾的“离线训练环”被分页和算法隔开。"
+    }
+  ],
+  "existing_layout_issues": [
+    "PDF第49页（正文第38页）仍仅有第三章小结两行续文。",
+    "PDF第25页的章节安排下方仍有较大留白。",
+    "中英文摘要仍各占两页。"
+  ],
+  "status": "compiled_with_pagination_issues_reported"
+}

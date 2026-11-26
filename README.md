@@ -37,8 +37,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\thesis\scripts\build_thesi
 
 ## 当前进度与模板
 
-- **当前内容修订截至 2026-11-22；上一版入库交接于 2026-11-16。** 最新稿为92页，已采用用户再次精简的英文摘要，保留中文摘要及全部排版设置；中英文摘要连同关键词均各占一页，分别位于PDF第4、5页，未再修改用户措辞。此前已按用户改写后的绪论和相关工作重编译，保留两份章节源码，调整图1-1与图1-3布局并完成全篇渲染检查；第2—5章的节与小节标题由81个合并为45个，目录由4页缩至3页。图1-1仍位于正文第一页。完整进度见 [`thesis/PROGRESS.md`](thesis/PROGRESS.md)。
-- 本轮[摘要各一页验证记录](thesis/reviews/2026-11-22-abstract-onepage.json)已记录原文、原版式保留和分页结果；此前的[精简摘要试排记录](thesis/reviews/2026-11-22-abstract-retry.json)与[摘要原文替换与超页检查记录](thesis/reviews/2026-11-22-abstract-revision.json)分别保留为93页和94页版本的快照。
+- **当前检查稿截至 2026-11-26，共101页。** 中英文摘要仍各占两页（PDF第4—5、6—7页），目录为PDF第9—11页，71个条目页码与跳转一致，正文从PDF第12页开始。“章节安排”现位于正文第14页（PDF第25页），页底留白较大；图1-1仍在正文第2页（PDF第13页）。本轮仅修复算法附近的局部断行，论文文字、字号和行距保持不变。导师署名仍为“王忠杰教授”和“Prof. Zhongjie Wang”。完整进度见 [`thesis/PROGRESS.md`](thesis/PROGRESS.md)。
+- 本轮[分页修复记录](thesis/reviews/2026-11-26-algorithm-pagination.json)记录了算法4-1附近的单字续页修复。“离线训练环节。”现完整排在PDF第58页，PDF第59页算法后直接接4.3节，整稿仍为101页。已检查变化的8页，其他93页渲染一致，71个目录条目的页码与跳转相符。PDF第49页第三章小结的两行续文仍保留。全文24幅编号图、13张正文表。[此前章节检查报告](thesis/output/layout-review-20261123.html)及[修复前检查](thesis/reviews/2026-11-26-recompile-03.json)保留为历史快照。
 - [最新完整论文](thesis/output/pdf/thesis.pdf)、[用户改稿重编译与图片检查记录](thesis/reviews/2026-11-22-user-prose-recompile.json)。此前的[机载语义处理背景记录](thesis/reviews/2026-11-22-onboard-vlm.json)、[绪论分页记录](thesis/reviews/2026-11-21-intro-pagination.json)、[图示与标题精简记录](thesis/reviews/2026-11-21-structure-compact.json)、[背景扩写记录](thesis/reviews/2026-11-21-background-enrichment.json)、[五条意见修订记录](thesis/reviews/2026-11-21-revision.json)、[15条批注处理与验收自查记录](thesis/output/review-comments-20261103.html)和[原批注文字](thesis/reviews/2026-11-03/annotations.json)保留为相应版本的历史记录。HTML 记录可下载后在浏览器打开。
 - 模板上游：[hithesis/hithesis](https://github.com/hithesis/hithesis)，[CTAN 页面](https://ctan.org/pkg/hithesis)。本稿随仓库保存的版本是 **2025/03/03 v3.1d**；使用项目内模板即可。版本、来源及本地调整见 [`thesis/template/README.md`](thesis/template/README.md)。
 

@@ -1,0 +1,66 @@
+{
+  "revision_date": "2026-11-23",
+  "revision": "用户再次改写摘要后的原样重编译",
+  "branch": "final",
+  "scope": "仅编译、检查及同步记录；用户文字、字号、行距、间距及全部论文源码均未修改。",
+  "compile": {
+    "command": "powershell -NoProfile -ExecutionPolicy Bypass -File .\\thesis\\scripts\\build_thesis.ps1",
+    "exit_code": 0,
+    "output": "thesis/output/pdf/thesis.pdf",
+    "pdf_sha256": "44083e3f0e647d265efbfe02b11369529585de81cb68d63c69ef95fa99e57bdf"
+  },
+  "static_check": {
+    "exit_code": 0,
+    "input_files": 33,
+    "labels": 221,
+    "references": 64,
+    "figures": 25,
+    "body_tables": 14,
+    "algorithms": 4
+  },
+  "source_preservation": {
+    "files_checked": 121,
+    "all_unchanged_since_start": true,
+    "abstract_sha256": "8c27adb2d98f35662087fc9e24005a84b08fbc5d669e457b7b4f298d967b0393",
+    "changed_since_previous_review": [
+      "thesis/front/thesis-abstracts.tex"
+    ]
+  },
+  "layout": {
+    "previous_pages": 98,
+    "current_pages": 99,
+    "chinese_abstract_pdf_pages": [
+      4,
+      5
+    ],
+    "chinese_abstract_body_fits_first_page": true,
+    "chinese_keywords_overflow_text": "完备反馈",
+    "chinese_keywords_overflow_lines": 1,
+    "english_abstract_pdf_pages": [
+      6
+    ],
+    "symbol_table_pdf_page": 7,
+    "toc_pdf_pages": [
+      8,
+      9,
+      10
+    ],
+    "first_body_pdf_page": 11,
+    "body_page_numbers_unchanged": true
+  },
+  "verification": {
+    "abstract_pdf_pages_visually_reviewed": [
+      4,
+      5,
+      6
+    ],
+    "no_missing_glyphs_clipping_or_overlap_observed": true,
+    "body_and_back_matter_unchanged_pages": 89,
+    "comparison": "MuPDF pixel comparison at 72 dpi with previous PDF after accounting for one inserted front-matter page",
+    "toc_entries_checked": 71,
+    "toc_labels_match_destinations": true,
+    "fatal_missing_or_overfull_messages": [],
+    "pdf_copies_identical": true
+  },
+  "pending": "中文摘要关键词末尾四字溢出一页，保留现状，由用户自行修改文字；上一轮章节问题仍保留，正文页码不变，PDF顺序页码加1。"
+}

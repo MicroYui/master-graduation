@@ -6,68 +6,62 @@
 \label{rq3:subsec:channel}
 \label{rq3:subsec:feedback}
 
-考虑由感知节点集合 $\mathcal N=\{1,\ldots,N\}$ 与接收中心 $d$ 组成的系统，依次处理 $N_{\mathrm{task}}$ 个任务。任务 $k$ 的相对截止时间为 $D_k$。节点电量跨任务连续扣减，接收状态与确认记录在任务开始时初始化。
+考虑由感知节点集合 $\mathcal N=\{1,\ldots,N\}$ 与地面接收中心 $d$ 构成的协同观测系统，依次处理 $N_{\mathrm{task}}$ 个连续任务，其中第 $k$ 个任务的相对截止时间为 $D_k$。各节点的通信电量跨任务连续扣减，而接收状态与确认记录则在每个新任务开始时重置。
 
-对于任务 $k$，上层候选选择模块根据局部观测与语义粒度给出候选证据集合
+对于任务 $k$，上层内容选择模块依据各节点的局部观测与语义粒度，预先生成候选证据集合
 \begin{equation}
   \mathcal{M}_k=\{m_{k,1},m_{k,2},\ldots,m_{k,K_k}\}.
   \label{rq3:eq:candidates}
 \end{equation}
-证据 $m$ 包含发送节点 $s(m)$、长度 $\ell_m$、语义粒度和信念更新量，粒度分为标签、简洁声明、摘要和完整证据。交付过程中，候选内容、融合次序与融合规则保持固定，控制器通过选择候选确定发送内容及相应节点。
+每条候选证据 $m$ 包含发送节点 $s(m)$、词元长度 $\ell_m$、表达粒度（标签、简洁声明、摘要或完整证据）以及对应的信念更新量。在交付控制阶段，候选内容、融合次序与融合规则均保持固定，控制器只需决定发送哪条候选，从而隐式确定对应的发送节点与传输开销。
 
-设接收中心实际已经获得的唯一证据集合为 $S_{k,t}\subseteq\mathcal{M}_k$，其中 $t$ 表示当前任务内的决策时刻。接收状态空间为
+记当前任务内决策时刻 $t$ 接收中心实际收到的唯一证据集合为 $S_{k,t}\subseteq\mathcal{M}_k$，则可能的接收状态空间为
 \begin{equation}
   \states_k=2^{\mathcal{M}_k},\qquad |\states_k|=2^{K_k}.
   \label{rq3:eq:state-space}
 \end{equation}
-接收中心按固定次序融合 $S_{k,t}$ 中的唯一证据，输出类别 $c_k(S_{k,t})$。同一证据只融合一次，因而分类由集合决定，与重复接收次数及到达次序无关。
-
-记任务参考类别为 $y_k$，集合 $S$ 对应的真实任务效用定义为
+接收中心按既定次序对 $S_{k,t}$ 中的唯一证据执行融合，并输出预测类别 $c_k(S_{k,t})$。由于同一条证据仅融合一次，最终分类结果完全取决于接收集合本身，不受重复到达次数或到达先后顺序的影响。记该任务的参考类别为 $y_k$，集合 $S$ 对应的真实任务效用定义为
 \begin{equation}
-  u_k(S)=\ind\{S\ne\varnothing,\ c_k(S)=y_k\}.
+  u_k(S)=\ind\{S\ne\varnothing,\ c_k(S)=y_k\},
   \label{rq3:eq:true-utility}
 \end{equation}
-空集合效用为零，表示未通过本次通信获得服务。参考类别 $y_k$ 仅用于离线学习和评价；在线效用由第~\ref{rq3:subsec:utility} 节的网络估计。
+其中空集合效用为零，即未收到任何有效证据时不计作任务完成。需要说明的是，参考类别 $y_k$ 仅在离线训练与测试评价阶段可见，在线交付控制则采用第~\ref{rq3:subsec:utility} 节学习的效用网络进行估计。
 
-模型假设短任务内单跳接触持续存在，数据动作串行执行，反馈使用独立控制信道，各次速率扰动独立。候选描述与条件融合效果预先给定。能耗统计包含数据及确认发送，不含候选元数据分发、感知推理和飞行开销。
+在系统假设方面，考虑到单个观测任务的持续时间较短，假设任务内单跳无线接触保持连通、数据发送按串行方式执行、确认反馈占用独立控制信道，且各次发送的信道速率扰动相互独立。能耗统计涵盖数据帧与确认帧的无线发射支出，不计入候选元数据同步、端侧推理及无人机推进能耗。
 
-在数据传输方面，本章采用 LEADR 建模中的视距路径损耗、香农速率与发送能耗计算方法。由于数据串行发送、反馈使用独立信道，速率表达式中的并发数据干扰项为零。设候选 $m$ 的有效预测速率为 $\bar r_{k,m}$，根据节点距离、有效带宽和发射功率，有
+底层链路沿用 LEADR 中的视距路径损耗、香农速率与发送能耗模型。由于数据串行传输且反馈信道独立，速率计算中不计同频并发数据干扰。结合节点到中心的距离 $d_{k,i}$、参考信道增益 $\rho_0$、有效带宽 $W_k$、噪声功率谱密度 $N_0$ 及数据发射功率 $P^{\mathrm d}$，候选 $m$ 所在链路的信道增益与预测速率分别为
 \begin{equation}
   h_{k,i}=\frac{\rho_0}{\max\{d_{k,i},1\}^2},\qquad
-  \bar r_{k,i}=W_k\log_2\left(1+\frac{P^{\mathrm d}h_{k,i}}{N_0W_k}\right),
+  \bar r_{k,i}=W_k\log_2\left(1+\frac{P^{\mathrm d}h_{k,i}}{N_0W_k}\right).
   \label{rq3:eq:rate}
 \end{equation}
-其中 $d_{k,i}$ 为节点到中心的距离，$\rho_0$ 为参考信道增益，$N_0$ 为噪声功率谱密度，$P^{\mathrm d}$ 为数据功率，$W_k$ 为有效带宽。短任务内预测值固定，跨任务更新距离与带宽。
+上述预测速率在单个短任务内保持不变，距离与可用带宽则在任务间动态更新。
 
-语义长度以 token 数表示。设平均每个 token 占用 $b$ 字节，分组的最大传输单元（Maximum Transmission Unit，MTU）约束其长度，有效载荷上限记为 $L_{\mathrm{MTU}}$ 字节，分组头部长度为 $H$ 字节，则实际发送比特数为
+在物理层封装上，设平均每个 token 占 $b$ 字节，分组最大传输单元（Maximum Transmission Unit，MTU）的有效载荷上限为 $L_{\mathrm{MTU}}$ 字节，分组头部开销为 $H$ 字节，则候选 $m$ 实际需要传输的总比特数为
 \begin{equation}
   B_m=8\left(b\ell_m+H\left\lceil\frac{b\ell_m}{L_{\mathrm{MTU}}}\right\rceil\right).
   \label{rq3:eq:bits}
 \end{equation}
-一次发送的预留时长为
+单次发送的预留时长记为
 \begin{equation}
   \tau_{k,m}=\min\left\{\tau_{\max},\ \kappa\frac{B_m}{\bar r_{k,m}}\right\},
   \label{rq3:eq:duration}
 \end{equation}
-其中 $\kappa$ 为时长裕量，$\tau_{\max}$ 为单次占用上限；完整发送时长须落在剩余任务窗口内。
-
-为表示每次尝试的速率波动，令实际速率满足
+其中 $\kappa$ 为时间裕量系数，$\tau_{\max}$ 为单次发送时长上限，且整次传输必须落在任务剩余时间内。为刻画无线信道的随机波动，设第 $a$ 次尝试时的实际传输速率服从对数正态扰动：
 \begin{equation}
   r_{k,m}^{(a)}=\bar r_{k,m}\exp\left(\sigma_r Z_a-\frac{\sigma_r^2}{2}\right),
   \qquad Z_a\sim\mathcal{N}(0,1),
   \label{rq3:eq:random-rate}
 \end{equation}
-其中 $a$ 为尝试编号，$\sigma_r$ 控制波动强度。若在预留时长内能够传完全部比特，则本次证据送达。相应成功概率为
+其中 $\sigma_r$ 控制速率波动强度。若预留时长内能够传完全部 $B_m$ 比特，则该条证据完整送达；否则视为本次传输擦除，且依然耗尽完整预留时长。由此可得单次发送的成功概率：
 \begin{equation}
   p_{k,m}=\Prb\{r_{k,m}^{(a)}\tau_{k,m}\ge B_m\}
   =\Phi\left(\frac{\ln(\bar r_{k,m}\tau_{k,m}/B_m)-\sigma_r^2/2}{\sigma_r}\right),
   \label{rq3:eq:success-probability}
 \end{equation}
-其中 $\Phi(\cdot)$ 为标准正态分布函数；$\sigma_r=0$ 时按确定容量判定。实验依据该概率对各次尝试独立抽样，失败也消耗完整预留时长。
+其中 $\Phi(\cdot)$ 为标准正态分布函数（$\sigma_r=0$ 时退化为确定性容量判定）。重传机制通过提供多次独立传输机会，提升证据至少成功送达一次的概率。
 
-每次尝试按完整证据的成功接收或擦除处理，重传通过增加独立发送机会提高至少一次送达的概率。
-
-发送端通过累计确认获知接收情况。图~\ref{rq3:fig:delivery-scene} 示意了数据已送达而累计确认尚未返回的情形。消息是否到达与发送端是否获知其到达是两个不同状态：继续补发可能重复占用链路，切换候选又需要判断此前证据缺失的风险。
+发送端依靠地面中心返回的累计确认（ACK）了解接收进展。如图~\ref{rq3:fig:delivery-scene} 所示，数据实际送达与发送端获知其送达往往并不同步：当确认尚在途中或已丢失时，继续重传可能造成不必要的重复占用，而盲目切换新候选又可能承担关键证据缺失的风险。
 
 \begin{figure}[htbp]
 \centering
@@ -76,49 +70,44 @@
 \label{rq3:fig:delivery-scene}
 \end{figure}
 
-每次尝试结束后，接收中心生成携带尝试序号 $j$ 和集合快照 $S_j^{\mathrm{ack}}$ 的累计确认帧。假设短控制头可标识本次调度，因此载荷失败时仍可返回位图，既确认已收证据，也指出此前尝试未送达的证据。
-
-记第 $j$ 次数据发送结束时间为 $t_j^{\mathrm{end}}$，反馈帧长度为 $B^{\mathrm f}$ 比特。反馈按对应链路的预测速率串行发送，完成时间满足
+具体而言，每次数据发送结束后，接收中心均会生成一条包含尝试序号 $j$ 与当前接收集合快照 $S_j^{\mathrm{ack}}$ 的累计确认帧（短控制头可独立标识调度序号，因此即便本次数据载荷解码失败，中心仍可回传最新接收位图，以便发送端同步确认已收集合与漏收情况）。记第 $j$ 次数据发送的结束时刻为 $t_j^{\mathrm{end}}$，反馈帧长度为 $B^{\mathrm f}$ 比特，则各确认帧沿对应链路按预测速率串行发出的完成时刻满足
 \begin{equation}
   v_j=\max\{t_j^{\mathrm{end}},v_{j-1}\}+\tau_j^{\mathrm f},
   \qquad \tau_j^{\mathrm f}=\frac{B^{\mathrm f}}{\bar r_{k,m_j}},
   \label{rq3:eq:feedback-serialization}
 \end{equation}
-其中 $v_{-1}=0$。在串行发送之后，反馈以概率 $\epsilon_{\mathrm f}$ 丢失；若未丢失，则经过额外时延 $L_j$ 到达发送端，
+其中初始值 $v_{-1}=0$。串行发出后，每条确认帧以概率 $\epsilon_{\mathrm f}$ 发生丢失；若未丢失，则经历随机额外时延 $L_j$ 到达发送端：
 \begin{equation}
   L_j\sim\mathcal{U}\left(\frac{\bar d_{\mathrm f}}{2},\frac{3\bar d_{\mathrm f}}{2}\right),
   \qquad t_j^{\mathrm{ack}}=v_j+L_j.
   \label{rq3:eq:feedback-delay}
 \end{equation}
-数据成功、反馈丢失和反馈额外时延分别抽样。累计确认可能乱序到达，控制器保留序号最大的有效快照，较旧位图不覆盖较新信息。
+数据成败、反馈丢失及反馈延迟彼此独立抽样。由于确认帧可能乱序到达，控制器仅保留尝试序号最大的有效快照，不会用陈旧位图覆盖较新状态。
 
-可见历史 $\history_{k,t}$ 包含候选与链路预测、发送记录、已到达确认及剩余时间和能量，不包含真实接收集合与未到达位图。定义接收信念
+记时刻 $t$ 发送端掌握的全部可见历史为 $\history_{k,t}$，涵盖候选与链路预测、过往发送记录、已到达的累计确认以及当前剩余时间与电量（不包含真实的隐藏接收集合和在途确认）。定义接收信念为当前真实接收集合的条件概率分布：
 \begin{equation}
-  b_{k,t}(S)=\Prb\{S_{k,t}=S\mid\history_{k,t}\},\qquad S\in\states_k,
+  b_{k,t}(S)=\Prb\{S_{k,t}=S\mid\history_{k,t}\},\qquad S\in\states_k.
   \label{rq3:eq:belief-definition}
 \end{equation}
-数据成功与反馈丢失相互独立，确认未到达时，控制器仍须按发送记录估计接收概率；等待能否获得新信息则取决于反馈的到达概率。
+在数据成败与反馈丢失相互独立的前提下，即便尚未收到确认，发送端仍可结合历史发送记录推断各接收状态的概率，而主动等待能否换取新状态信息则取决于在途确认的到达概率。
 
 \subsection{通信资源与优化目标}
 \label{rq3:subsec:energy}
 \label{rq3:subsec:objective}
 
-节点 $i$ 的初始发送能量为 $E_i^{(0)}$。一次数据发送及其反馈所消耗的能量分别为
+设感知节点 $i$ 的初始通信电量为 $E_i^{(0)}$，则单次数据发送与对应确认回传的发射能耗分别为
 \begin{equation}
   e_{k,m}^{\mathrm d}=P^{\mathrm d}\tau_{k,m},\qquad
   e_{k,m}^{\mathrm f}=P^{\mathrm f}\tau_{k,m}^{\mathrm f}.
   \label{rq3:eq:transmit-energy}
 \end{equation}
-数据能耗扣减发送节点电量；中心独立供能，反馈计入系统通信成本。反馈一旦生成，即使丢失或晚于任务结束到达，也计入能耗。
-
-设第 $k$ 个任务中节点 $i$ 的数据发送能耗为 $e_i(k)$，则跨任务能量状态满足
+其中数据发送能耗从对应感知节点 $s(m)$ 电量中逐次扣减；接收中心独立供电，但反馈帧一经生成（无论后续是否丢失或超时到达），其发射能耗 $e_{k,m}^{\mathrm f}$ 均计入系统总通信成本。记节点 $i$ 在第 $k$ 项任务中累计消耗的数据发送能量为 $e_i(k)$，则跨任务尺度的节点剩余电量演化为
 \begin{equation}
   E_i(k+1)=E_i(k)-e_i(k),\qquad E_i(1)=E_i^{(0)}.
   \label{rq3:eq:energy-evolution}
 \end{equation}
-任务内逐次扣减电量，式~\eqref{rq3:eq:energy-evolution} 为任务尺度的汇总。
 
-动作包括发送候选 $m$、等待 $w$ 及停止；重发已尝试候选即为重传。设已执行尝试数为 $n_{k,t}$，上限为 $A_{\max}$，则可行发送集合为
+在每个决策时刻，控制器可执行三类动作：发送某条候选 $m$（若该候选此前已发过即为重传）、主动等待时长 $w$ 或直接停止当前任务。记当前已执行尝试次数为 $n_{k,t}$，单任务尝试上限为 $A_{\max}$，则同时满足剩余时限、节点电量与尝试上限的可行发送集合为
 \begin{equation}
   \begin{split}
   \actions^{\mathrm{send}}_{k,t}=\{m\in\mathcal{M}_k:\;&
@@ -127,15 +116,15 @@
   \end{split}
   \label{rq3:eq:action-mask}
 \end{equation}
-等待满足 $0<w\le D_k-t$，停止始终可行。时限、电量与尝试次数均由硬约束保证。
+等待动作须满足 $0<w\le D_k-t$，停止动作则始终可行。通过式~\eqref{rq3:eq:action-mask} 的硬约束校验，系统严格杜绝超时发送或电量透支。
 
-在上述资源与动作约束下，记策略 $\pi$ 在任务 $k$ 上的停止时刻为 $T_k$，终止接收集合为 $S_k^{\mathrm{end}}$，该任务总通信能耗为
+记策略 $\pi$ 在任务 $k$ 上的停止时刻为 $T_k$、终止时的真实接收集合为 $S_k^{\mathrm{end}}$、实际执行的数据发送尝试集合为 $\mathcal{T}_k$，则该任务的总通信能耗为
 \begin{equation}
   E_k^{\mathrm{comm}}=\sum_{a\in\mathcal{T}_k}
-    \left(e_{k,m_a}^{\mathrm d}+e_{k,m_a}^{\mathrm f}\right),
+    \left(e_{k,m_a}^{\mathrm d}+e_{k,m_a}^{\mathrm f}\right).
   \label{rq3:eq:total-communication-energy}
 \end{equation}
-其中 $\mathcal{T}_k$ 是实际执行的数据发送尝试集合。以正确完成收益与通信消耗之间的权衡为目标，可将有限任务周期内的问题写为
+在有限任务序列中，交付控制的目标是在提升按时正确完成率与压缩通信能耗之间取得平衡，相应的全局随机优化问题可表述为
 \begin{equation}
   \begin{aligned}
     \max_{\pi}\quad &\frac{1}{N_{\mathrm{task}}}\E_{\pi}\left[
@@ -143,13 +132,11 @@
       \frac{E_k^{\mathrm{comm}}}{E_{\mathrm{ref}}}\right)\right] \\
     \text{s.t.}\quad &\sum_{k=1}^{N_{\mathrm{task}}} e_i(k)\le E_i^{(0)},\quad i\in\mathcal{N},\\
     &0\le T_k\le D_k,\quad |\mathcal{T}_k|\le A_{\max},\\
-    &a_{k,t}\text{ 仅依赖 }\history_{k,t}\text{，且满足式~\eqref{rq3:eq:action-mask}}.
+    &a_{k,t}\text{ 仅依赖 }\history_{k,t}\text{，且满足式~\eqref{rq3:eq:action-mask}},
   \end{aligned}
   \label{rq3:eq:global-problem}
 \end{equation}
-其中 $E_{\mathrm{ref}}>0$ 为能量尺度，$\lambda_E\ge0$ 表示能耗偏好。求解该问题需要同时处理接收状态未知和跨任务资源分配：一次发送会改变当前任务的接收概率，也会减少后续任务的可用能量，而发送端无法观测真实任务效用。
-
-本章用学习得到的效用估计任务收益，将发送与反馈历史归纳为接收信念，在剩余时间和能量约束下进行有限前瞻。用于局部决策的能量权重由验证集选择，后续算法给出式~\eqref{rq3:eq:global-problem} 的有限前瞻近似策略。
+其中 $E_{\mathrm{ref}}>0$ 为能量归一化尺度，$\lambda_E\ge0$ 为能耗惩罚系数。该问题的难点在于接收状态隐藏、真实任务效用不可观测以及多任务共享有限电量三者交织：多发一次数据既可能补齐当前判断证据，也会直接压缩后续任务的能量余量。为此，下节先利用离线学习的效用网络替代不可观测的真实效用，再基于接收信念、跨任务虚拟能量队列与有限前瞻，构造式~\eqref{rq3:eq:global-problem} 的在线近似求解方法。本章主要符号汇总于表~\ref{rq3:tab:notation}。
 
 \begin{table}[t]
   \centering\small

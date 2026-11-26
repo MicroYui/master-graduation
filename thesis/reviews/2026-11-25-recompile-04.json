@@ -1,0 +1,60 @@
+{
+  "revision_date": "2026-11-25",
+  "revision": "研究框架图再次更新后原样重编译",
+  "branch": "final",
+  "compile": {
+    "exit_code": 0,
+    "output": "thesis/output/pdf/thesis.pdf",
+    "pdf_sha256": "b4540c66b32e75c44f59a26a497103788a1227793060a9e90532ee4771d83bfc"
+  },
+  "static_check": {
+    "exit_code": 0,
+    "chinese_body_characters": 41537,
+    "input_files": 33,
+    "labels": 221,
+    "references": 64,
+    "figures": 25,
+    "body_tables": 14,
+    "algorithms": 4
+  },
+  "user_changed_files": [
+    "thesis/figures/common/research-framework.tex"
+  ],
+  "source_preservation": {
+    "files_checked": 121,
+    "changed_since_start": []
+  },
+  "layout": {
+    "previous_pages": 102,
+    "current_pages": 102,
+    "changed_pdf_pages": [
+      24,
+      25
+    ],
+    "chinese_abstract_pdf_pages": [
+      4,
+      5
+    ],
+    "english_abstract_pdf_pages": [
+      6,
+      7
+    ],
+    "chapter_arrangement_pdf_page": 25,
+    "chapter_arrangement_printed_page": 14
+  },
+  "verification": {
+    "log_problems": [],
+    "pdf_copies_identical": true,
+    "rendered_and_reviewed_pdf_pages": [
+      24,
+      25
+    ],
+    "other_100_pages_pixel_identical": true,
+    "figure_1_3_text_and_arrows_visible": true
+  },
+  "pending_layout_issues": [
+    "章节安排仍位于正文第14页（PDF第25页），其前有上段两行续文，页底留白较大。",
+    "中英文摘要仍各占两页。"
+  ],
+  "status": "compiled_with_existing_pagination_issues_reported"
+}

@@ -1,7 +1,7 @@
 \section{一致性感知的信念反馈控制方法}
 \label{rq3:sec:method}
 
-C-BFC 的计算过程分为任务准备和任务内控制两部分，如图~\ref{rq3:fig:controller} 所示。任务开始时，控制器枚举接收集合并计算各集合的效用，将同一预测类别下的估计结果作一致性修正。执行任务时，只更新接收信念、剩余时间和能量状态，再比较发送、等待与停止的收益；任务效用表不随重传改变，也无需重新调用视觉语言模型。
+如图~\ref{rq3:fig:controller} 所示，C-BFC 的在线运行划分为任务初始化与任务内滚动控制两个阶段。在任务开始时，控制器一次性枚举所有可能的非空接收集合并估计其任务效用，再经同类别一致性投影生成静态效用表；进入传输阶段后，控制器只需随事件推进更新接收信念、剩余时限与能量状态，在线权衡发送、等待与停止动作。整个重传周期内既无需重算效用表，也不必重新调用视觉语言模型，从而保持极低的在线计算开销。
 
 \begin{figure}[t]
   \centering
@@ -13,57 +13,57 @@ C-BFC 的计算过程分为任务准备和任务内控制两部分，如图~\ref
 \subsection{消息组合的任务收益估计}
 \label{rq3:subsec:utility}
 
-对非空集合 $S$ 构造 $\bm f_k(S)\in\mathbb R^{29}$，包含五类融合信念、最大置信度、类别间隔、熵、证据数量与长度、发送方置信度、局部观测质量、一致程度和粒度比例。效用以集合已到达为条件，链路不确定性另由滤波处理。
+为了在不依赖真实参考标签的情况下评估任意非空接收集合 $S$ 的判别质量，本文构造了 29 维集合特征向量 $\bm f_k(S)\in\mathbb R^{29}$，涵盖五类融合后语义信念、最大置信度、前二类别间隔、分布熵、证据条数与总长度、发送方置信度、局部观测质量、节点间一致程度以及各表达粒度占比。该特征仅以集合 $S$ 已经成功送达为条件描述语义内容质量，无线链路丢包风险则解耦交由后续接收信念滤波处理。
 
-设训练特征的均值和标准差分别为 $\bm\mu$ 与 $\bm s$，先按维度进行标准化：
+利用训练集特征的均值 $\bm\mu$ 与标准差 $\bm s$，对输入特征按维执行标准化：
 \begin{equation}
   \widetilde{\bm f}_k(S)=\frac{\bm f_k(S)-\bm\mu}{\max\{\bm s,0.1\}}.
   \label{rq3:eq:feature-normalization}
 \end{equation}
-效用网络使用两层隐藏表示，结构为
+效用估计器采用轻量级两层全连接网络，结构为
 \begin{equation}
-  29\longrightarrow128\longrightarrow96\longrightarrow1.
+  29\longrightarrow128\longrightarrow96\longrightarrow1,
   \label{rq3:eq:network-architecture}
 \end{equation}
-隐藏层采用 Sigmoid 线性单元（Sigmoid Linear Unit，SiLU）激活，训练时使用概率为 0.1 的随机失活（Dropout），输出通过 Sigmoid 得到原始效用 $\hat q_\theta(S)$。模型共包含 16,321 个可训练参数。
+共包含 16,321 个可训练参数。隐藏层选用 Sigmoid 线性单元（Sigmoid Linear Unit，SiLU）激活函数，训练阶段施加 0.1 概率的随机失活（Dropout），输出端经 Sigmoid 映射得到原始效用估计 $\hat q_\theta(S)\in(0,1)$。
 
-训练数据由训练任务中所有非空接收集合构成，监督目标为式~\eqref{rq3:eq:true-utility}。设集合样本数量为 $n_{\mathcal D}$，优化目标为二元交叉熵：
+离线训练时，枚举训练任务中的所有非空接收集合，以式~\eqref{rq3:eq:true-utility} 的真实分类正确性为监督标签，最小化二元交叉熵损失：
 \begin{equation}
   \mathcal L(\theta)=-\frac{1}{n_{\mathcal D}}
   \sum_{(k,S)\in\mathcal D}
   \left[u_k(S)\ln\hat q_\theta(S)
-  +(1-u_k(S))\ln\bigl(1-\hat q_\theta(S)\bigr)\right].
+  +(1-u_k(S))\ln\bigl(1-\hat q_\theta(S)\bigr)\right],
   \label{rq3:eq:utility-loss}
 \end{equation}
-训练完成后，通过验证集损失选择模型参数；推理阶段不再使用参考类别。
+其中 $n_{\mathcal D}$ 为样本总数。训练完毕后选取验证集交叉熵最低的模型参数并冻结，在线推理阶段不再需要参考标签。
 
-原始效用估计还需满足同类别集合的一致性。固定任务中，若两个非空集合满足 $c_k(S)=c_k(S^{\prime})$，其真实正确性必相同，即 $u_k(S)=u_k(S^{\prime})$。据此约束独立预测的集合效用。
+然而，神经网络对各集合独立打分时存在一个隐蔽缺陷：同一任务中，哪怕两个非空集合 $S$ 与 $S'$ 融合后输出完全相同的预测类别（即 $c_k(S)=c_k(S')$），神经网络仍可能因置信度高低不同给出 $\hat q_\theta(S')>\hat q_\theta(S)$ 的估值。按照任务完成定义，只要预测类别一致，二者的真实正确性必然完全相同（$u_k(S)=u_k(S')$）；这种虚假的估值差会误导控制器为了追求“更高的信心”而白白重发或补发根本无法翻转最终判断的冗余消息。
 
-基于这一关系，将具有相同预测类别的非空集合划入同一组：
+为此，本文提出同类别一致性投影。对任务 $k$ 中所有输出同一预测类别 $c$ 的非空集合划分等价组：
 \begin{equation}
   \mathcal G_{k,c}=\{S\in\states_k:S\ne\varnothing,\ c_k(S)=c\}.
   \label{rq3:eq:class-groups}
 \end{equation}
-在尽量保留原始估计的条件下，求解
+在最小化与原始估值平方偏差的前提下，强制同组集合取相等效用：
 \begin{equation}
   \begin{aligned}
     \min_{\{q_k(S)\}}\quad &\sum_{S\ne\varnothing}
        \bigl(q_k(S)-\hat q_\theta(S)\bigr)^2\\
-    \mathrm{s.t.}\quad &q_k(S)=q_k(S'),\quad S,S'\in\mathcal G_{k,c}.
+    \mathrm{s.t.}\quad &q_k(S)=q_k(S'),\quad S,S'\in\mathcal G_{k,c},
   \end{aligned}
   \label{rq3:eq:consistency-projection}
 \end{equation}
-空集合另外固定为 $q_k(\varnothing)=0$。
+空集合则单独固定为 $q_k(\varnothing)=0$。该凸优化问题不仅具有简洁的闭式解，还能严格保证不增大估计的平方误差。
 
 \begin{proposition}[一致性投影的闭式解与误差性质]
 \label{rq3:prop:projection}
-对于任一非空类别组，式~\eqref{rq3:eq:consistency-projection} 的唯一解为组内原始效用的均值：
+对于任一非空类别组，式~\eqref{rq3:eq:consistency-projection} 的唯一最优解为组内原始估计效用的算术平均：
 \begin{equation}
   q_k(S)=\frac{1}{|\mathcal G_{k,c_k(S)}|}
     \sum_{S'\in\mathcal G_{k,c_k(S)}}\hat q_\theta(S').
   \label{rq3:eq:projection-solution}
 \end{equation}
-若 $\bm u_k$ 是各非空集合的真实正确性向量，则该投影满足
+记 $\bm u_k$ 为各非空集合的真实效用向量，则投影后的效用向量 $\bm q_k$ 满足
 \begin{equation}
   \|\bm q_k-\bm u_k\|_2^2
   \le\|\widehat{\bm q}_k-\bm u_k\|_2^2.
@@ -72,19 +72,17 @@ C-BFC 的计算过程分为任务准备和任务内控制两部分，如图~\ref
 \end{proposition}
 
 \begin{proof}
-对类别组 $\mathcal G_{k,c}$，一致性约束要求所有分量取同一数值 $z_c$。组内目标函数为 $\sum_{S\in\mathcal G_{k,c}}(z_c-\hat q_\theta(S))^2$。该函数严格凸，令其导数为零即得到式~\eqref{rq3:eq:projection-solution}。又因为同组集合输出相同类别，其真实效用为同一常数 $u_c$，所以
+对任意类别组 $\mathcal G_{k,c}$，一致性约束等价于令组内所有分量共享同一标量 $z_c$，对应子目标 $\sum_{S\in\mathcal G_{k,c}}(z_c-\hat q_\theta(S))^2$ 关于 $z_c$ 严格凸，令其一阶导数为零即得唯一最优解~\eqref{rq3:eq:projection-solution}。进一步注意到同组集合具有相同的真实效用常数 $u_c$，利用均值中心化展开可得
 \begin{equation}
   \sum_{S\in\mathcal G_{k,c}}(\hat q_\theta(S)-u_c)^2
   =\sum_{S\in\mathcal G_{k,c}}(\hat q_\theta(S)-z_c)^2
    +|\mathcal G_{k,c}|(z_c-u_c)^2.
   \label{rq3:eq:projection-decomposition}
 \end{equation}
-第一项非负，对各组求和即可得到式~\eqref{rq3:eq:projection-error}。
+由于右侧第一项恒非负，对所有类别组求和即证得式~\eqref{rq3:eq:projection-error}。
 \end{proof}
 
-上述结论给出了集合效用估计的平方误差界。在线决策结合效用估计、时间、能量与接收概率比较可行动作。修正后的 $q_k(S)$ 表示效用分数，无需跨类别归一化；接收状态的概率由 $b_{k,t}$ 表示。
-
-投影保留接收中心的预测类别，仅约束同类别非空集合的效用，因此在线计算无需参考标签。对于分类结果相同的两个集合，传输路径和送达概率仍可能不同。这部分差异由接收信念参与后续动作评价，不能仅凭效用分数决定是否发送。
+需要指出的是，上述投影仅依据接收中心自身可计算的预测类别 $c_k(S)$ 分组，在线阶段完全无需真实标签，且修正后的 $q_k(S)$ 表示各集合的任务效用得分（无需跨类别归一化）。同时，即便两个集合因预测相同而获得一致效用，各自对应的传输路径和送达概率依然存在差异，这部分差异会通过接收信念 $b_{k,t}$ 完整传递到后续动作决策中。效用模型训练与任务效用表构造流程见算法~\ref{rq3:alg:utility}。
 
 \begin{algorithm}[H]
   \bicaption{语义效用模型训练与任务效用表构造}{Semantic utility learning and task utility table construction}
@@ -110,34 +108,32 @@ C-BFC 的计算过程分为任务准备和任务内控制两部分，如图~\ref
 \subsection{接收状态估计}
 \label{rq3:subsec:filter}
 
-在不考虑新反馈到达时，一次发送候选 $m$ 会以概率 $p_{k,m}$ 将当前集合 $S$ 转移为 $S\cup\{m\}$，否则保持原集合。定义信念转移算子
+在不考虑新确认到达的情况下，发送一次候选 $m$ 会以概率 $p_{k,m}$ 使接收集合由 $S$ 扩充为 $S\cup\{m\}$，以概率 $1-p_{k,m}$ 保持不变。由此定义信念前向转移算子：
 \begin{equation}
   (\mathcal T_m b)(S')=(1-p_{k,m})b(S')
    +p_{k,m}\sum_{S:S\cup\{m\}=S'}b(S).
   \label{rq3:eq:belief-transition}
 \end{equation}
-若原集合已含 $m$，成功与失败均保持集合不变，重复发送不会增加语义信息。
+若原集合 $S$ 已包含 $m$，则无论本次发送成功与否集合均不改变，从而自然刻画了“已收证据重复发送无增量信息”的性质。
 
-若最新确认携带第 $j$ 次尝试的快照 $S_j^{\mathrm{ack}}$，先将当时信念恢复为点质量 $\delta_{S_j^{\mathrm{ack}}}$，再重放其后至第 $n$ 次发送：
+每当控制器进行决策时，先检查迄今已收到的最新累计确认。若最新有效确认携带了第 $j$ 次尝试结束时的快照 $S_j^{\mathrm{ack}}$，则先将第 $j$ 次尝试后的状态锚定为单点分布 $\delta_{S_j^{\mathrm{ack}}}$，再依次重放其后截至第 $n$ 次的所有未确认发送记录：
 \begin{equation}
   b_{k,t}=\mathcal T_{m_n}\cdots\mathcal T_{m_{j+1}}
           \delta_{S_j^{\mathrm{ack}}}.
   \label{rq3:eq:ack-replay}
 \end{equation}
-尚无确认时，从空集合重放全部记录；乱序旧确认不覆盖更新的快照。
+若尚未收到任何确认，则直接从初始空集合 $\delta_{\varnothing}$ 重放全部发送记录；乱序迟到的陈旧确认一律忽略。
 
 \begin{proposition}[接收信念的有效性]
 \label{rq3:prop:belief}
-对于任意非负、归一化信念 $b$，式~\eqref{rq3:eq:belief-transition} 的结果仍为非负、归一化分布。在第~\ref{rq3:subsec:channel} 节给出的数据传输与反馈独立性假设下，式~\eqref{rq3:eq:ack-replay} 给出已知累计快照与后续发送历史对应的接收状态条件分布。
+对于任意非负且归一化的信念分布 $b$，经式~\eqref{rq3:eq:belief-transition} 转移后的结果仍构成合法的概率分布。在第~\ref{rq3:subsec:channel} 节的数据传输与反馈独立性假设下，式~\eqref{rq3:eq:ack-replay} 精确给出了给定最新累计确认与后续发送历史时当前接收集合的后验条件分布。
 \end{proposition}
 
 \begin{proof}
-转移式各项非负，每个原状态的质量分配到不变与加入 $m$ 两个结果，权重和为一。累计确认确定第 $j$ 次尝试结束时的集合；后续尝试条件独立，依次转移即得当前分布。由于反馈时延和丢失独立于数据结果，反馈未到达不产生额外状态信息。
+式~\eqref{rq3:eq:belief-transition} 中各项非负，且每个原状态 $S$ 的概率质量以权重 $1-p_{k,m}$ 与 $p_{k,m}$ 分别流向 $S$ 与 $S\cup\{m\}$，总概率质量守恒为 1。累计确认精确锁定了第 $j$ 次尝试结束时的真实集合；其后各次数据发送相互条件独立，且反馈的延迟或丢失独立于数据解码结果（即“确认尚未到达”本身不泄露数据失败的额外信息），因此顺次施加转移算子即得当前精确的条件分布。
 \end{proof}
 
-例如，成功概率为 $p$ 的证据经 $r$ 次独立尝试后，已送达概率为 $1-(1-p)^r$。该信念能够反映重传收益递减，而非将未确认消息一律视为未收到。
-
-根据接收信念和一致性效用表，当前估计任务效用为
+直观来看，若某条单次成功概率为 $p$ 的证据已连续独立发送 $r$ 次，即使尚未收到确认，其至少送达一次的概率也已升至 $1-(1-p)^r$。借助接收信念滤波，控制器能够自然捕捉到连续重传的边际收益递减，避免了传统方法把“未收到确认”一概等同于“接收失败”所引发的过度重传。结合一致性效用表 $q_k$，当前接收信念对应的期望任务效用为
 \begin{equation}
   U_k(b)=\sum_{S\in\states_k}b(S)q_k(S).
   \label{rq3:eq:expected-utility}
@@ -148,20 +144,18 @@ C-BFC 的计算过程分为任务准备和任务内控制两部分，如图~\ref
 \label{rq3:subsec:decision}
 \label{rq3:subsec:complexity}
 
-每个节点维护一个虚拟能量队列 $Z_i(k)$，记录相对于平均任务额度的累积超支压力：
+为防止前序任务过度耗电导致后续任务无电可用，沿用第~\ref{rq1:chapter} 章的李雅普诺夫虚拟队列思想，并将时间尺度由网络时隙切换为连续任务序列。每个感知节点维护跨任务虚拟能量队列 $Z_i(k)$，记录相对平均任务额度的累积超支压力：
 \begin{equation}
   Z_i(k+1)=\max\left\{0,Z_i(k)+e_i(k)-\frac{E_i^{(0)}}{N_{\mathrm{task}}}\right\},
   \qquad Z_i(1)=0.
   \label{rq3:eq:virtual-queue}
 \end{equation}
-任务支出超过平均额度时，虚拟队列增大；支出较低时则逐步回落。因而，连续几个任务的大量发送会提高该节点后续的能量价格。
-
-由于节点剩余电量和待执行任务数持续变化，以当前剩余资源构造平均可用额度
+当某节点在前期任务中频繁超额发送时，$Z_i(k)$ 持续累积升高，而在低消耗任务后逐步回落。同时，结合集群当前的剩余总电量与待完成任务数，动态计算后续每项任务的平均可用能量额度：
 \begin{equation}
   A_{k,t}=\frac{\sum_{i\in\mathcal{N}}E_i(k,t)}{N_{\mathrm{task}}-k+1}.
   \label{rq3:eq:remaining-allowance}
 \end{equation}
-一次候选发送的资源价格定义为
+由此定义一次候选发送（含对应确认反馈）的归一化资源价格：
 \begin{equation}
   \pi_{k,m}=\frac{
       \left(1+\dfrac{Z_{s(m)}(k)}{E_{s(m)}^{(0)}}\right)e_{k,m}^{\mathrm d}
@@ -169,45 +163,39 @@ C-BFC 的计算过程分为任务准备和任务内控制两部分，如图~\ref
       {\max\{A_{k,t},\varepsilon_E\}},
   \label{rq3:eq:resource-price}
 \end{equation}
-其中 $\varepsilon_E>0$ 防止分母过小。分子计入数据和反馈发送成本，并对历史支出较高的感知节点增加权重；分母表示后续任务平均可用的能量。反馈成本由中心承担，不扣减感知节点电量。
+其中小常数 $\varepsilon_E>0$ 用于避免数值除零。分子同时计入数据与反馈能耗，并对历史透支较重的节点施加额外溢价（反馈能耗由地面中心承担，不扣减无人机电量）；分母则反映剩余任务的平均能量余量。在实际控制中，硬电量约束仍由动作掩码~\eqref{rq3:eq:action-mask} 严格把关，而虚拟队列通过动态抬升 $\pi_{k,m}$ 引导前期耗电偏快的节点在后续任务中趋于克制。
 
-队列影响收益排序，式~\eqref{rq3:eq:action-mask} 则按节点排除电量不足的动作。
-
-在第~\ref{rq1:chapter} 章的能量预算模型基础上，本章将虚拟队列的更新尺度由网络时隙调整为连续任务。节点能量的可行性由式~\eqref{rq3:eq:action-mask} 保证，虚拟队列用于调整发送价格。前期支出较高时，队列增大且平均可用额度减少，后续选择因而更偏向节能。
-
-为简化发送与等待收益的表达，以下省略任务与时刻下标，令剩余任务时间为 $h=D_k-t$。发送候选 $m$ 的即时净收益为
+为简化表达，下文省去任务与时刻下标，记任务剩余时间为 $h=D_k-t$。在当前信念 $b$ 下，发送候选 $m$ 带来的单步即时净收益定义为
 \begin{equation}
   g_m(b;h)=U_k(\mathcal T_m b)-U_k(b)
      -\eta_E\pi_{k,m}-\eta_T\frac{\tau_{k,m}}{D_k},
   \label{rq3:eq:send-gain}
 \end{equation}
-其中 $\eta_E$ 和 $\eta_T$ 分别控制能量价格与显式时间代价。若动作不满足当前时限或节点电量约束，其收益置为负无穷。
+其中 $\eta_E$ 与 $\eta_T$ 分别为能量价格权重与显式时间代价权重；凡违反时限或节点电量约束的候选，其收益直接置为 $-\infty$。值得注意的是，式~\eqref{rq3:eq:send-gain} 统一评估新发与重传动作：重传通过拉高已发证据的送达概率获取收益，新发则通过引入互补证据拓展集合组合，两者在统一框架下直接比拼净收益，无需人为设定固定最大重传次数。
 
-补发与发送新候选均按式~\eqref{rq3:eq:send-gain} 评价。补发提高某条已尝试证据的接收概率，新发则引入其他证据组合；二者的作用通过转移后的集合分布计算，无需单独指定固定重传次数。
-
-为保留单条证据无增益、组合后改变分类的情况，控制器展开两次发送：
+由于多条互补证据常常存在“单条发送无法翻转类别、两条组合后才产生显著增益”的协同效应，仅看单步即时收益容易过早停止。为此，控制器向前展开两步发送前瞻：
 \begin{equation}
   V_m^{\mathrm{send}}(b;h)=g_m(b;h)
     +\max\left\{0,\max_{m'\in\mathcal F(m)}
       g_{m'}(\mathcal T_m b;h-\tau_{k,m})\right\},
   \label{rq3:eq:two-step-lookahead}
 \end{equation}
-其中 $\mathcal F(m)$ 按执行 $m$ 后的时间和节点电量构造。前瞻内固定能量价格，反馈在下次实际决策时处理；发送前均检查尝试上限。前瞻值相同时依次按即时收益及固定候选次序选择。
+其中第二步可行集 $\mathcal F(m)$ 依据执行 $m$ 后的剩余时间、剩余电量与尝试上限构造（前瞻计算内固定当前能量价格，实际反馈留待下次决策再行消化；若多个候选两步收益打平，则依次按单步即时收益与固定候选序号打破平局）。
 
-除发送动作外，控制器还需要评价主动等待的收益。等待期间不会发送新证据，但返回的确认可能消除对接收集合的部分不确定性。本章仅评价最新未确认快照。设其反馈串行发送结束于 $v_j$，年龄为 $a=t-v_j$，额外时延分布函数为 $F$，则在尚未收到反馈的条件下，等待 $w$ 内收到它的概率为
+与立即发送相对，主动等待虽然不发出新数据包，却有机会在等待窗口内等到在途累计确认，从而消除接收状态的不确定性、避免盲目重传。为控制分支规模，本文围绕最新一条尚未返回的确认快照评估等待价值。设该确认帧的串行发送结束时刻为 $v_j$，截至当前的在途年龄为 $a=t-v_j$，额外时延累积分布函数为 $F(\cdot)$，则在已知当前尚未收到该确认的条件下，继续等待时长 $w$ 内收到它的条件概率为
 \begin{equation}
   \rho(w)=\frac{(1-\epsilon_{\mathrm f})[F(a+w)-F(a)]}
-                {1-(1-\epsilon_{\mathrm f})F(a)}.
+                {1-(1-\epsilon_{\mathrm f})F(a)},
   \label{rq3:eq:conditional-feedback}
 \end{equation}
-分母包含尚未到达与已经丢失两种情况；反馈不可能再到达时，该快照的等待信息价值为零。
+其中分母同时包含了“尚在途中”和“已经丢失”两种未达情形；一旦 $a$ 超出时延分布上界使分子为零，继续等待该快照的信息价值便自动归零。
 
-令
+记再执行至多一次发送所能获得的最大净收益为
 \begin{equation}
-  G(b;h)=\max\left\{0,\max_m g_m(b;h)\right\}
+  G(b;h)=\max\left\{0,\max_m g_m(b;h)\right\}.
   \label{rq3:eq:one-step-value}
 \end{equation}
-表示再发送至多一次的最优净收益。收到最新位图后接收集合已知，否则保留原信念，等待价值近似为
+若等待 $w$ 后成功收到确认，接收集合将坍缩为某个确切状态 $S$（分布变为点质量 $\delta_S$）；若未收到，则沿用原信念 $b$。据此，等待时长 $w$ 的近似信息价值可写为
 \begin{equation}
   \begin{split}
     V^{\mathrm{wait}}(w;b,h)
@@ -216,17 +204,13 @@ C-BFC 的计算过程分为任务准备和任务内控制两部分，如图~\ref
   \end{split}
   \label{rq3:eq:waiting-value}
 \end{equation}
-剩余时域 $h-w$ 体现机会成本，故 $\eta_T=0$ 时等待仍受任务窗口限制。
-
-等待候选由固定短等待、到反馈平均额外时延的等待和到该分布上界的等待组成：
+需要强调的是，即便显式时间权重 $\eta_T=0$，等待消耗的时间依然通过缩短剩余窗口 $h-w$ 压缩了后续可行发送空间，从而天然体现出等待的机会成本。具体执行时，等待候选集仅需考察三个具有明确物理意义的时长节点——固定短等待 $w_0$、等待至反馈平均额外时延以及等待至时延分布上界：
 \begin{equation}
   \mathcal W_t=\left\{w_0,\ \max(w_0,\bar d_{\mathrm f}-a),\
      \max(w_0,1.5\bar d_{\mathrm f}-a)\right\}\cap(0,h).
   \label{rq3:eq:wait-candidates}
 \end{equation}
-候选仅由可见历史和时延模型生成。实际滤波使用全部已到达确认；等待评价忽略其他待到达位图，以限制分支开销。
-
-综合上述评价，控制器执行发送与等待中收益最大的正收益动作，否则停止，并在任务结束后更新虚拟队列，见算法~\ref{rq3:alg:cbfc}。该策略采用有限前瞻，不精确搜索全部未来反馈或任务分支。
+在每次决策中，控制器比较所有可行发送动作的 $V_m^{\mathrm{send}}$ 与等待候选的 $V^{\mathrm{wait}}$，执行正收益最大的动作；若所有动作收益均不大于零，则果断停止当前任务，并在任务结束后更新虚拟能量队列。完整在线流程见算法~\ref{rq3:alg:cbfc}。
 
 \begin{algorithm}[t]
   \bicaption{C-BFC 在线语义交付控制}{Online semantic delivery control of C-BFC}
@@ -260,15 +244,11 @@ C-BFC 的计算过程分为任务准备和任务内控制两部分，如图~\ref
   \end{algorithmic}
 \end{algorithm}
 
-为评估在线控制的计算开销，设候选数为 $K$，效用网络参数量为 $P_\theta$。任务开始时批量构造至多 $2^K$ 个集合的效用。一次信念转移与期望效用计算为 $O(2^K)$，两步发送评价为 $O(K^2 2^K)$。
-
-等待评价枚举反馈可能揭示的集合及下一次发送。结合两步发送前瞻，一次动作评价的主要复杂度为
+就计算复杂度而言，设单任务候选数为 $K$，效用网络参数量为 $P_\theta$。任务初始化阶段批量推理至多 $2^K$ 个集合的效用；在线控制中，单次信念转移与期望效用求值复杂度为 $O(2^K)$，两步发送前瞻为 $O(K^2 2^K)$，而等待评价需枚举反馈可能揭示的接收集合及随后的单步最优发送，因此单次决策的总体时间复杂度为
 \begin{equation}
   O\left(K^2 2^K+|\mathcal W_t|K4^K\right).
   \label{rq3:eq:complexity}
 \end{equation}
-存储包括网络参数、集合特征与效用表、信念和历史。本章 $K\le4$，接收集合至多十六个，等待候选至多三个，可显式枚举。
-
-候选增多时状态数指数增长，需要候选压缩或近似滤波。一致性投影对应离散分类正确性；生成式回答、连续估计等任务须按相应损失重新定义约束。
+得益于前端 EviComRL 的预筛选，本章中 $K\le4$（状态空间至多 16 个集合，等待候选至多 3 个），可直接精确枚举，单步决策耗时极低。若未来应用场景中候选规模大幅扩张导致状态数呈指数增长，则需进一步引入候选剪枝或因子化近似滤波；此外，本文的同类别一致性投影立足于离散分类任务，面向开放式文本生成或连续值回归任务时，还需结合相应的任务损失函数重新构造一致性约束。
 
 \FloatBarrier

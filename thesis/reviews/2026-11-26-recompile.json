@@ -1,0 +1,87 @@
+{
+  "revision_date": "2026-11-26",
+  "revision": "第二章修改后原样重编译",
+  "branch": "final",
+  "compile": {
+    "exit_code": 0,
+    "output": "thesis/output/pdf/thesis.pdf",
+    "pdf_sha256": "55b9970b1d062cc4e658551864f1883533369f5919015d59ece8ee42e96c8b27"
+  },
+  "static_check": {
+    "exit_code": 0,
+    "chinese_body_characters": 42244,
+    "input_files": 32,
+    "labels": 220,
+    "references": 64,
+    "figures": 24,
+    "body_tables": 14,
+    "algorithms": 4
+  },
+  "user_changed_files": [
+    "thesis/chapters/02_foundations.tex"
+  ],
+  "source_preservation": {
+    "files_checked": 121,
+    "changed_since_start": []
+  },
+  "layout": {
+    "previous_pages": 102,
+    "current_pages": 102,
+    "changed_pdf_pages": [
+      9,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33
+    ],
+    "chinese_abstract_pdf_pages": [
+      4,
+      5
+    ],
+    "english_abstract_pdf_pages": [
+      6,
+      7
+    ],
+    "chapter2_pdf_pages": [
+      26,
+      33
+    ],
+    "chapter3_pdf_page": 34,
+    "figure_2_1_pdf_page": 27,
+    "figure_2_2_pdf_page": 29,
+    "table_2_1_pdf_page": 31
+  },
+  "verification": {
+    "log_problems": [],
+    "pdf_copies_identical": true,
+    "rendered_and_reviewed_pdf_pages": [
+      9,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33
+    ],
+    "enlarged_pages_reviewed": [
+      27,
+      29,
+      31,
+      33
+    ],
+    "other_93_pages_pixel_identical": true,
+    "toc_entries_checked": 71,
+    "toc_mismatches": [],
+    "no_missing_or_clipped_figures_observed": true
+  },
+  "pending_layout_issues": [
+    "中英文摘要仍各占两页，第一章章节安排页（PDF第25页）留白未变化。"
+  ],
+  "status": "compiled_and_changed_pages_reviewed"
+}

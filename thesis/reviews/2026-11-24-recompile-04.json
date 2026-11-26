@@ -1,0 +1,123 @@
+{
+  "revision_date": "2026-11-24",
+  "revision": "绪论再次改写后的原样重编译",
+  "branch": "final",
+  "scope": "仅编译、检查和记录；未修改论文文字、图表或排版设置。",
+  "compile": {
+    "command": "powershell -NoProfile -ExecutionPolicy Bypass -File .\\thesis\\scripts\\build_thesis.ps1",
+    "exit_code": 0,
+    "output": "thesis/output/pdf/thesis.pdf",
+    "pdf_sha256": "e9aa76b8c4c47848b28d992f7223344d9049c82571e888deaaecb5159ed56355"
+  },
+  "static_check": {
+    "exit_code": 0,
+    "chinese_body_characters": 41269,
+    "input_files": 33,
+    "labels": 221,
+    "references": 64,
+    "figures": 25,
+    "body_tables": 14,
+    "algorithms": 4
+  },
+  "source_preservation": {
+    "files_checked": 121,
+    "all_unchanged_since_start": true,
+    "user_changed_files_since_previous_build": [
+      "thesis/chapters/01_introduction.tex"
+    ]
+  },
+  "layout": {
+    "previous_pages": 101,
+    "current_pages": 102,
+    "chinese_abstract_including_keywords_pdf_pages": [
+      4,
+      5
+    ],
+    "english_abstract_including_keywords_pdf_pages": [
+      6,
+      7
+    ],
+    "symbol_table_pdf_page": 8,
+    "toc_pdf_pages": [
+      9,
+      10,
+      11
+    ],
+    "first_body_pdf_page": 12,
+    "chapter_first_pdf_pages": {
+      "1": 12,
+      "2": 26,
+      "3": 34,
+      "4": 50,
+      "5": 67
+    },
+    "figures_1_1_to_1_3_pdf_pages": [
+      13,
+      14,
+      24
+    ],
+    "chapter_one_end_pdf_page": 25,
+    "chapter_one_end_printed_page": 14,
+    "chapter_two_onward_printed_and_pdf_pages_shift": 1
+  },
+  "verification": {
+    "front_pages_1_to_8_pixel_identical": true,
+    "toc_entries_checked": 71,
+    "toc_labels_match_destinations": true,
+    "second_chapter_onward_pages_compared": 77,
+    "pixel_comparison_clip_points": [
+      0,
+      0,
+      595.28,
+      750
+    ],
+    "pixel_comparison_note": "MuPDF at 72 dpi; compared corresponding pages through y=750 pt, excluding footer page numbers.",
+    "second_chapter_onward_pixel_mismatches": [],
+    "fatal_missing_or_overfull_messages": [],
+    "pdf_copies_identical": true,
+    "rendered_and_reviewed_pdf_pages": [
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25
+    ],
+    "enlarged_pages_reviewed": [
+      13,
+      24,
+      25
+    ],
+    "no_missing_figures_clipping_or_overlap_observed": true
+  },
+  "issues": [
+    {
+      "id": "L1",
+      "title": "图1-1移至正文第二页",
+      "pdf_page": 13,
+      "printed_page": 2,
+      "detail": "研究背景改写后，图1-1从正文第1页移至第2页，未满足此前放在正文第一页的偏好；本次仅编译，不调整位置。"
+    },
+    {
+      "id": "L2",
+      "title": "章节安排末尾两行单独占页",
+      "pdf_page": 25,
+      "printed_page": 14,
+      "body_lines": 2,
+      "detail": "章节安排标题及前文位于正文第13页，最后两行续排到第14页，页底大面积留白；保留自然分页。"
+    }
+  ],
+  "pending": "此前章节问题仍保留。相较2026-11-23的98页检查稿，第二章起正文页码增加2、PDF顺序页码增加4。",
+  "status": "compiled_with_pagination_changes_reported"
+}

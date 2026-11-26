@@ -1,0 +1,37 @@
+{
+  "revision_date": "2026-11-24",
+  "revision": "导师署名增加教授职称",
+  "branch": "final",
+  "changes": {
+    "file": "thesis/thesis-meta.tex",
+    "chinese_supervisor": "王忠杰教授",
+    "english_supervisor": "Prof. Zhongjie Wang"
+  },
+  "compile": {
+    "exit_code": 0,
+    "command": "powershell -NoProfile -ExecutionPolicy Bypass -File .\\thesis\\scripts\\build_thesis.ps1",
+    "output": "thesis/output/pdf/thesis.pdf",
+    "pdf_pages": 100,
+    "pdf_sha256": "620056d669fa75aa84d0d60f7e174457b37ae58dc42371eb0dfcc702f1559c06"
+  },
+  "verification": {
+    "static_check_exit_code": 0,
+    "source_files_checked": 121,
+    "changed_source_files": [
+      "thesis/thesis-meta.tex"
+    ],
+    "chinese_cover_pdf_page": 2,
+    "english_cover_pdf_page": 3,
+    "other_98_pages_pixel_identical": true,
+    "comparison": "MuPDF at 72 dpi",
+    "fatal_missing_or_overfull_messages": [],
+    "pdf_copies_identical": true,
+    "cover_pages_visually_reviewed": [
+      2,
+      3
+    ],
+    "no_clipping_or_overlap_observed": true
+  },
+  "scope": "只调整中英文封面的导师职称，不修改摘要、正文及排版设置。",
+  "status": "completed"
+}

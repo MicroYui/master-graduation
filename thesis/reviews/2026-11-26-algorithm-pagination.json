@@ -1,0 +1,56 @@
+{
+  "date": "2026-11-26",
+  "scope": "修复算法4-1附近的单字续页，仅调整计算复杂度段落的断行规则。",
+  "pages_before": 101,
+  "pages_after": 101,
+  "changed_pdf_pages": [
+    58,
+    59,
+    60,
+    61,
+    62,
+    63,
+    64,
+    65
+  ],
+  "source_files_changed": [
+    "thesis/chapters/04_evicom.tex"
+  ],
+  "other_source_files_unchanged": 120,
+  "log_problems": [],
+  "all_pdf_text_equal_ignoring_whitespace": false,
+  "pdf_sha256": "ef491b7b78631e30835cc339f21411ee09c2fb85a7be3246f0b435fbe4ce0080",
+  "pdf_copies_identical": true,
+  "source_content_preserved_except_local_layout_commands_and_final_newline": true,
+  "pdf_body_character_counts_equal": true,
+  "toc_entries_checked": 71,
+  "toc_mismatches": [],
+  "static_check_exit_code": 0,
+  "compile_exit_code": 0,
+  "single_character_continuation_fixed": true,
+  "status": "fixed_and_verified",
+  "rendered_and_reviewed_pdf_pages": [
+    58,
+    59,
+    60,
+    61,
+    62,
+    63,
+    64,
+    65
+  ],
+  "enlarged_pages_reviewed": [
+    58,
+    59
+  ],
+  "unchanged_rendered_pages": 93,
+  "no_new_missing_glyphs_clipping_or_overlap_observed": true,
+  "text_comparison_note": "跨页续文与浮动体的读取先后位置变化，因此原始提取文本顺序不完全一致；正文字符计数一致，源码仅新增局部断行命令及末尾换行。",
+  "unchanged_settings": [
+    "正文措辞与公式",
+    "字号",
+    "行距",
+    "段落间距",
+    "全局版心设置"
+  ]
+}

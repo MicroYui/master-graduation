@@ -1,0 +1,261 @@
+{
+  "revision_date": "2026-11-23",
+  "revision": "用户自行改写章节后的原样重编译与排版、一致性检查",
+  "branch": "final",
+  "previous_commit": "50d45c9228b84cfffaa28b3295811fd33adb07ee",
+  "scope": "仅编译、检查和记录问题；所有论文源码、图表资源及模板不作修改，后续方案由用户决定。",
+  "compile": {
+    "command": "powershell -NoProfile -ExecutionPolicy Bypass -File .\\thesis\\scripts\\build_thesis.ps1",
+    "exit_code": 0,
+    "output": "thesis/output/pdf/thesis.pdf",
+    "pdf_sha256": "2359676eb0365a2a7473ec52e5c9a24e4aff77db1c07f41412a8de2a4635088c"
+  },
+  "static_check": {
+    "command": "python -X utf8 thesis/scripts/check_thesis.py",
+    "exit_code": 0,
+    "chinese_body_characters": 40347,
+    "input_files": 33,
+    "labels": 221,
+    "cited_references": 64,
+    "numbered_figures": 25,
+    "numbered_body_tables": 14,
+    "algorithms": 4
+  },
+  "source_preservation": {
+    "source_asset_files_checked": 121,
+    "all_byte_identical_to_user_worktree_at_start": true,
+    "modified_by_assistant": [],
+    "user_modified_tex_sha256": {
+      "thesis/chapters/02_foundations.tex": "b6d97fa2411661a9544ffb8e618d8b3fbbf8987d352eea03ef8a301a7cf59aad",
+      "thesis/chapters/03_leadr.tex": "708455cf268a6b87a1d984f9be79d641e26839c0832c8f4c5996e28f3f31a39e",
+      "thesis/chapters/04_evicom.tex": "f2ad99dffdc495f3d77eaa417eccc7c60807e022e0a21ad80073f91abf1b96fe",
+      "thesis/chapters/05_cbfc.tex": "b267c8240342dae88ba12b0aaf8d2d05db7a14d18aaf5c528020012b7c4c0d2e",
+      "thesis/chapters/06_conclusion.tex": "8594a151e372c1d15637d4b479adc0656053302ac21bce58afba7c6a7234c6d3",
+      "thesis/chapters/rq3/experiments.tex": "43e491388d992008dd50298b402a8a67f63b147790d2a188817b3876c862e6b9",
+      "thesis/chapters/rq3/method.tex": "cb30595d4c7b7b40eaca465a07e6f841d5ddf6617ece62fd20d2a8f3d43a2a0c",
+      "thesis/chapters/rq3/model.tex": "4c5d8183e8c149b48c3993caf64ec67e66dec30b6caec27ffde79f6b09bd1514",
+      "thesis/front/thesis-abstracts.tex": "a1c6a169e8eecb5a27a160bfb01d92c3fb9142ef2817c6fd85106c5c643cb807"
+    }
+  },
+  "technical_checks": {
+    "pdf_pages": 98,
+    "toc_entries_checked": 71,
+    "toc_pdf_pages": [
+      7,
+      8,
+      9
+    ],
+    "all_toc_page_labels_match_destinations": true,
+    "invalid_internal_links": [],
+    "font_entries": 97,
+    "all_fonts_embedded": true,
+    "source_asset_files_unchanged": 121,
+    "unchanged_page_pixel_comparisons": [
+      1,
+      2,
+      3,
+      5,
+      6,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21
+    ],
+    "pdf_sha256": "2359676eb0365a2a7473ec52e5c9a24e4aff77db1c07f41412a8de2a4635088c"
+  },
+  "comparison_with_prior_commit": {
+    "equation_changes": [],
+    "table_number_changes": [],
+    "heading_changes": [],
+    "caption_changes": [],
+    "math_label_count": 119
+  },
+  "layout": {
+    "previous_pdf_pages": 92,
+    "current_pdf_pages": 98,
+    "chinese_abstract_pdf_pages": [
+      4
+    ],
+    "english_abstract_pdf_pages": [
+      5
+    ],
+    "toc_pdf_pages": [
+      7,
+      8,
+      9
+    ],
+    "first_body_pdf_page": 10,
+    "chapter_first_pdf_pages": {
+      "1": 10,
+      "2": 22,
+      "3": 30,
+      "4": 46,
+      "5": 63,
+      "conclusion": 86
+    },
+    "figures_1_1_to_1_3_pdf_pages": [
+      10,
+      12,
+      21
+    ]
+  },
+  "visual_inspection": {
+    "renderer": "Poppler pdftoppm at 90 dpi plus enlarged views",
+    "all_98_pages_rendered": true,
+    "all_pages_reviewed_via_contact_sheets": true,
+    "enlarged_pages": [
+      28,
+      29,
+      42,
+      43,
+      44,
+      74,
+      75
+    ],
+    "all_numbered_figures_reviewed": 25,
+    "missing_or_clipped_figures_observed": false,
+    "text_clipping_or_overlap_observed": false
+  },
+  "compile_log": {
+    "fatal_missing_glyph_undefined_or_overfull_messages": [],
+    "nonfatal_messages": [
+      "Underfull \\hbox (badness 10000) in paragraph at lines 124--125",
+      "Underfull \\hbox (badness 10000) in paragraph at lines 124--125",
+      "Underfull \\hbox (badness 2460) in paragraph at lines 13--14",
+      "Underfull \\hbox (badness 2460) in paragraph at lines 22--23",
+      "Underfull \\hbox (badness 10000) in paragraph at lines 391--391",
+      "Underfull \\hbox (badness 1231) in paragraph at lines 49--50",
+      "Underfull \\hbox (badness 2165) in paragraph at lines 49--50",
+      "Underfull \\hbox (badness 1194) in paragraph at lines 49--50",
+      "Package glossaries Warning: No \\printglossary or \\printglossaries found. "
+    ]
+  },
+  "issues": [
+    {
+      "id": "L1",
+      "kind": "layout",
+      "title": "小结与结论的末段单独占页",
+      "printed_pages": [
+        20,
+        36,
+        53,
+        76,
+        78
+      ],
+      "pdf_pages": [
+        29,
+        45,
+        62,
+        85,
+        87
+      ],
+      "remaining_lines": [
+        4,
+        4,
+        8,
+        8,
+        7
+      ],
+      "detail": "第2、3、4、5章小结及结论分别在下一页只剩4、4、8、8、7行正文，页底留白明显。正文扩写后段落跨页，而下一章仍从新页开始。",
+      "source_locations": [
+        "thesis/chapters/02_foundations.tex:175",
+        "thesis/chapters/03_leadr.tex:499",
+        "thesis/chapters/04_evicom.tex:500",
+        "thesis/chapters/05_cbfc.tex:22",
+        "thesis/chapters/06_conclusion.tex:10"
+      ],
+      "status": "awaiting_user_solution"
+    },
+    {
+      "id": "L2",
+      "kind": "layout",
+      "title": "算法前页留白较大",
+      "printed_pages": [
+        61,
+        65
+      ],
+      "pdf_pages": [
+        70,
+        74
+      ],
+      "detail": "正文第61页底部约61 mm留白，算法5-1从第62页开始；正文第65页底部约80 mm留白，算法5-2从第66页开始。算法5-1使用[H]固定定位，算法5-2使用[t]并在本节末设置FloatBarrier，浮动体完整放置与边界共同影响分页。",
+      "source_locations": [
+        "thesis/chapters/rq3/method.tex:87",
+        "thesis/chapters/rq3/method.tex:215",
+        "thesis/chapters/rq3/method.tex:254"
+      ],
+      "status": "awaiting_user_solution"
+    },
+    {
+      "id": "C1",
+      "kind": "figure_text_consistency",
+      "title": "“所有配置丢包率最低”与曲线不完全一致",
+      "printed_pages": [
+        33,
+        35,
+        77
+      ],
+      "pdf_pages": [
+        42,
+        44,
+        86
+      ],
+      "evidence_pdf_pages": [
+        42,
+        43
+      ],
+      "detail": "正文第33页称LEADR在所有通信半径下均维持最低丢包，第35页及结论第77页又概括三组实验均取得最低丢包率；但图3-2(b)在20架无人机时GPSR低于LEADR，图3-3(b)在300 m时ACO低于LEADR。",
+      "source_locations": [
+        "thesis/chapters/03_leadr.tex:471",
+        "thesis/chapters/03_leadr.tex:495",
+        "thesis/chapters/06_conclusion.tex:6"
+      ],
+      "status": "awaiting_user_solution"
+    },
+    {
+      "id": "C2",
+      "kind": "figure_text_consistency",
+      "title": "LB-GPSR的完整生命周期表述与图不符",
+      "printed_pages": [
+        34
+      ],
+      "pdf_pages": [
+        43
+      ],
+      "detail": "正文第34页称LEADR与LB-GPSR在全部五组通信范围配置中均维持3600 s，但图3-3(d)中200 m时LB-GPSR的红色柱约为3200 s，未达到3600 s。",
+      "source_locations": [
+        "thesis/chapters/03_leadr.tex:473"
+      ],
+      "status": "awaiting_user_solution"
+    },
+    {
+      "id": "C3",
+      "kind": "figure_text_consistency",
+      "title": "“吞吐量降幅最为平缓”的比较不准确",
+      "printed_pages": [
+        33
+      ],
+      "pdf_pages": [
+        42
+      ],
+      "evidence_pdf_pages": [
+        43
+      ],
+      "detail": "正文第33页称LEADR随通信范围扩大的吞吐量降幅最为平缓；图3-3(a)中200 m到300 m的RLFR下降幅度小于LEADR。LEADR保持最高吞吐量与降幅最小并非同一结论。",
+      "source_locations": [
+        "thesis/chapters/03_leadr.tex:471"
+      ],
+      "status": "awaiting_user_solution"
+    }
+  ],
+  "report": "thesis/output/layout-review-20261123.html",
+  "status": "compiled_and_reviewed_findings_pending_user_decision"
+}

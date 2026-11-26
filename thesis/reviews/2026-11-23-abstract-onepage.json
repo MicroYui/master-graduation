@@ -1,0 +1,65 @@
+{
+  "revision_date": "2026-11-23",
+  "revision": "用户调整关键词后的摘要各一页验证",
+  "branch": "final",
+  "scope": "仅编译与检查；本轮未修改任何论文源码或排版设置。",
+  "compile": {
+    "command": "powershell -NoProfile -ExecutionPolicy Bypass -File .\\thesis\\scripts\\build_thesis.ps1",
+    "exit_code": 0,
+    "output": "thesis/output/pdf/thesis.pdf",
+    "pdf_sha256": "0f057ab093e8a2a5ff8e8b62c59648a6c35d49724224e533e4461e84fbe37b2f"
+  },
+  "static_check": {
+    "exit_code": 0,
+    "input_files": 33,
+    "labels": 221,
+    "references": 64,
+    "figures": 25,
+    "body_tables": 14,
+    "algorithms": 4
+  },
+  "source_preservation": {
+    "files_checked": 121,
+    "all_unchanged_since_start": true,
+    "user_changed_files_since_previous_build": [
+      "thesis/front/cover.tex"
+    ],
+    "user_change": "用户从中英文关键词中分别移除不完备反馈及incomplete feedback；摘要正文未变。",
+    "cover_sha256": "0f68e19fbddeee243073d23468a274f50978bd0363ac03a9b1ddcc71f956d046",
+    "abstract_sha256": "8c27adb2d98f35662087fc9e24005a84b08fbc5d669e457b7b4f298d967b0393"
+  },
+  "layout": {
+    "previous_pages": 99,
+    "current_pages": 98,
+    "chinese_abstract_including_keywords_pdf_pages": [
+      4
+    ],
+    "english_abstract_including_keywords_pdf_pages": [
+      5
+    ],
+    "symbol_table_pdf_page": 6,
+    "toc_pdf_pages": [
+      7,
+      8,
+      9
+    ],
+    "first_body_pdf_page": 10,
+    "body_page_numbers_unchanged": true
+  },
+  "verification": {
+    "body_and_back_matter_unchanged_pages": 89,
+    "comparison": "MuPDF pixel comparison at 72 dpi with previous PDF after accounting for removal of one front-matter page",
+    "toc_entries_checked": 71,
+    "toc_labels_match_destinations": true,
+    "fatal_missing_or_overfull_messages": [],
+    "pdf_copies_identical": true,
+    "abstract_pdf_pages_visually_reviewed": [
+      4,
+      5
+    ],
+    "both_abstracts_including_keywords_fit_one_page": true,
+    "no_missing_glyphs_clipping_or_overlap_observed": true
+  },
+  "pending": "此前章节分页和图文一致性问题仍保留，本次未处理。当前PDF页码与本日最初98页检查报告一致。",
+  "status": "abstract_onepage_requirement_satisfied"
+}

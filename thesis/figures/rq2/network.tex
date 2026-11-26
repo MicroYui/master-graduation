@@ -1,96 +1,163 @@
 % Matches GraphHistoryActorCriticNet and Eqs. (encoders)--(policy).
-% Named tensors are reused; they do not denote additional encoders.
-% Contexts pool the base encoding. The critic pools only legal candidates.
+\begingroup
 \begin{tikzpicture}[
   x=1mm,y=1mm,>=Stealth,
-  font=\fontsize{9bp}{11.5bp}\selectfont,
-  enbox/.style={draw,line width=.45pt,fill=white,align=center,inner sep=.8mm},
-  enencoder/.style={enbox,text width=18mm,minimum height=13.5mm},
-  encontext/.style={enbox,text width=41.5mm,minimum height=10.5mm},
-  enarrow/.style={->,line width=.55pt},
-  enwire/.style={line width=.45pt},
-  entag/.style={fill=white,inner sep=.25mm}
+  font=\fontsize{8.2bp}{9.8bp}\selectfont,
+  inframe/.style={draw=black!80,line width=.55pt,fill=blue!9!white,
+    align=center,inner sep=1.2mm,outer sep=0pt},
+  modbox/.style={draw=black!80,line width=.55pt,fill=black!2!white,
+    align=center,inner sep=1.2mm,outer sep=0pt},
+  ctxbox/.style={draw=blue!55!black,line width=.5pt,fill=blue!3!white,
+    align=center,inner sep=1.1mm,outer sep=0pt},
+  outbox/.style={draw=black!80,line width=.55pt,fill=white,
+    align=center,inner sep=1.2mm,outer sep=0pt},
+  headfill/.style={fill=blue!7!white},
+  dataedge/.style={-{Stealth[length=1.5mm,width=1.05mm]},
+    draw=black!85,line width=.6pt},
+  datawire/.style={draw=black!85,line width=.6pt},
+  ctxedge/.style={-{Stealth[length=1.5mm,width=1.05mm]},
+    draw=blue!55!black,line width=.55pt},
+  ctxwire/.style={draw=blue!55!black,line width=.55pt},
+  maskedge/.style={-{Stealth[length=1.5mm,width=1.05mm]},
+    draw=black!65,line width=.55pt,dashed,dash pattern=on 1.3mm off .8mm},
+  halo/.style={preaction={draw=white,line width=2.2pt}},
+  lbl/.style={font=\fontsize{7.8bp}{9bp}\selectfont,inner sep=.8pt}
 ]
-\path[use as bounding box] (0,0) rectangle (148,-94);
+\path[use as bounding box] (0,0) rectangle (148,-112);
 
-\node[enbox,text width=144mm,minimum height=6mm] (enx) at (74,-3)
-  {候选特征 $X_t\in\mathbb R^{M\times41}$\qquad 基准配置 $M=16$，共享隐藏维数 $d=64$};
-\draw[enwire] (enx.south) -- (74,-8);
-\draw[enwire] (11,-8) -- (137,-8);
+% 第1层：外部输入（候选特征与全局状态相互独立）
+\node[inframe,anchor=north west,minimum width=108mm,minimum height=7mm]
+  (enx) at (0,0)
+  {\textbf{候选特征输入}\ $X_t\in\mathbb R^{M\times 41}$};
+\node[inframe,anchor=north west,minimum width=35mm,minimum height=7mm]
+  (engin) at (113,0)
+  {\textbf{全局状态}\ $\bm g_t\in\mathbb R^{11}$};
 
-\node[enencoder] (enbase) at (11,-16.5)
-  {基础编码\\\mbox{$41{\to}d{\to}d$}\\$\bm h_m^0$};
-\node[enencoder] (ensender) at (32,-16.5)
-  {发送方\\$3\to d$\\$\bm v_m^s$};
-\node[enencoder] (enreceiver) at (53,-16.5)
-  {接收方\\$2\to d$\\$\bm v_m^r$};
-\node[enencoder] (enmode) at (74,-16.5)
-  {语义模式\\$4\to d$\\$\bm v_m^c$};
-\node[enencoder] (enlink) at (95,-16.5)
-  {链路代价\\$7\to d$\\$\bm v_m^l$};
-\node[enencoder] (enbelief) at (116,-16.5)
-  {三方信念\\$15\to d$\\$\bm v_m^b$};
-\node[enencoder] (enreliability) at (137,-16.5)
-  {可靠性\\$5\to d$\\$\bm v_m^q$};
-\foreach \name/\x in {enbase/11,ensender/32,enreceiver/53,enmode/74,enlink/95,enbelief/116,enreliability/137}
-  \draw[enarrow] (\x,-8) -- (\name.north);
+% 第2层：特征编码（将6路属性合并为一个分组编码模块）
+\node[modbox,anchor=north west,minimum width=64mm,minimum height=14mm]
+  (enattr) at (0,-12.5)
+  {\textbf{分组属性编码（6路）}\\
+   发送方 $\bm v_m^s$、接收方 $\bm v_m^r$、语义模式 $\bm v_m^c$\\
+   链路代价 $\bm v_m^l$、三方信念 $\bm v_m^b$、可靠性 $\bm v_m^q$};
+\node[modbox,anchor=north west,minimum width=39mm,minimum height=14mm]
+  (enbase) at (69,-12.5)
+  {\textbf{基础编码}\\
+   候选基础表示 $\bm h_m^0$};
+\node[ctxbox,anchor=north west,minimum width=35mm,minimum height=14mm]
+  (englob) at (113,-12.5)
+  {\textbf{全局编码} $f_g$\\
+   全局表示 $\bm z_t$};
 
-% Seven candidate encodings feed the relation encoder along the left bus.
-\foreach \name/\x in {enbase/11,ensender/32,enreceiver/53,enmode/74,enlink/95,enbelief/116,enreliability/137}
-  \draw[enwire] (\name.south) -- (\x,-25);
-\draw[enwire] (137,-25) -- (1,-25) -- (1,-48);
-\foreach \x in {11,32,53,74,95,116}
-  \fill (\x,-25) circle (.35mm);
+\draw[dataedge] (32,-7) -- (32,-12.5);
+\draw[dataedge] (88.5,-7) -- (88.5,-12.5);
+\draw[ctxedge]  (130.5,-7) -- (130.5,-12.5);
 
-% Named h_m^0 makes clear that both contexts pool the base encoding.
-\node[encontext] (enselected) at (25,-32)
+% 第3层：上下文池化（仅对基础表示 h_m^0 加权池化）
+\node[ctxbox,anchor=north west,minimum width=29mm,minimum height=11mm]
+  (ensel) at (64,-32.5)
   {已选历史 $\bar{\bm h}_t^{\mathrm{sel}}$\\
-   $\bm h_m^0$ 按 $e_m s_m^t$ 加权均值};
-\node[encontext] (encenter) at (74,-32)
+   按 $e_m s_m^t$ 池化};
+\node[ctxbox,anchor=north west,minimum width=29mm,minimum height=11mm]
+  (enctr) at (96,-32.5)
   {中心上下文 $\bar{\bm h}_t^{\mathrm{ctr}}$\\
-   $\bm h_m^0$ 按 $e_m c_m$ 加权均值};
-\node[encontext] (englobal) at (123.5,-32)
-  {全局输入 $\bm g_t\in\mathbb R^{11}$\\
-   $f_g:11\to d$，输出 $\bm z_t$};
-\foreach \name/\x in {enselected/25,encenter/74,englobal/123.5}
-  \draw[enwire] (\name.south) -- (\x,-39);
-\draw[enwire] (25,-39) -- (123.5,-39);
-\fill (74,-39) circle (.35mm);
+   按 $e_m c_m$ 池化};
 
-\node[enbox,text width=66mm,minimum height=14.5mm] (enrelation) at (38,-48)
-  {关系编码 $f_{\mathrm{rel}}:10d\to d\to d$\\
-   $[\bm h_m^0,\bm v_m^s,\bm v_m^r,\bm v_m^c,\bm v_m^l,\bm v_m^b,\bm v_m^q,$\\
-   $\bar{\bm h}_t^{\mathrm{sel}},\bar{\bm h}_t^{\mathrm{ctr}},\bm z_t]\to\bm u_m$};
-\node[enbox,text width=66mm,minimum height=14.5mm] (engate) at (113,-48)
-  {门控残差融合\\
-   $\bm a_m=\sigma\!\left(W_a[\bm h_m^0,\bm u_m,\bm z_t]+\bm b_a\right)$\\
+% 基础编码输出分流：两路进上下文池化，一路向下进关系编码与门控残差
+\draw[datawire] (88.5,-26.5) -- (88.5,-29.5);
+\draw[datawire] (56,-29.5) -- (110.5,-29.5);
+\fill[black!85] (88.5,-29.5) circle (.4mm);
+\fill[black!85] (78.5,-29.5) circle (.4mm);
+\draw[dataedge] (78.5,-29.5) -- (78.5,-32.5);
+\draw[dataedge] (110.5,-29.5) -- (110.5,-32.5);
+
+% 全局编码输出分流：一路进右侧共享上下文总线，一路向下进门控残差
+\draw[ctxwire] (130.5,-26.5) -- (130.5,-29.5) -- (143,-29.5);
+\fill[blue!55!black] (130.5,-29.5) circle (.4mm);
+
+% 共享上下文总线（汇聚已选历史、中心上下文与全局表示）
+\draw[ctxwire] (78.5,-43.5) -- (78.5,-46.5);
+\draw[ctxwire] (110.5,-43.5) -- (110.5,-46.5);
+\draw[ctxwire] (143,-29.5) -- (143,-73.5);
+\draw[ctxwire] (50,-46.5) -- (143,-46.5);
+\fill[blue!55!black] (78.5,-46.5) circle (.4mm);
+\fill[blue!55!black] (110.5,-46.5) circle (.4mm);
+\fill[blue!55!black] (143,-46.5) circle (.4mm);
+\draw[ctxedge] (50,-46.5) -- (50,-53.5);
+
+% 第4层：关系编码与门控残差融合
+\node[modbox,anchor=north west,minimum width=60mm,minimum height=12mm]
+  (enrel) at (0,-53.5)
+  {\textbf{关系编码} $f_{\mathrm{rel}}$\\
+   融合基础、属性与上下文，输出 $\bm u_m$};
+\node[modbox,anchor=north west,minimum width=64mm,minimum height=12mm]
+  (engate) at (72,-53.5)
+  {\textbf{门控残差融合}\\
    $\bm h_m=\bm h_m^0+\bm a_m\odot\bm u_m$};
-\draw[enarrow] (1,-48) -- (enrelation.west);
-\draw[enarrow] (38,-39) -- (enrelation.north);
-\draw[enarrow] (enrelation.east) -- (engate.west);
 
-% Both decision heads reuse the gate output and the three context tensors.
-\node[enbox,text width=66mm,minimum height=18.5mm] (enactor) at (38,-68.5)
-  {\textbf{策略网络}：消息头 $4d\to d\to1$\\
-   $[\bm h_m,\bm z_t,\bar{\bm h}_t^{\mathrm{sel}},\bar{\bm h}_t^{\mathrm{ctr}}]\to\ell_m$\\
-   停止头 $3d\to d\to1$\\
-   $[\bm z_t,\bar{\bm h}_t^{\mathrm{sel}},\bar{\bm h}_t^{\mathrm{ctr}}]\to\ell_0$};
-\node[enbox,text width=66mm,minimum height=18.5mm] (encritic) at (113,-68.5)
-  {\textbf{价值网络}：价值头 $4d\to d\to1$\\
-   对合法候选的 $\bm h_m$ 求掩码均值\\
-   拼接 $\bm z_t,\bar{\bm h}_t^{\mathrm{sel}},\bar{\bm h}_t^{\mathrm{ctr}}$\\
-   输出价值 $V_\psi(s_t)$};
-\draw[enwire] (engate.south) -- (113,-57.3) -- (38,-57.3);
-\draw[enarrow] (38,-57.3) -- (enactor.north);
-\draw[enarrow] (113,-57.3) -- (encritic.north);
-\fill (113,-57.3) circle (.4mm);
+% 6路属性直连关系编码
+\draw[dataedge] (22,-26.5) -- (22,-53.5);
+\node[lbl,anchor=west] at (23.2,-38) {$\bm v_m^*$};
 
-\node[enbox,text width=66mm,minimum height=10.5mm] (enpolicy) at (38,-87)
-  {屏蔽非法消息后，归一化为动作概率\\
+% h_m^0 连入关系编码，并作为残差跳连进入门控融合
+\draw[datawire,halo] (56,-29.5) -- (56,-50);
+\draw[datawire] (36,-50) -- (88,-50);
+\fill[black!85] (56,-50) circle (.4mm);
+\draw[dataedge] (36,-50) -- (36,-53.5);
+\draw[dataedge] (88,-50) -- (88,-53.5);
+\node[lbl,anchor=east] at (54.8,-38) {$\bm h_m^0$};
+
+% z_t 连入门控残差融合（控制门控系数 a_m）
+\draw[ctxedge,halo] (130.5,-29.5) -- (130.5,-53.5);
+\node[lbl,anchor=west,text=blue!55!black] at (131.7,-38) {$\bm z_t$};
+
+% 关系编码 -> 门控残差融合
+\draw[dataedge] (60,-59.5) -- (72,-59.5);
+\node[lbl,anchor=south] at (66,-58.8) {$\bm u_m$};
+
+% 第5层：策略网络与价值网络
+\fill[headfill] (0,-77) rectangle (64,-82.2);
+\draw[black!60,line width=.4pt] (0,-82.2) -- (64,-82.2);
+\draw[black!80,line width=.55pt] (0,-77) rectangle (64,-94);
+\node[align=center,inner sep=0pt] at (32,-79.6) {\textbf{策略网络}};
+\node[align=center,text width=61mm,inner sep=0pt] at (32,-88.1)
+  {消息头：由 $\bm h_m$ 与上下文输出 $\ell_m$\\
+   停止头：由上下文输出 $\ell_0$};
+
+\fill[headfill] (74,-77) rectangle (136,-82.2);
+\draw[black!60,line width=.4pt] (74,-82.2) -- (136,-82.2);
+\draw[black!80,line width=.55pt] (74,-77) rectangle (136,-94);
+\node[align=center,inner sep=0pt] at (105,-79.6) {\textbf{价值网络}};
+\node[align=center,text width=59mm,inner sep=0pt] at (105,-88.1)
+  {对合法候选 $\bm h_m$ 求掩码均值\\
+   拼接上下文后输出价值 $V_\psi(s_t)$};
+
+% 共享上下文总线接入策略网络与价值网络
+\draw[ctxwire] (143,-73.5) -- (46,-73.5);
+\fill[blue!55!black] (120,-73.5) circle (.4mm);
+\draw[ctxedge] (120,-73.5) -- (120,-77);
+\draw[ctxedge] (46,-73.5) -- (46,-77);
+\node[lbl,fill=white,text=blue!55!black] at (69,-73.5)
+  {上下文 $(\bar{\bm h}_t^{\mathrm{sel}},\bar{\bm h}_t^{\mathrm{ctr}},\bm z_t)$};
+
+% 门控输出 h_m 接入策略网络与价值网络
+\draw[datawire] (92,-65.5) -- (92,-69) -- (22,-69);
+\fill[black!85] (92,-69) circle (.4mm);
+\draw[dataedge] (22,-69) -- (22,-77);
+\draw[dataedge,halo] (92,-69) -- (92,-77);
+\node[lbl,fill=white] at (34,-69) {$\bm h_m$};
+
+% 第6层：动作概率输出与合法动作掩码
+\node[outbox,anchor=north west,minimum width=64mm,minimum height=11mm]
+  (enpol) at (0,-100)
+  {屏蔽非法消息后归一化为动作概率\\
    $\pi_\theta(a\mid s_t),\quad a\in\{0,1,\ldots,M\}$};
-\node[enbox,text width=45mm,minimum height=10.5mm] (enmask) at (113,-87)
-  {合法动作掩码 $\bm\mu_t$\\停止动作始终可用};
-\draw[enarrow] (enactor.south) -- (enpolicy.north);
-\draw[enarrow] (enmask.west) -- (enpolicy.east);
-\draw[enarrow] (enmask.north) -- (encritic.south);
+\node[inframe,anchor=north west,minimum width=54mm,minimum height=11mm]
+  (enmask) at (78,-100)
+  {\textbf{合法动作掩码}\ $\bm\mu_t$\\
+   屏蔽重复与超预算项，停止动作恒可用};
+
+\draw[dataedge] (32,-94) -- (32,-100);
+\draw[maskedge] (78,-105.5) -- (64,-105.5);
+\draw[maskedge] (105,-100) -- (105,-94);
 \end{tikzpicture}
+\endgroup

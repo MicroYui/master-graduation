@@ -1,0 +1,68 @@
+{
+  "revision_date": "2026-11-24",
+  "revision": "英文摘要缩短后的原样重编译",
+  "branch": "final",
+  "scope": "仅编译与检查；未修改论文文字或排版设置。",
+  "compile": {
+    "command": "powershell -NoProfile -ExecutionPolicy Bypass -File .\\thesis\\scripts\\build_thesis.ps1",
+    "exit_code": 0,
+    "output": "thesis/output/pdf/thesis.pdf",
+    "pdf_sha256": "00018f6388fb958ce9acd8f27d706f478669e98f4d27337a27dc0e0ccebe91dc"
+  },
+  "static_check": {
+    "exit_code": 0,
+    "input_files": 33,
+    "labels": 221,
+    "references": 64,
+    "figures": 25,
+    "body_tables": 14,
+    "algorithms": 4
+  },
+  "source_preservation": {
+    "files_checked": 121,
+    "all_unchanged_since_start": true,
+    "user_changed_files_since_previous_build": [
+      "thesis/front/thesis-abstracts.tex"
+    ],
+    "abstract_sha256": "ab2d4aa91af7b6b70ce4da05eb0643db8976e9c5b5272ff533ad6c674bbe3a19"
+  },
+  "layout": {
+    "previous_pages": 101,
+    "current_pages": 100,
+    "chinese_abstract_including_keywords_pdf_pages": [
+      4,
+      5
+    ],
+    "english_abstract_including_keywords_pdf_pages": [
+      6,
+      7
+    ],
+    "english_keywords_pdf_page": 7,
+    "english_keywords_no_longer_on_separate_page": true,
+    "symbol_table_pdf_page": 8,
+    "toc_pdf_pages": [
+      9,
+      10,
+      11
+    ],
+    "first_body_pdf_page": 12,
+    "body_page_numbers_unchanged": true
+  },
+  "verification": {
+    "unchanged_cover_pages": 3,
+    "unchanged_chinese_abstract_pages": 2,
+    "unchanged_body_and_back_matter_pages": 89,
+    "comparison": "MuPDF pixel comparison at 72 dpi accounting for removal of one front-matter page",
+    "toc_entries_checked": 71,
+    "toc_labels_match_destinations": true,
+    "fatal_missing_or_overfull_messages": [],
+    "pdf_copies_identical": true,
+    "english_abstract_pdf_pages_visually_reviewed": [
+      6,
+      7
+    ],
+    "no_missing_glyphs_clipping_or_overlap_observed": true
+  },
+  "pending": "中英文摘要仍各两页；此前章节问题未改动，当前PDF顺序页码比2026-11-23的98页检查稿增加2。",
+  "status": "compiled_english_keywords_fit_second_page"
+}

@@ -1,0 +1,75 @@
+{
+  "revision_date": "2026-11-24",
+  "revision": "摘要再次更新后的第二次原样重编译",
+  "branch": "final",
+  "scope": "仅编译、检查与记录；未修改论文内容或排版设置。",
+  "compile": {
+    "command": "powershell -NoProfile -ExecutionPolicy Bypass -File .\\thesis\\scripts\\build_thesis.ps1",
+    "exit_code": 0,
+    "output": "thesis/output/pdf/thesis.pdf",
+    "pdf_sha256": "756fe5f4852c33f63974467a26fd77b73136deace7a24196bd61d44f8c9dfebf"
+  },
+  "static_check": {
+    "exit_code": 0,
+    "input_files": 33,
+    "labels": 221,
+    "references": 64,
+    "figures": 25,
+    "body_tables": 14,
+    "algorithms": 4
+  },
+  "source_preservation": {
+    "files_checked": 121,
+    "all_unchanged_since_start": true,
+    "user_changed_files_since_previous_build": [
+      "thesis/front/thesis-abstracts.tex"
+    ],
+    "abstract_sha256": "adf454c08e9829992b6c42e37a5425c067145331c3e4e29da6882955e481c407"
+  },
+  "layout": {
+    "previous_pages": 100,
+    "current_pages": 101,
+    "chinese_abstract_including_keywords_pdf_pages": [
+      4,
+      5
+    ],
+    "english_abstract_body_pdf_pages": [
+      6,
+      7
+    ],
+    "english_abstract_including_keywords_pdf_pages": [
+      6,
+      7,
+      8
+    ],
+    "english_keywords_overflow_text": "tic communication, reinforcement learning",
+    "english_keywords_overflow_lines": 1,
+    "symbol_table_pdf_page": 9,
+    "toc_pdf_pages": [
+      10,
+      11,
+      12
+    ],
+    "first_body_pdf_page": 13,
+    "body_page_numbers_unchanged": true
+  },
+  "verification": {
+    "abstract_pdf_pages_visually_reviewed": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "no_missing_glyphs_clipping_or_overlap_observed": true,
+    "body_and_back_matter_unchanged_pages": 89,
+    "comparison": "MuPDF pixel comparison at 72 dpi after accounting for one added front-matter page",
+    "toc_entries_checked": 71,
+    "toc_labels_match_destinations": true,
+    "supervisor_titles_preserved": true,
+    "fatal_missing_or_overfull_messages": [],
+    "pdf_copies_identical": true
+  },
+  "status": "compiled_abstract_overflow_preserved",
+  "pending": "中文摘要共两页；英文正文两页，最后一行关键词单独占据第三页，保留自然分页。此前章节问题仍待用户方案，PDF顺序页码比2026-11-23的98页检查稿增加3。"
+}
